@@ -369,30 +369,35 @@ export default function HomeScreen({ onNavigate }) {
           </button>
         </div>
 
-        {/* 6 Point-Wise Separate Boxes */}
+        {/* 6 Point-Wise Separate Animated Boxes */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {SECURITY_POINTS.map((pt, index) => {
             const Icon = pt.icon;
             return (
               <div
                 key={pt.id}
-                className="group bg-white p-6 rounded-3xl border border-[#D4E0D5] hover:border-[#059669] transition shadow-[0_4px_16px_rgba(15,31,23,0.02)] hover:shadow-[0_12px_32px_rgba(15,31,23,0.06)] flex flex-col justify-between space-y-4"
+                onClick={() => onNavigate('check')}
+                style={{ animationDelay: `${index * 0.4}s` }}
+                className="group relative overflow-hidden bg-white p-6 rounded-3xl border border-[#D4E0D5] hover:border-[#059669] transition-all duration-300 ease-out shadow-[0_4px_16px_rgba(15,31,23,0.02)] hover:shadow-[0_20px_40px_-15px_rgba(5,150,105,0.18)] hover:-translate-y-2 active:scale-[0.98] cursor-pointer flex flex-col justify-between space-y-4 animate-float-gentle"
               >
+                {/* Top Glowing Shimmer Beam on Hover */}
+                <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-[#34D399] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
                 <div className="space-y-3.5">
                   <div className="flex items-center justify-between">
-                    <span className="font-mono text-xs font-bold text-[#059669] bg-[#E6F7EF] border border-[#A7F3D0] px-2.5 py-0.5 rounded-lg">
+                    <span className="font-mono text-xs font-bold text-[#059669] bg-[#E6F7EF] border border-[#A7F3D0] px-2.5 py-0.5 rounded-lg group-hover:bg-[#059669] group-hover:text-white group-hover:border-[#059669] transition-colors duration-300">
                       {t.pointLabel || 'Point'} 0{index + 1}
                     </span>
-                    <span className="text-[10px] font-mono font-semibold text-[#5C6B63] bg-[#F7FAF8] border border-[#E2EAE3] px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                    <span className="text-[10px] font-mono font-semibold text-[#5C6B63] bg-[#F7FAF8] border border-[#E2EAE3] px-2.5 py-0.5 rounded-full uppercase tracking-wider group-hover:border-[#A7F3D0] group-hover:text-[#047857] transition-colors duration-300">
                       {t[pt.tagKey]}
                     </span>
                   </div>
 
                   <div className="space-y-2.5">
-                    <div className="w-10 h-10 rounded-xl bg-[#E6F7EF] border border-[#A7F3D0] flex items-center justify-center text-[#059669] group-hover:bg-[#059669] group-hover:text-white transition">
-                      <Icon className="w-5 h-5" />
+                    <div className="w-10 h-10 rounded-xl bg-[#E6F7EF] border border-[#A7F3D0] flex items-center justify-center text-[#059669] group-hover:bg-[#059669] group-hover:text-white group-hover:scale-110 group-hover:rotate-[-6deg] group-hover:shadow-[0_4px_16px_rgba(5,150,105,0.3)] transition-all duration-300">
+                      <Icon className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
                     </div>
-                    <h3 className="text-base font-bold text-[#0F1F17] font-sans leading-snug">
+                    <h3 className="text-base font-bold text-[#0F1F17] font-sans leading-snug group-hover:text-[#047857] transition-colors duration-300">
                       {t[pt.titleKey]}
                     </h3>
                   </div>
@@ -404,10 +409,16 @@ export default function HomeScreen({ onNavigate }) {
 
                 <div className="pt-3 border-t border-[#EAF0EB] flex items-center justify-between text-[11px] font-mono">
                   <span className="flex items-center gap-1.5 text-[#059669] font-medium">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#059669]" />
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#34D399] opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-[#059669]" />
+                    </span>
                     <span>ZERO-TRUST GUARD</span>
                   </span>
-                  <span className="text-[#8E9C94]">100% VERIFIED</span>
+                  <span className="text-[#8E9C94] group-hover:text-[#059669] transition-colors duration-300 flex items-center gap-1 font-semibold">
+                    <span>TEST THIS SCAM</span>
+                    <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform duration-300" />
+                  </span>
                 </div>
               </div>
             );
