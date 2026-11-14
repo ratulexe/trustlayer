@@ -6,11 +6,15 @@ const fs = require('fs');
 let db = null;
 let isFirestoreConnected = false;
 
-try {
-  // Resolves from C:\trustlayer\src\config\ directly to C:\trustlayer\serviceAccountKey.json
-  const serviceAccountPath = path.resolve(__dirname, '../../serviceAccountKey.json');
+// Key file locations: project root (local dev) or Render's Secret Files folder
+const KEY_FILE_CANDIDATES = [
+  path.resolve(__dirname, '../../serviceAccountKey.json'),
+  '/etc/secrets/serviceAccountKey.json'
+];
+const serviceAccountPath = KEY_FILE_CANDIDATES.find((p) => fs.existsSync(p)) || null;
 
-  if (fs.existsSync(serviceAccountPath)) {
+try {
+  if (serviceAccountPath) {
     // 1. Initialize from local serviceAccountKey.json if present
     const serviceAccount = require(serviceAccountPath);
     if (!getApps().length) {
@@ -48,8 +52,7 @@ try {
 // (the key file wins, matching how Firestore itself is initialised above)
 let projectId = null;
 try {
-  const keyPath = path.resolve(__dirname, '../../serviceAccountKey.json');
-  if (fs.existsSync(keyPath)) projectId = require(keyPath).project_id || null;
+  if (serviceAccountPath) projectId = require(serviceAccountPath).project_id || null;
 } catch (_) {}
 if (!projectId) projectId = process.env.FIREBASE_PROJECT_ID || null;
 

@@ -93,30 +93,50 @@ Respond ONLY with valid JSON in this exact structure:
     // Model is configurable because Google retires older models for new API keys
     // (gemini-2.5-flash now returns 404 "no longer available to new users").
     const model = (process.env.GEMINI_MODEL || 'gemini-3.8-flash').replace(/^models\//, '').trim();
-    const generationConfig = { responseMimeType: 'application/json', temperature: 0.1 };
-    // 2.5 models accept thinkingBudget 0 (much faster); other models keep their default
-    if (model.startsWith('gemini-2.5')) generationConfig.thinkingConfig = { thinkingBudget: 0 };
+    const baseConfig = { responseMimeType: 'application/json', temperature: 0.1 };
+    // Keep "thinking" short: a scam verdict doesn't need long reasoning, and it is the main
+    // source of latency. 2.5 models take thinkingBudget; newer models take thinkingLevel.
+    const thinkingConfig = model.startsWith('gemini-2.5')
+      ? { thinkingBudget: 0 }
+      : { thinkingLevel: process.env.GEMINI_THINKING_LEVEL || 'low' };
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig
-        }),
-        signal: controller.signal
-      }
-    );
-
-    if (!response.ok) {
+    const callGemini = async (withThinking) => {
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: withThinking ? { ...baseConfig, thinkingConfig } : baseConfig
+          }),
+          signal: controller.signal
+        }
+      );
+      if (res.ok) return res.json();
       // Google's error body names the cause (e.g. API_KEY_INVALID) without echoing the key
-      const errBody = await response.json().catch(() => ({}));
-      throw new Error(`Gemini HTTP ${response.status} ${errBody?.error?.status || ''} ${errBody?.error?.message || ''}`.trim());
-    }
+      const errBody = await res.json().catch(() => ({}));
+      const err = new Error(`Gemini HTTP ${res.status} ${errBody?.error?.status || ''} ${errBody?.error?.message || ''}`.trim());
+      err.status = res.status;
+      throw err;
+    };
 
-    const data = await response.json();
+    const elapsed = () => performance.now() - aiStart;
+    let data;
+    try {
+      data = await callGemini(true);
+    } catch (err) {
+      if (err.status === 400 && /thinking/i.test(err.message)) {
+        // This model doesn't accept the thinking setting — retry once without it
+        data = await callGemini(false);
+      } else if ((err.status === 503 || err.status === 429) && elapsed() < timeoutMs / 2) {
+        // Temporary overload — one quick retry while there's still time left
+        await new Promise((r) => setTimeout(r, 250));
+        data = await callGemini(true);
+      } else {
+        throw err;
+      }
+    }
     // Use the answer part (skip any "thought" parts) and strip ```json fences if present
     const parts = data.candidates?.[0]?.content?.parts || [];
     const textOutput = (parts.filter((p) => !p.thought).map((p) => p.text || '').join('') || '')
