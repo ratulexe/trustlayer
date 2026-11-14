@@ -403,7 +403,8 @@ html.dark textarea::placeholder {
 }
 
 /* Header Segmented Active State */
-html.dark .bg-white.text-\[\#0F1F17\] {
+html.dark [role="group"] .bg-white.text-\[\#0F1F17\],
+html.dark [role="tablist"] .bg-white.text-\[\#0F1F17\] {
   background-color: #09110C !important;
   color: #34D399 !important;
   border-color: #1E3326 !important;
