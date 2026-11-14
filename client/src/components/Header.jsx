@@ -3,6 +3,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { PhoneCall, LogIn, LogOut, ChevronDown, Wallet, Sun, Moon, Monitor } from 'lucide-react';
+import AuthModal from './AuthModal';
 
 const THEMES = [
   { id: 'light', icon: Sun, labelKey: 'themeLight' },
@@ -94,8 +95,9 @@ function UserMenu({ onOpenMoney }) {
 
 export default function Header({ onHome, onOpenMoney }) {
   const { language, setLanguage, t } = useLanguage();
-  const { status, user, signIn, error } = useAuth();
+  const { status, user, error } = useAuth();
   const { theme, setTheme } = useTheme();
+  const [authModalMode, setAuthModalMode] = useState(null);
 
   const cycleTheme = () => {
     const i = THEMES.findIndex((item) => item.id === theme);
@@ -128,24 +130,24 @@ export default function Header({ onHome, onOpenMoney }) {
         </button>
 
         {/* Utilities */}
-        <div className="flex items-center gap-2">
-          <span className="hidden xl:inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#E6F7EF] border border-[#A7F3D0] text-[10px] font-mono text-[#047857]">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#059669] animate-pulse" />
-            <span className="font-semibold">{t.engineStatus}</span>
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          <span className="hidden 2xl:inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#E6F7EF] border border-[#A7F3D0] text-[10px] font-mono text-[#047857] whitespace-nowrap shrink-0">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#059669] animate-pulse shrink-0" />
+            <span className="font-semibold whitespace-nowrap">{t.engineStatus}</span>
           </span>
 
           <a
             href="tel:1930"
             aria-label={t.helplineAria}
-            className="flex items-center gap-1.5 h-10 px-3 rounded-xl bg-[#FFE4E6] text-[#BE123C] border border-[#FECDD3] hover:bg-[#FFD5DA] font-bold text-sm transition"
+            className="flex items-center gap-1.5 h-10 px-2.5 sm:px-3 rounded-xl bg-[#FFE4E6] text-[#BE123C] border border-[#FECDD3] hover:bg-[#FFD5DA] font-bold text-xs sm:text-sm transition whitespace-nowrap shrink-0"
           >
-            <PhoneCall className="w-4 h-4" />
-            <span className="hidden md:inline">{t.helpline}</span>
+            <PhoneCall className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <span className="hidden md:inline whitespace-nowrap">{t.helpline}</span>
             <span className="md:hidden">1930</span>
           </a>
 
           {/* Theme: segmented control on larger screens, one tap to cycle on phones */}
-          <div className="hidden sm:flex items-center bg-[#EAF0EB] p-0.5 rounded-xl border border-[#D4E0D5] text-xs font-semibold" role="group" aria-label={t.themeLabel || 'Theme'}>
+          <div className="hidden sm:flex items-center bg-[#EAF0EB] dark:bg-[#132219] p-0.5 rounded-xl border border-[#D4E0D5] dark:border-[#22382B] text-xs font-semibold shrink-0" role="group" aria-label={t.themeLabel || 'Theme'}>
             {THEMES.map(({ id, icon: Icon, labelKey }) => (
               <button
                 key={id}
@@ -154,14 +156,14 @@ export default function Header({ onHome, onOpenMoney }) {
                 aria-pressed={theme === id}
                 title={t[labelKey]}
                 aria-label={t[labelKey]}
-                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-all ${
+                className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg transition-all whitespace-nowrap shrink-0 ${
                   theme === id
-                    ? 'bg-white text-[#0F1F17] shadow-xs font-bold border border-[#D4E0D5]'
-                    : 'text-[#5C6B63] hover:text-[#0F1F17]'
+                    ? 'bg-white dark:bg-[#1E3326] text-[#0F1F17] dark:text-[#34D399] shadow-xs font-bold border border-[#D4E0D5] dark:border-transparent'
+                    : 'text-[#5C6B63] dark:text-[#9EB3A6] hover:text-[#0F1F17] dark:hover:text-white'
                 }`}
               >
-                <Icon className="w-3.5 h-3.5" />
-                <span className="hidden lg:inline">{t[labelKey]}</span>
+                <Icon className="w-3.5 h-3.5 shrink-0" />
+                <span className="hidden xl:inline text-xs whitespace-nowrap">{t[labelKey]}</span>
               </button>
             ))}
           </div>
@@ -170,13 +172,13 @@ export default function Header({ onHome, onOpenMoney }) {
             onClick={cycleTheme}
             aria-label={t.themeLabel || 'Theme'}
             title={t.themeLabel || 'Theme'}
-            className="sm:hidden h-10 w-10 flex items-center justify-center rounded-xl bg-[#EAF0EB] text-[#0F1F17] text-sm font-bold border border-[#D4E0D5]"
+            className="sm:hidden h-10 w-10 flex items-center justify-center rounded-xl bg-[#EAF0EB] dark:bg-[#132219] text-[#0F1F17] dark:text-white text-sm font-bold border border-[#D4E0D5] dark:border-[#22382B] shrink-0"
           >
             {theme === 'dark' ? <Moon className="w-4 h-4" /> : theme === 'light' ? <Sun className="w-4 h-4" /> : <Monitor className="w-4 h-4" />}
           </button>
 
           {/* Language: segmented control on larger screens, one tap to cycle on phones */}
-          <div className="hidden sm:flex items-center bg-[#EAF0EB] p-0.5 rounded-xl border border-[#D4E0D5] text-xs font-semibold" role="group" aria-label={t.languageLabel}>
+          <div className="hidden sm:flex items-center bg-[#EAF0EB] dark:bg-[#132219] p-0.5 rounded-xl border border-[#D4E0D5] dark:border-[#22382B] text-xs font-semibold shrink-0" role="group" aria-label={t.languageLabel}>
             {LANGUAGES.map((l) => (
               <button
                 key={l.code}
@@ -184,8 +186,10 @@ export default function Header({ onHome, onOpenMoney }) {
                 onClick={() => setLanguage(l.code)}
                 aria-pressed={language === l.code}
                 aria-label={l.aria}
-                className={`px-2.5 py-1.5 rounded-lg transition-all ${
-                  language === l.code ? 'bg-white text-[#0F1F17] shadow-xs font-bold border border-[#D4E0D5]' : 'text-[#5C6B63] hover:text-[#0F1F17]'
+                className={`px-2.5 py-1.5 rounded-lg transition-all whitespace-nowrap shrink-0 ${
+                  language === l.code
+                    ? 'bg-white dark:bg-[#1E3326] text-[#0F1F17] dark:text-[#34D399] shadow-xs font-bold border border-[#D4E0D5] dark:border-transparent'
+                    : 'text-[#5C6B63] dark:text-[#9EB3A6] hover:text-[#0F1F17] dark:hover:text-white'
                 }`}
               >
                 {l.label}
@@ -196,21 +200,21 @@ export default function Header({ onHome, onOpenMoney }) {
             type="button"
             onClick={cycleLanguage}
             aria-label={t.languageLabel}
-            className="sm:hidden h-10 px-3 rounded-xl bg-[#EAF0EB] text-[#0F1F17] text-sm font-bold border border-[#D4E0D5]"
+            className="sm:hidden h-10 px-3 rounded-xl bg-[#EAF0EB] dark:bg-[#132219] text-[#0F1F17] dark:text-white text-sm font-bold border border-[#D4E0D5] dark:border-[#22382B] whitespace-nowrap shrink-0"
           >
             {LANGUAGES.find((l) => l.code === language)?.label}
           </button>
 
-          {status === 'ready' && !user && (
+          {status !== 'loading' && !user && (
             <button
               type="button"
-              onClick={signIn}
-              className="flex items-center gap-1.5 h-10 px-3 sm:px-4 rounded-xl bg-[#059669] hover:bg-[#047857] text-white font-bold text-sm shadow-[0_2px_10px_rgba(5,150,105,0.25)] border border-[#047857] transition"
-              title={t.signInGoogle}
-              aria-label={t.signInGoogle}
+              onClick={() => setAuthModalMode('signin')}
+              className="flex items-center gap-1.5 h-10 px-3.5 sm:px-4 rounded-xl bg-[#059669] hover:bg-[#047857] text-white font-bold text-xs sm:text-sm shadow-[0_2px_10px_rgba(5,150,105,0.25)] border border-[#047857] transition active:scale-95 whitespace-nowrap shrink-0"
+              title={t.logIn || t.signIn}
+              aria-label={t.logIn || t.signIn}
             >
-              <LogIn className="w-4 h-4" />
-              <span className="hidden sm:inline">{t.signIn}</span>
+              <LogIn className="w-4 h-4 shrink-0" />
+              <span className="whitespace-nowrap">{t.logIn || t.signIn}</span>
             </button>
           )}
           {status === 'ready' && user && <UserMenu onOpenMoney={onOpenMoney} />}
@@ -223,6 +227,13 @@ export default function Header({ onHome, onOpenMoney }) {
           {error === 'unauthorized-domain' ? t.signInDomain : t.signInFailed}
         </div>
       )}
+
+      {/* Auth Modal (Sign In & Create Account Dialog) */}
+      <AuthModal
+        isOpen={Boolean(authModalMode)}
+        initialMode={authModalMode || 'signup'}
+        onClose={() => setAuthModalMode(null)}
+      />
     </header>
   );
 }
