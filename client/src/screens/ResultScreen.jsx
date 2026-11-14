@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import RiskGauge from '../components/RiskGauge';
+import { ShieldCheck, ShieldAlert, AlertTriangle, Ban, PhoneCall, ArrowRight, ArrowLeft } from 'lucide-react';
 
 export default function ResultScreen({ result, onProceedToPay, onReset }) {
   const { t } = useLanguage();
@@ -10,6 +11,8 @@ export default function ResultScreen({ result, onProceedToPay, onReset }) {
   const { score, verdict, reasons = [], vernacularExplanation, extractedUpi, latencyMs, engine } = result;
   const isScam = verdict === 'SCAM' || score >= 70;
   const isSafe = verdict === 'SAFE' && score < 30;
+
+  const StatusIcon = isScam ? ShieldAlert : isSafe ? ShieldCheck : AlertTriangle;
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
@@ -28,7 +31,7 @@ export default function ResultScreen({ result, onProceedToPay, onReset }) {
             : 'bg-amber-50 border-amber-200 text-amber-900'
         }`}>
           <div className="flex items-center gap-2 font-bold mb-1 font-display">
-            <span>{isScam ? '🚨' : isSafe ? '🛡️' : '⚠️'}</span>
+            <StatusIcon className="w-4 h-4 shrink-0" />
             <span>{isScam ? t.scamSubtitle : isSafe ? t.safeSubtitle : t.cautionSubtitle}</span>
           </div>
           <p className="text-xs leading-relaxed mt-1 opacity-90">
@@ -45,7 +48,7 @@ export default function ResultScreen({ result, onProceedToPay, onReset }) {
             <div className="space-y-1.5">
               {reasons.map((r, i) => (
                 <div key={i} className="flex items-start gap-2 p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-700">
-                  <span className="text-slate-400 font-bold shrink-0">•</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0 mt-1.5" />
                   <span>{r}</span>
                 </div>
               ))}
@@ -67,18 +70,19 @@ export default function ResultScreen({ result, onProceedToPay, onReset }) {
               className="w-full py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-md transition flex items-center justify-center gap-2 font-display"
             >
               <span>{t.proceedToPay}</span>
-              <span>→</span>
+              <ArrowRight className="w-4 h-4" />
             </button>
           ) : (
             <div className="space-y-2">
-              <div className="p-3 bg-rose-100/70 border border-rose-300 rounded-xl text-center text-xs text-rose-800 font-bold">
-                ⛔ Payment Blocked by TrustLayer for Consumer Protection
+              <div className="p-3 bg-rose-100/70 border border-rose-300 rounded-xl text-center text-xs text-rose-800 font-bold flex items-center justify-center gap-2">
+                <Ban className="w-4 h-4" />
+                <span>Payment Blocked by TrustLayer for Consumer Protection</span>
               </div>
               <a
                 href="tel:1930"
                 className="w-full py-3 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-800 font-bold text-xs transition flex items-center justify-center gap-2 font-display"
               >
-                <span>📞</span>
+                <PhoneCall className="w-4 h-4" />
                 <span>{t.reportScam}</span>
               </a>
             </div>
@@ -86,9 +90,10 @@ export default function ResultScreen({ result, onProceedToPay, onReset }) {
 
           <button
             onClick={onReset}
-            className="w-full py-2.5 rounded-xl text-slate-600 hover:text-slate-900 text-xs font-semibold transition"
+            className="w-full py-2.5 rounded-xl text-slate-600 hover:text-slate-900 text-xs font-semibold transition flex items-center justify-center gap-1.5"
           >
-            ← {t.backToCheck}
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>{t.backToCheck}</span>
           </button>
         </div>
 

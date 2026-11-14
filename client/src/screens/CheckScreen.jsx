@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import ScamChip from '../components/ScamChip';
+import { Clipboard, ArrowRight, Loader2, Zap, Gift, Store, X } from 'lucide-react';
 
 export default function CheckScreen({ onCheckComplete }) {
   const { language, t } = useLanguage();
@@ -53,7 +54,6 @@ export default function CheckScreen({ onCheckComplete }) {
   const loadPreset = (presetText) => {
     setInputText(presetText);
     setTimeout(() => {
-      // auto submit after small delay
       const fakeEvent = { preventDefault: () => {} };
       handleSubmit(fakeEvent);
     }, 150);
@@ -89,9 +89,10 @@ export default function CheckScreen({ onCheckComplete }) {
               <button
                 type="button"
                 onClick={() => setInputText('')}
-                className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded text-[11px] bg-slate-200 text-slate-600 hover:bg-slate-300 transition"
+                className="absolute top-2.5 right-2.5 px-2 py-1 rounded-lg text-[11px] bg-slate-200 text-slate-600 hover:bg-slate-300 transition flex items-center gap-1"
               >
-                Clear
+                <X className="w-3 h-3" />
+                <span>Clear</span>
               </button>
             )}
           </div>
@@ -102,7 +103,7 @@ export default function CheckScreen({ onCheckComplete }) {
               onClick={handlePaste}
               className="text-brand-600 hover:text-brand-700 font-semibold flex items-center gap-1.5 transition"
             >
-              <span>📋</span>
+              <Clipboard className="w-4 h-4" />
               <span>{t.pasteBtn}</span>
             </button>
             <span className="text-[11px] text-slate-400 font-mono">
@@ -123,11 +124,14 @@ export default function CheckScreen({ onCheckComplete }) {
           >
             {isLoading ? (
               <span className="flex items-center gap-2">
-                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                <Loader2 className="w-4 h-4 animate-spin" />
                 <span>{t.checking}</span>
               </span>
             ) : (
-              <span>{t.checkBtn} →</span>
+              <span className="flex items-center gap-2">
+                <span>{t.checkBtn}</span>
+                <ArrowRight className="w-4 h-4" />
+              </span>
             )}
           </button>
 
@@ -141,19 +145,19 @@ export default function CheckScreen({ onCheckComplete }) {
         </span>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
           <ScamChip
-            emoji="⚡"
+            icon={Zap}
             label="Electricity Phishing"
-            subtext="Threatens power disconnection at 9:30 PM"
+            subtext="Threatens power cut at 9:30 PM"
             onClick={() => loadPreset("Dear customer, your electricity power will be disconnected tonight at 9.30 PM from electricity office. Please immediately pay pending bill of ₹850 to powerbill@okaxis")}
           />
           <ScamChip
-            emoji="🎁"
+            icon={Gift}
             label="₹25L Lottery Scam"
-            subtext="Demands processing fee to claim prize"
+            subtext="Demands processing fee for prize"
             onClick={() => loadPreset("Congratulations! You won ₹25,00,000 in Special Lottery. To release your fund immediately transfer processing tax of ₹12,500 to lottery_reward99@okhdfc")}
           />
           <ScamChip
-            emoji="☕"
+            icon={Store}
             label="Safe Tea Vendor"
             subtext="Verified street food merchant"
             onClick={() => loadPreset("Payment for evening tea and snacks at Ramu Tea Stall. Pay ₹45 to ramu.tea@upi")}

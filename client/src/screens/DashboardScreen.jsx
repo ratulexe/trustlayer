@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { ShieldCheck, IndianRupee, Zap, AlertTriangle, History } from 'lucide-react';
 
 export default function DashboardScreen() {
   const { t } = useLanguage();
@@ -45,8 +46,8 @@ export default function DashboardScreen() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         
         <div className="bg-surface rounded-2xl p-5 border border-slate-200 shadow-card flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-xl shrink-0 border border-rose-100">
-            🛡️
+          <div className="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0 border border-rose-100">
+            <ShieldCheck className="w-6 h-6 text-rose-600" />
           </div>
           <div>
             <span className="text-xs text-slate-500 font-semibold block">{t.scamsBlocked}</span>
@@ -57,8 +58,8 @@ export default function DashboardScreen() {
         </div>
 
         <div className="bg-surface rounded-2xl p-5 border border-slate-200 shadow-card flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl shrink-0 border border-emerald-100">
-            💰
+          <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100">
+            <IndianRupee className="w-6 h-6 text-emerald-600" />
           </div>
           <div>
             <span className="text-xs text-slate-500 font-semibold block">{t.fundsProtected}</span>
@@ -69,8 +70,8 @@ export default function DashboardScreen() {
         </div>
 
         <div className="bg-surface rounded-2xl p-5 border border-slate-200 shadow-card flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center text-xl shrink-0 border border-brand-100">
-            ⚡
+          <div className="w-12 h-12 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center shrink-0 border border-brand-100">
+            <Zap className="w-6 h-6 text-brand-600" />
           </div>
           <div>
             <span className="text-xs text-slate-500 font-semibold block">{t.activeThreats}</span>
@@ -88,10 +89,13 @@ export default function DashboardScreen() {
         {/* Trending Scams */}
         <div className="bg-surface rounded-2xl p-6 border border-slate-200 shadow-card space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-            <h3 className="font-bold text-sm text-slate-900 font-display">
-              {t.trendingHeader}
-            </h3>
-            <span className="text-[10px] font-mono bg-rose-50 text-rose-700 px-2 py-0.5 rounded-full border border-rose-200">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-amber-500" />
+              <h3 className="font-bold text-sm text-slate-900 font-display">
+                {t.trendingHeader}
+              </h3>
+            </div>
+            <span className="text-[10px] font-mono bg-rose-50 text-rose-700 px-2 py-0.5 rounded-full border border-rose-200 font-bold">
               HIGH ALERT
             </span>
           </div>
@@ -119,9 +123,12 @@ export default function DashboardScreen() {
         {/* User Recent Checks */}
         <div className="bg-surface rounded-2xl p-6 border border-slate-200 shadow-card space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-            <h3 className="font-bold text-sm text-slate-900 font-display">
-              {t.recentHeader}
-            </h3>
+            <div className="flex items-center gap-2">
+              <History className="w-4 h-4 text-slate-500" />
+              <h3 className="font-bold text-sm text-slate-900 font-display">
+                {t.recentHeader}
+              </h3>
+            </div>
             <span className="text-[10px] font-mono text-slate-400">
               Local Session
             </span>
