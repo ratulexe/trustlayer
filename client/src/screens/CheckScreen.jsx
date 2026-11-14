@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useAuth } from '../contexts/AuthContext';
+import { getDeviceId } from '../utils/deviceId';
 import ScamChip from '../components/ScamChip';
 import { Clipboard, ArrowRight, Loader2, Zap, Gift, Store, X, QrCode } from 'lucide-react';
 
 export default function CheckScreen({ onCheckComplete }) {
   const { language, t } = useLanguage();
+  const auth = useAuth();
+  const authFetch = auth?.authFetch || fetch;
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -29,13 +33,13 @@ export default function CheckScreen({ onCheckComplete }) {
     setErrorMsg('');
 
     try {
-      const res = await fetch('/api/check', {
+      const res = await authFetch('/api/check', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           rawInput: inputText,
           language,
-          deviceId: 'pwa_client_web'
+          deviceId: getDeviceId()
         })
       });
 

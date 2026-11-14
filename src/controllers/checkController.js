@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const { evaluateWithGemini } = require('../engines/geminiEngine');
-const { db, isFirestoreConnected } = require('../config/firebase');
+const { db, isFirestoreConnected, verifyIdToken } = require('../config/firebase');
+const { recordCheckStat } = require('./statsController');
 
 // In-memory store for fast local checks history (synced with Firestore when enabled)
 const checkHistory = [];
@@ -28,12 +29,19 @@ async function handleCheck(req, res) {
       });
     }
 
+    // Determine owner from Bearer token if signed in, otherwise deviceId
+    const authHeader = req.headers.authorization;
+    const idToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
+    const user = await verifyIdToken(idToken);
+    const owner = user?.uid ? `uid_${user.uid}` : (deviceId || 'anon_device');
+
     const evaluation = await evaluateWithGemini({ rawInput, language });
     const checkId = `chk_${crypto.randomBytes(4).toString('hex')}`;
     const timestamp = new Date().toISOString();
 
     const record = {
       id: checkId,
+      owner,
       rawInput,
       deviceId,
       score: evaluation.score,
@@ -50,6 +58,13 @@ async function handleCheck(req, res) {
 
     checkHistory.unshift(record);
     if (checkHistory.length > 50) checkHistory.pop();
+
+    // Increment community stats counters
+    recordCheckStat({
+      verdict: record.verdict,
+      score: record.score,
+      rawInput: record.rawInput
+    });
 
     // Async write to Cloud Firestore if connected
     if (isFirestoreConnected && db) {
@@ -82,26 +97,61 @@ async function handleCheck(req, res) {
   }
 }
 
-function handleGetHistory(req, res) {
-  const { deviceId, limit = 10 } = req.query;
-  let records = checkHistory;
-  if (deviceId) {
-    records = records.filter(r => r.deviceId === deviceId);
-  }
-  const history = records.slice(0, parseInt(limit)).map(r => ({
-    checkId: r.id,
-    snippet: r.rawInput.length > 60 ? r.rawInput.substring(0, 60) + '...' : r.rawInput,
-    verdict: r.verdict,
-    score: r.score,
-    extractedUpi: r.extractedUpi,
-    date: r.timestamp
-  }));
+async function handleGetHistory(req, res) {
+  try {
+    const authHeader = req.headers.authorization;
+    const idToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
+    const user = await verifyIdToken(idToken);
+    const owner = user?.uid ? `uid_${user.uid}` : req.query.deviceId;
 
-  res.json({
-    success: true,
-    total: history.length,
-    history
-  });
+    // Reject if no owner identified (neither valid token nor deviceId)
+    if (!owner || typeof owner !== 'string' || !owner.trim()) {
+      return res.status(400).json({
+        success: false,
+        error: 'deviceId query parameter or Authorization Bearer token is required'
+      });
+    }
+
+    let records = [];
+
+    if (isFirestoreConnected && db) {
+      try {
+        const snapshot = await db.collection('checks')
+          .where('owner', '==', owner)
+          .get();
+        snapshot.forEach(doc => records.push(doc.data()));
+        // Sort descending by timestamp
+        records.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+      } catch (err) {
+        console.error('[Firestore] History query error, falling back to memory:', err.message);
+        records = checkHistory.filter(r => r.owner === owner);
+      }
+    } else {
+      records = checkHistory.filter(r => r.owner === owner);
+    }
+
+    const limit = Math.min(20, Math.max(1, parseInt(req.query.limit, 10) || 20));
+    const history = records.slice(0, limit).map(r => ({
+      checkId: r.id,
+      snippet: r.rawInput.length > 60 ? r.rawInput.substring(0, 60) + '...' : r.rawInput,
+      verdict: r.verdict,
+      score: r.score,
+      extractedUpi: r.extractedUpi,
+      date: r.timestamp
+    }));
+
+    res.json({
+      success: true,
+      total: history.length,
+      history
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      error: 'HISTORY_FETCH_FAILED',
+      message: err.message
+    });
+  }
 }
 
 module.exports = {
