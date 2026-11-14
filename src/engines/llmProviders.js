@@ -99,7 +99,7 @@ function getGeminiApiKey() {
 
 function geminiModels() {
   // Comma-separated: each model has its own free quota; Google retires models for new keys
-  return (process.env.GEMINI_MODEL || 'gemini-3.8-flash,gemini-2.5-flash-lite')
+  return (process.env.GEMINI_MODEL || 'gemini-3.8-flash,gemini-3.5-flash-lite')
     .split(',')
     .map((m) => m.replace(/^models\//, '').trim())
     .filter(Boolean);
@@ -191,9 +191,11 @@ async function grokModels(apiKey, signal) {
   if (!res.ok) throw httpError('Grok', res.status, 'model list unavailable');
   const data = await res.json();
   const ids = (data.data || data.models || []).map((m) => m.id).filter(Boolean);
-  const textModels = ids.filter((id) => /grok/i.test(id) && !/image|imagine|vision|video|voice|audio|embed/i.test(id));
+  const textModels = ids.filter((id) => /grok/i.test(id) && !/image|imagine|vision|video|voice|audio|embed|multi-agent/i.test(id));
+  // Prefer fast non-reasoning models: reasoning models are slower than our time limit and cost more
+  const fast = textModels.filter((id) => /non-reasoning|fast|mini/i.test(id));
   const rank = (id) => (/non-reasoning/i.test(id) ? 0 : 2) + (/fast|mini/i.test(id) ? 0 : 1);
-  const models = textModels.sort((a, b) => rank(a) - rank(b)).slice(0, 3);
+  const models = (fast.length ? fast : textModels).sort((a, b) => rank(a) - rank(b)).slice(0, 2);
   if (!models.length) throw new Error('Grok: no text models available for this key');
   discoveredGrokModels = { at: Date.now(), models };
   console.log(`[Grok] Using model(s): ${models.join(', ')}`);
