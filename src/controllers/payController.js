@@ -5,6 +5,8 @@ const { db, isFirestoreConnected } = require('../config/firebase');
 const { recordBlockedPaymentStat } = require('./statsController');
 
 const paymentsHistory = [];
+// UPI apps cap person-to-person payments made through links / gallery QRs at ₹2,000
+const P2P_LINK_LIMIT_INR = 2000;
 const idempotencyStore = new Map();
 
 /**
@@ -32,6 +34,7 @@ function buildUpiUri({ upiId, payeeName, amount, note, txnRef, merchantCode, isM
   const safeNote = (note || 'Payment')
     .replace(/verified/gi, '')
     .replace(/[^\w\s-]/gi, '')
+    .replace(/\s{2,}/g, ' ')
     .trim() || 'Payment';
   parts.push(`tn=${encodeURIComponent(safeNote.slice(0, 50))}`);
 
@@ -85,9 +88,9 @@ function handlePay(req, res) {
     const { 
       checkId, 
       upiId, 
-      payeeName = 'Merchant', 
+      payeeName = '', 
       amount = 100, 
-      note = 'TrustLayer Verified Pay',
+      note = 'Payment',
       merchantCode,
       idempotencyKey,
       cautionAcknowledged = false
@@ -168,11 +171,27 @@ function handlePay(req, res) {
 
     const paymentId = `pay_${crypto.randomBytes(4).toString('hex')}`;
     const txnRef = `TL${Date.now()}${crypto.randomBytes(2).toString('hex').toUpperCase()}`;
-    const cleanAmount = parseFloat(amount).toFixed(2);
+
+    const numAmount = Number(amount);
+    if (!Number.isFinite(numAmount) || numAmount <= 0 || numAmount > 100000) {
+      return res.status(400).json({ success: false, error: 'INVALID_AMOUNT', message: 'Enter an amount between ₹1 and ₹1,00,000.' });
+    }
+    const cleanAmount = numAmount.toFixed(2);
 
     // Verified merchant lookup
     const verifiedMerchant = scamDb.verifiedMerchants.find(m => m.vpa === cleanUpi);
     const isMerchant = Boolean(merchantCode || verifiedMerchant);
+
+    // NPCI rule: paying a PERSON through a payment link / intent or a QR from the gallery is capped
+    // at ₹2,000 by UPI apps (GPay, PhonePe, Paytm, BHIM). Above that the app declines, so say so up front.
+    if (!isMerchant && numAmount > P2P_LINK_LIMIT_INR) {
+      return res.status(400).json({
+        success: false,
+        error: 'P2P_LINK_LIMIT',
+        limit: P2P_LINK_LIMIT_INR,
+        message: `UPI apps allow at most ₹${P2P_LINK_LIMIT_INR.toLocaleString('en-IN')} when you pay a person through a link or a QR from the gallery. Enter ₹${P2P_LINK_LIMIT_INR.toLocaleString('en-IN')} or less.`
+      });
+    }
 
     // Build standard NPCI URI (omits tr/mc for P2P so bank switches don't reject with limit errors)
     const upiDeepLink = buildUpiUri({

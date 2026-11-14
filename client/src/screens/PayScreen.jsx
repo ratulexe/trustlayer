@@ -7,7 +7,7 @@ import { ShieldCheck, AlertTriangle, ExternalLink, ArrowLeft, CheckCircle2, Arro
 export default function PayScreen({ prefilledVpa = '', prefill = null, payContext = null, onBack }) {
   const { t } = useLanguage();
   const [upiId, setUpiId] = useState(prefilledVpa || 'grocer@okaxis');
-  const [payeeName, setPayeeName] = useState(prefill?.payeeName || 'Verified Merchant');
+  const [payeeName, setPayeeName] = useState(prefill?.payeeName || '');
   // Empty by default (shows a grey "0"); a scanned QR's amount is pre-filled
   const [amount, setAmount] = useState(prefill?.amount ? String(prefill.amount) : '');
   const [note, setNote] = useState(prefill?.note || 'Payment');
@@ -92,7 +92,7 @@ export default function PayScreen({ prefilledVpa = '', prefill = null, payContex
       if (res.ok && data.success) {
         setPaymentResult(data);
       } else {
-        setErrorMsg(data.message || 'Payment initiation rejected.');
+        setErrorMsg(data.error === 'P2P_LINK_LIMIT' ? t.p2pLimitError : data.message || 'Payment initiation rejected.');
       }
     } catch (err) {
       setErrorMsg('Failed to connect to UPI rail: ' + err.message);
@@ -150,7 +150,8 @@ export default function PayScreen({ prefilledVpa = '', prefill = null, payContex
                 type="text"
                 value={payeeName}
                 onChange={(e) => setPayeeName(e.target.value)}
-                required
+                placeholder={t.payeeNamePlaceholder}
+                maxLength={60}
                 className="w-full bg-[#F7FAF8] border border-[#D4E0D5] rounded-xl px-3 py-2.5 text-[#0F1F17] text-xs focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition"
               />
             </div>
@@ -165,9 +166,11 @@ export default function PayScreen({ prefilledVpa = '', prefill = null, payContex
                 placeholder="0"
                 inputMode="decimal"
                 min="1"
+                step="any"
                 required
                 className="w-full bg-[#F7FAF8] border border-[#D4E0D5] rounded-xl px-3 py-2.5 text-[#0F1F17] font-mono font-bold text-xs focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition"
               />
+              <p className="mt-1 text-[11px] text-[#5C6B63]">{t.p2pLimitHint}</p>
             </div>
           </div>
 
@@ -249,6 +252,7 @@ export default function PayScreen({ prefilledVpa = '', prefill = null, payContex
                   <span>{t.limitHelpTitle}</span>
                 </div>
                 <ul className="space-y-1 text-[11px] leading-relaxed text-amber-900/90 list-disc list-inside">
+                  <li>{t.limitReasonP2p}</li>
                   <li>{t.limitReasonSelf}</li>
                   <li>{t.limitReasonBank}</li>
                 </ul>
