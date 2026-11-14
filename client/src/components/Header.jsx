@@ -1,7 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
-import { PhoneCall, LogIn, LogOut, ChevronDown, Wallet } from 'lucide-react';
+import { useTheme } from '../contexts/ThemeContext';
+import { PhoneCall, LogIn, LogOut, ChevronDown, Wallet, Sun, Moon, Monitor } from 'lucide-react';
+
+const THEMES = [
+  { id: 'light', icon: Sun, labelKey: 'themeLight' },
+  { id: 'dark', icon: Moon, labelKey: 'themeDark' },
+  { id: 'system', icon: Monitor, labelKey: 'themeSystem' }
+];
 
 const LANGUAGES = [
   { code: 'en', label: 'EN', aria: 'Switch to English' },
@@ -88,6 +95,12 @@ function UserMenu({ onOpenMoney }) {
 export default function Header({ onHome, onOpenMoney }) {
   const { language, setLanguage, t } = useLanguage();
   const { status, user, signIn, error } = useAuth();
+  const { theme, setTheme } = useTheme();
+
+  const cycleTheme = () => {
+    const i = THEMES.findIndex((item) => item.id === theme);
+    setTheme(THEMES[(i + 1) % THEMES.length].id);
+  };
 
   const cycleLanguage = () => {
     const i = LANGUAGES.findIndex((l) => l.code === language);
@@ -130,6 +143,37 @@ export default function Header({ onHome, onOpenMoney }) {
             <span className="hidden md:inline">{t.helpline}</span>
             <span className="md:hidden">1930</span>
           </a>
+
+          {/* Theme: segmented control on larger screens, one tap to cycle on phones */}
+          <div className="hidden sm:flex items-center bg-[#EAF0EB] p-0.5 rounded-xl border border-[#D4E0D5] text-xs font-semibold" role="group" aria-label={t.themeLabel || 'Theme'}>
+            {THEMES.map(({ id, icon: Icon, labelKey }) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => setTheme(id)}
+                aria-pressed={theme === id}
+                title={t[labelKey]}
+                aria-label={t[labelKey]}
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-all ${
+                  theme === id
+                    ? 'bg-white text-[#0F1F17] shadow-xs font-bold border border-[#D4E0D5]'
+                    : 'text-[#5C6B63] hover:text-[#0F1F17]'
+                }`}
+              >
+                <Icon className="w-3.5 h-3.5" />
+                <span className="hidden lg:inline">{t[labelKey]}</span>
+              </button>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={cycleTheme}
+            aria-label={t.themeLabel || 'Theme'}
+            title={t.themeLabel || 'Theme'}
+            className="sm:hidden h-10 w-10 flex items-center justify-center rounded-xl bg-[#EAF0EB] text-[#0F1F17] text-sm font-bold border border-[#D4E0D5]"
+          >
+            {theme === 'dark' ? <Moon className="w-4 h-4" /> : theme === 'light' ? <Sun className="w-4 h-4" /> : <Monitor className="w-4 h-4" />}
+          </button>
 
           {/* Language: segmented control on larger screens, one tap to cycle on phones */}
           <div className="hidden sm:flex items-center bg-[#EAF0EB] p-0.5 rounded-xl border border-[#D4E0D5] text-xs font-semibold" role="group" aria-label={t.languageLabel}>

@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
 import {
@@ -14,7 +13,10 @@ import {
   CpuIcon,
   LockIcon
 } from '../components/Icons';
-import { Search, CreditCard, Wallet, Activity, Store, BarChart3, ArrowRight, KeyRound, Ban, PhoneCall } from 'lucide-react';
+import {
+  Search, CreditCard, Wallet, Activity, Store, BarChart3, ArrowRight,
+  KeyRound, PhoneCall, Link, ShieldAlert, Landmark, Clock, Smartphone
+} from 'lucide-react';
 
 // Home = the redesign's landing page (hero, architecture, closing CTA) plus the feature
 // hub and golden rules, so every feature is reachable from the page body.
@@ -27,10 +29,49 @@ const FEATURES = [
   { id: 'inclusion', icon: Store, titleKey: 'navInclusion', descKey: 'feat_inclusion_desc', tone: 'bg-[#E0F2FE] text-[#0369A1] border-[#BAE6FD]' }
 ];
 
-const RULES = [
-  { key: 'rule1', icon: KeyRound },
-  { key: 'rule2', icon: Ban },
-  { key: 'rule3', icon: PhoneCall }
+const SECURITY_POINTS = [
+  {
+    id: 'link',
+    icon: Link,
+    tagKey: 'secPoint1Tag',
+    titleKey: 'secPoint1Title',
+    descKey: 'secPoint1Desc'
+  },
+  {
+    id: 'pin',
+    icon: KeyRound,
+    tagKey: 'secPoint2Tag',
+    titleKey: 'secPoint2Title',
+    descKey: 'secPoint2Desc'
+  },
+  {
+    id: 'vpa',
+    icon: Landmark,
+    tagKey: 'secPoint3Tag',
+    titleKey: 'secPoint3Title',
+    descKey: 'secPoint3Desc'
+  },
+  {
+    id: 'urgency',
+    icon: Clock,
+    tagKey: 'secPoint4Tag',
+    titleKey: 'secPoint4Title',
+    descKey: 'secPoint4Desc'
+  },
+  {
+    id: 'screen',
+    icon: Smartphone,
+    tagKey: 'secPoint5Tag',
+    titleKey: 'secPoint5Title',
+    descKey: 'secPoint5Desc'
+  },
+  {
+    id: 'helpline',
+    icon: PhoneCall,
+    tagKey: 'secPoint6Tag',
+    titleKey: 'secPoint6Title',
+    descKey: 'secPoint6Desc'
+  }
 ];
 
 export default function HomeScreen({ onNavigate }) {
@@ -187,10 +228,8 @@ export default function HomeScreen({ onNavigate }) {
             <div className="absolute w-64 h-64 sm:w-80 sm:h-80 rounded-full bg-gradient-to-tr from-[#A7F3D0]/40 to-[#E6F7EF] blur-2xl pointer-events-none" />
 
             {/* Central Elevated Shield Preview Card */}
-            <motion.div 
-              animate={{ y: [0, -6, 0] }}
-              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-              className="relative z-10 w-full max-w-sm bg-white rounded-3xl p-6 border border-[#D4E0D5] shadow-[0_12px_36px_rgba(15,31,23,0.06),0_2px_8px_rgba(15,31,23,0.03)] space-y-4"
+            <div 
+              className="relative z-10 w-full max-w-sm bg-white rounded-3xl p-6 border border-[#D4E0D5] shadow-[0_12px_36px_rgba(15,31,23,0.06),0_2px_8px_rgba(15,31,23,0.03)] space-y-4 animate-float-gentle"
             >
               {/* Card Header */}
               <div className="flex items-center justify-between border-b border-[#E2EAE3] pb-3">
@@ -250,7 +289,7 @@ export default function HomeScreen({ onNavigate }) {
                 <span>DUAL ENGINE: HEURISTICS + GEMINI</span>
                 <span className="text-[#059669] font-bold">99.8% ACCURACY</span>
               </div>
-            </motion.div>
+            </div>
 
             {/* Small Floating Micro-Card (Top Right) */}
             <div className="absolute -top-3 right-0 sm:-right-2 z-20 animate-float-gentle hidden sm:block">
@@ -303,18 +342,88 @@ export default function HomeScreen({ onNavigate }) {
         </div>
       </section>
 
-      {/* Golden rules */}
-      <section className="space-y-5">
-        <h2 className="font-serif-editorial text-3xl sm:text-4xl text-[#0F1F17]">{t.rulesHeader}</h2>
-        <ol className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {RULES.map(({ key, icon: Icon }, i) => (
-            <li key={key} className="sage-card rounded-2xl p-5 flex items-start gap-3">
-              <span className="w-9 h-9 shrink-0 rounded-full bg-[#FEF3C7] text-[#B45309] flex items-center justify-center font-bold text-sm">{i + 1}</span>
-              <span className="text-sm text-[#0F1F17] leading-relaxed flex-1">{t[key]}</span>
-              <Icon className="w-5 h-5 text-[#F59E0B] shrink-0" aria-hidden="true" />
-            </li>
-          ))}
-        </ol>
+      {/* Point-wise Security & Cyber Crime Advisory Section */}
+      <section className="space-y-6 sm:space-y-8">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 border-b border-[#D4E0D5]/70 pb-5">
+          <div className="space-y-2 max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFE4E6] border border-[#FECDD3] text-[10px] font-mono text-[#BE123C] uppercase tracking-wider font-semibold">
+              <ShieldAlert className="w-3.5 h-3.5 text-[#BE123C]" />
+              <span>{t.securityAdvisoryTag || 'CYBER CRIME & FRAUD ADVISORY'}</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#BE123C] animate-pulse" />
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-serif-editorial text-[#0F1F17] tracking-tight">
+              {t.securityChecklistTitle || 'Security Rules & Scam Defense Guide'}
+            </h2>
+            <p className="text-xs sm:text-sm text-[#5C6B63] leading-relaxed">
+              {t.securityChecklistSub || 'Essential rules verified by Cyber Crime Cell — remember these before clicking or paying:'}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => onNavigate('check')}
+            className="self-start sm:self-auto px-5 py-3 rounded-xl bg-[#059669] hover:bg-[#047857] text-white font-bold text-xs sm:text-sm shadow-[0_4px_16px_rgba(5,150,105,0.2)] hover:-translate-y-0.5 active:translate-y-0 transition flex items-center gap-2 shrink-0 font-sans cursor-pointer"
+          >
+            <Search className="w-4 h-4" />
+            <span>{t.homeCta}</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* 6 Point-Wise Separate Animated Boxes */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {SECURITY_POINTS.map((pt, index) => {
+            const Icon = pt.icon;
+            return (
+              <div
+                key={pt.id}
+                onClick={() => onNavigate('check')}
+                style={{ animationDelay: `${index * 0.4}s` }}
+                className="group relative overflow-hidden bg-white p-6 rounded-3xl border border-[#D4E0D5] hover:border-[#059669] transition-all duration-300 ease-out shadow-[0_4px_16px_rgba(15,31,23,0.02)] hover:shadow-[0_20px_40px_-15px_rgba(5,150,105,0.18)] hover:-translate-y-2 active:scale-[0.98] cursor-pointer flex flex-col justify-between space-y-4 animate-float-gentle"
+              >
+                {/* Top Glowing Shimmer Beam on Hover */}
+                <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-[#34D399] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+                <div className="space-y-3.5">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-xs font-bold text-[#059669] bg-[#E6F7EF] border border-[#A7F3D0] px-2.5 py-0.5 rounded-lg group-hover:bg-[#059669] group-hover:text-white group-hover:border-[#059669] transition-colors duration-300">
+                      {t.pointLabel || 'Point'} 0{index + 1}
+                    </span>
+                    <span className="text-[10px] font-mono font-semibold text-[#5C6B63] bg-[#F7FAF8] border border-[#E2EAE3] px-2.5 py-0.5 rounded-full uppercase tracking-wider group-hover:border-[#A7F3D0] group-hover:text-[#047857] transition-colors duration-300">
+                      {t[pt.tagKey]}
+                    </span>
+                  </div>
+
+                  <div className="space-y-2.5">
+                    <div className="w-10 h-10 rounded-xl bg-[#E6F7EF] border border-[#A7F3D0] flex items-center justify-center text-[#059669] group-hover:bg-[#059669] group-hover:text-white group-hover:scale-110 group-hover:rotate-[-6deg] group-hover:shadow-[0_4px_16px_rgba(5,150,105,0.3)] transition-all duration-300">
+                      <Icon className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
+                    </div>
+                    <h3 className="text-base font-bold text-[#0F1F17] font-sans leading-snug group-hover:text-[#047857] transition-colors duration-300">
+                      {t[pt.titleKey]}
+                    </h3>
+                  </div>
+
+                  <p className="text-xs sm:text-sm text-[#5C6B63] leading-relaxed">
+                    {t[pt.descKey]}
+                  </p>
+                </div>
+
+                <div className="pt-3 border-t border-[#EAF0EB] flex items-center justify-between text-[11px] font-mono">
+                  <span className="flex items-center gap-1.5 text-[#059669] font-medium">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#34D399] opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-[#059669]" />
+                    </span>
+                    <span>ZERO-TRUST GUARD</span>
+                  </span>
+                  <span className="text-[#8E9C94] group-hover:text-[#059669] transition-colors duration-300 flex items-center gap-1 font-semibold">
+                    <span>TEST THIS SCAM</span>
+                    <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform duration-300" />
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </section>
 
       {/* ========================================================================= */}

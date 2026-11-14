@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
 import { getDeviceId, fillTemplate } from '../utils/deviceId';
@@ -239,19 +238,14 @@ export default function CheckScreen({ onCheckComplete, prefilledText = '' }) {
   return (
     <div className="space-y-8 sm:space-y-10 pb-8">
       {/* Toast Notification */}
-      <AnimatePresence>
-        {toastMsg && (
-          <motion.div
-            initial={{ opacity: 0, y: -20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -20, scale: 0.95 }}
-            className="fixed top-24 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 bg-[#0F1F17] text-white text-xs font-mono rounded-xl shadow-lg border border-[#059669]/30 flex items-center gap-2"
-          >
-            <span className="w-2 h-2 rounded-full bg-[#A7F3D0] animate-pulse" />
-            <span>{toastMsg}</span>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {toastMsg && (
+        <div
+          className="fixed top-24 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 bg-[#0F1F17] text-white text-xs font-mono rounded-xl shadow-lg border border-[#059669]/30 flex items-center gap-2 animate-bounce-in transition-all"
+        >
+          <span className="w-2 h-2 rounded-full bg-[#A7F3D0] animate-pulse" />
+          <span>{toastMsg}</span>
+        </div>
+      )}
 
       <div className="space-y-2">
         <h1 className="font-serif-editorial text-3xl sm:text-5xl text-[#0F1F17]">{t.checkTitle}</h1>

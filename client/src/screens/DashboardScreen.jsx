@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
 import { getDeviceId, formatInr } from '../utils/deviceId';
-import { ShieldCheck, IndianRupee, Zap, AlertTriangle, History, Flag } from 'lucide-react';
+import { ShieldCheck, IndianRupee, Zap, AlertTriangle, History, Flag, BookOpen, Link, KeyRound, AlertOctagon, PhoneCall } from 'lucide-react';
 
 export default function DashboardScreen() {
   const { t } = useLanguage();
@@ -197,6 +197,103 @@ export default function DashboardScreen() {
         </div>
 
       </div>
+
+      {/* Cyber Security Advisories & Scam Defense Section */}
+      <section className="bg-surface rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-card space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 border-b border-slate-100 pb-3">
+          <div className="flex items-center gap-2">
+            <BookOpen className="w-5 h-5 text-brand-600 shrink-0" />
+            <h3 className="font-bold text-base text-slate-900 font-display">
+              {t.advisoryTitle || 'Cyber Security Advisories & Scam Defense'}
+            </h3>
+          </div>
+          <span className="text-xs text-slate-500">
+            {t.advisorySub || 'Essential rules to protect yourself against online fraud'}
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+          {/* Tip 1: Never Click Random Links */}
+          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5 hover:border-slate-300 transition">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="w-7 h-7 rounded-lg bg-rose-50 text-rose-600 border border-rose-100 flex items-center justify-center shrink-0">
+                  <Link className="w-3.5 h-3.5" />
+                </span>
+                <span className="font-bold text-xs sm:text-sm text-slate-900 font-display truncate">
+                  {t.tipLinkTitle || 'Do not click random links in SMS or WhatsApp'}
+                </span>
+              </div>
+              <span className="text-[10px] font-mono font-bold text-rose-700 bg-rose-100/70 px-1.5 py-0.5 rounded shrink-0">
+                {t.tipLinkTag || 'NEVER CLICK'}
+              </span>
+            </div>
+            <p className="text-xs text-slate-600 leading-relaxed pl-9">
+              {t.tipLinkDesc}
+            </p>
+          </div>
+
+          {/* Tip 2: No PIN for Receiving Money */}
+          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5 hover:border-slate-300 transition">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 border border-amber-100 flex items-center justify-center shrink-0">
+                  <KeyRound className="w-3.5 h-3.5" />
+                </span>
+                <span className="font-bold text-xs sm:text-sm text-slate-900 font-display truncate">
+                  {t.tipPinTitle || 'You never need a UPI PIN to receive money'}
+                </span>
+              </div>
+              <span className="text-[10px] font-mono font-bold text-amber-700 bg-amber-100/70 px-1.5 py-0.5 rounded shrink-0">
+                {t.tipPinTag || 'NO PIN'}
+              </span>
+            </div>
+            <p className="text-xs text-slate-600 leading-relaxed pl-9">
+              {t.tipPinDesc}
+            </p>
+          </div>
+
+          {/* Tip 3: Beware of Artificial Urgency */}
+          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5 hover:border-slate-300 transition">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="w-7 h-7 rounded-lg bg-indigo-50 text-brand-600 border border-indigo-100 flex items-center justify-center shrink-0">
+                  <AlertOctagon className="w-3.5 h-3.5" />
+                </span>
+                <span className="font-bold text-xs sm:text-sm text-slate-900 font-display truncate">
+                  {t.tipUrgencyTitle || 'Beware of artificial panic and countdowns'}
+                </span>
+              </div>
+              <span className="text-[10px] font-mono font-bold text-brand-700 bg-brand-50 px-1.5 py-0.5 rounded shrink-0">
+                {t.tipUrgencyTag || 'FAKE URGENCY'}
+              </span>
+            </div>
+            <p className="text-xs text-slate-600 leading-relaxed pl-9">
+              {t.tipUrgencyDesc}
+            </p>
+          </div>
+
+          {/* Tip 4: Golden Hour 1930 */}
+          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5 hover:border-slate-300 transition">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center shrink-0">
+                  <PhoneCall className="w-3.5 h-3.5" />
+                </span>
+                <span className="font-bold text-xs sm:text-sm text-slate-900 font-display truncate">
+                  {t.tipHelplineTitle || 'Report immediately to National Cyber Cell (1930)'}
+                </span>
+              </div>
+              <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-100/70 px-1.5 py-0.5 rounded shrink-0">
+                {t.tipHelplineTag || 'GOLDEN HOUR'}
+              </span>
+            </div>
+            <p className="text-xs text-slate-600 leading-relaxed pl-9">
+              {t.tipHelplineDesc}
+            </p>
+          </div>
+        </div>
+      </section>
 
     </div>
   );

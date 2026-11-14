@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { ThemeProvider } from './contexts/ThemeContext';
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
 import { AuthProvider } from './contexts/AuthContext';
 import Header from './components/Header';
@@ -162,10 +163,12 @@ function MainApp() {
 
 export default function App() {
   return (
-    <LanguageProvider>
-      <AuthProvider>
-        <MainApp />
-      </AuthProvider>
-    </LanguageProvider>
+    <ThemeProvider>
+      <LanguageProvider>
+        <AuthProvider>
+          <MainApp />
+        </AuthProvider>
+      </LanguageProvider>
+    </ThemeProvider>
   );
 }
