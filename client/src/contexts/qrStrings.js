@@ -55,7 +55,10 @@ export const QR_STRINGS = {
     limitHelpTitle: "Bank says 'Your money was not debited / Check UPI limit'?",
     limitReasonSelf: "Self-transfer: UPI does not permit sending money to your own UPI ID or account via intent links.",
     limitReasonBank: "Daily Bank Limit: Most banks cap UPI transfers at ₹1 Lakh/day or 20 transfers/day (₹5,000 in first 24h of a new account).",
-    limitFix: "To complete payment: Try selecting a different bank account in your UPI app, test with a different person's QR instead of your own, or copy the UPI ID above to pay directly."
+    limitFix: "To complete payment: Try selecting a different bank account in your UPI app, test with a different person's QR instead of your own, or copy the UPI ID above to pay directly.",
+    qrDesktopModalTitle: "Please Continue with a mobile device",
+    qrDesktopModalSub: "Live camera QR scanning works best on a smartphone. Switch to your mobile browser to scan a QR code, or upload a QR image below.",
+    qrDesktopGotIt: "Got it"
   },
   hi: {
     qrScanBtn: 'UPI QR कोड स्कैन करें',
@@ -112,7 +115,10 @@ export const QR_STRINGS = {
     limitHelpTitle: "बैंक कह रहा है 'Your money was not debited / Check UPI limit'?",
     limitReasonSelf: "स्वयं का खाता: UPI डीप-लिंक से अपने ही UPI ID या बैंक खाते में पैसे भेजने की अनुमति नहीं देता।",
     limitReasonBank: "दैनिक बैंक सीमा: अधिकांश बैंक UPI को ₹1 लाख/दिन या 20 लेन-देन/दिन (नया खाता जोड़ने पर पहले 24 घंटे में ₹5,000) तक सीमित करते हैं।",
-    limitFix: "भुगतान करने के लिए: अपने UPI ऐप में दूसरा बैंक खाता चुनें, अपने स्वयं के QR के बजाय किसी अन्य व्यक्ति के QR पर परीक्षण करें, या ऊपर दिए गए UPI ID को कॉपी करके सीधे भुगतान करें।"
+    limitFix: "भुगतान करने के लिए: अपने UPI ऐप में दूसरा बैंक खाता चुनें, अपने स्वयं के QR के बजाय किसी अन्य व्यक्ति के QR पर परीक्षण करें, या ऊपर दिए गए UPI ID को कॉपी करके सीधे भुगतान करें।",
+    qrDesktopModalTitle: "कृपया मोबाइल डिवाइस से आगे बढ़ें",
+    qrDesktopModalSub: "लाइव कैमरा QR स्कैनिंग स्मार्टफ़ोन पर सबसे अच्छा काम करती है। QR कोड स्कैन करने के लिए अपने मोबाइल ब्राउज़र पर जाएं, या नीचे QR इमेज अपलोड करें।",
+    qrDesktopGotIt: "समझ गए"
   },
   bn: {
     qrScanBtn: 'UPI QR কোড স্ক্যান করুন',
@@ -169,6 +175,9 @@ export const QR_STRINGS = {
     limitHelpTitle: "ব্যাংক বলছে 'Your money was not debited / Check UPI limit'?",
     limitReasonSelf: "নিজের অ্যাকাউন্ট: UPI ডিপ-লিংক দিয়ে নিজের UPI ID বা নিজের অ্যাকাউন্টে টাকা পাঠানো যায় না।",
     limitReasonBank: "দৈনিক ব্যাংক সীমা: অধিকাংশ ব্যাংক UPI দিনে সর্বোচ্চ ₹১ লাখ বা ২০টি লেনদেনে সীমাবদ্ধ করে (নতুন অ্যাকাউন্টের প্রথম ২৪ ঘণ্টায় ₹৫,০০০)।",
-    limitFix: "পেমেন্ট সম্পন্ন করতে: আপনার UPI অ্যাপে অন্য ব্যাংক অ্যাকাউন্ট বেছে নিন, নিজের QR-এর বদলে অন্য কারো QR দিয়ে পরীক্ষা করুন, বা উপরে দেওয়া UPI ID কপি করে সরাসরি পেমেন্ট করুন।"
+    limitFix: "পেমেন্ট সম্পন্ন করতে: আপনার UPI অ্যাপে অন্য ব্যাংক অ্যাকাউন্ট বেছে নিন, নিজের QR-এর বদলে অন্য কারো QR দিয়ে পরীক্ষা করুন, বা উপরে দেওয়া UPI ID কপি করে সরাসরি পেমেন্ট করুন।",
+    qrDesktopModalTitle: "দয়া করে মোবাইল ডিভাইস ব্যবহার করুন",
+    qrDesktopModalSub: "লাইভ ক্যামেরা QR স্ক্যানিং স্মার্টফোনে সবচেয়ে ভালো কাজ করে। QR কোড স্ক্যান করতে আপনার মোবাইল ব্রাউজারে যান, অথবা নিচে QR ছবি আপলোড করুন।",
+    qrDesktopGotIt: "বুঝেছি"
   }
 };

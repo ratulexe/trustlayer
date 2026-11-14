@@ -3,7 +3,8 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
 import { getDeviceId, fillTemplate } from '../utils/deviceId';
 import QrScanner from '../components/QrScanner';
-import { ScanLine, QrCode } from 'lucide-react';
+import { ScanLine, QrCode, Smartphone, ImageUp, X, Loader2 } from 'lucide-react';
+import { isMobileDevice } from '../utils/deviceDetect';
 import {
   ClipboardIcon,
   ShieldCheckIcon,
@@ -56,8 +57,12 @@ export default function CheckScreen({ onCheckComplete, prefilledText = '' }) {
   const [activeScenarioId, setActiveScenarioId] = useState(null);
   const [showScanner, setShowScanner] = useState(false);
   const [showDemoQrs, setShowDemoQrs] = useState(false);
+  const [showDesktopModal, setShowDesktopModal] = useState(false);
+  const [desktopUploadError, setDesktopUploadError] = useState('');
+  const [isDecodingQr, setIsDecodingQr] = useState(false);
   const textareaRef = useRef(null);
   const inspectorCardRef = useRef(null);
+  const desktopFileInputRef = useRef(null);
 
   useEffect(() => {
     if (prefilledText) {
@@ -223,6 +228,63 @@ export default function CheckScreen({ onCheckComplete, prefilledText = '' }) {
     });
   };
 
+  // Close desktop QR modal on Escape
+  useEffect(() => {
+    if (!showDesktopModal) return;
+    const onKey = (e) => {
+      if (e.key === 'Escape') setShowDesktopModal(false);
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [showDesktopModal]);
+
+  const handleOpenScanner = () => {
+    if (isMobileDevice()) {
+      setShowScanner(true);
+    } else {
+      setDesktopUploadError('');
+      setShowDesktopModal(true);
+    }
+  };
+
+  const handleDesktopFileUpload = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    setDesktopUploadError('');
+    setIsDecodingQr(true);
+
+    try {
+      if (typeof window === 'undefined' || !('BarcodeDetector' in window)) {
+        setDesktopUploadError(t.qrUnsupported || "This browser cannot decode QR codes. Please paste the UPI ID or payment link directly.");
+        setIsDecodingQr(false);
+        return;
+      }
+
+      const formats = await window.BarcodeDetector.getSupportedFormats();
+      if (!formats.includes('qr_code')) {
+        setDesktopUploadError(t.qrUnsupported || "QR code detection is not supported in this browser.");
+        setIsDecodingQr(false);
+        return;
+      }
+
+      const detector = new window.BarcodeDetector({ formats: ['qr_code'] });
+      const bitmap = await createImageBitmap(file);
+      const codes = await detector.detect(bitmap);
+
+      if (codes && codes.length > 0 && codes[0].rawValue) {
+        setShowDesktopModal(false);
+        handleScanQr(codes[0].rawValue);
+      } else {
+        setDesktopUploadError(t.qrNoneInPhoto || 'No QR code found in that photo. Try a clearer, closer picture.');
+      }
+    } catch {
+      setDesktopUploadError(t.qrNoneInPhoto || 'No QR code found in that photo. Try a clearer, closer picture.');
+    } finally {
+      setIsDecodingQr(false);
+    }
+  };
+
   const handleKeyDown = (e) => {
     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
       handleSubmit(e);
@@ -256,9 +318,9 @@ export default function CheckScreen({ onCheckComplete, prefilledText = '' }) {
       {/* Real camera QR scan */}
       <button
         type="button"
-        onClick={() => setShowScanner(true)}
+        onClick={handleOpenScanner}
         disabled={isLoading}
-        className="w-full rounded-3xl p-5 sm:p-6 bg-[#059669] hover:bg-[#047857] disabled:opacity-60 text-white border border-[#047857] shadow-[0_4px_16px_rgba(5,150,105,0.25)] transition flex items-center gap-4 text-left"
+        className="w-full rounded-3xl p-5 sm:p-6 bg-[#059669] hover:bg-[#047857] disabled:opacity-60 text-white border border-[#047857] shadow-[0_4px_16px_rgba(5,150,105,0.25)] transition flex items-center gap-4 text-left cursor-pointer"
       >
         <span className="w-12 h-12 shrink-0 rounded-2xl bg-white/15 border border-white/25 flex items-center justify-center">
           <ScanLine className="w-6 h-6" />
@@ -270,7 +332,97 @@ export default function CheckScreen({ onCheckComplete, prefilledText = '' }) {
         <ArrowRightIcon className="w-5 h-5 shrink-0" />
       </button>
 
+      {/* Mobile camera scanner */}
       {showScanner && <QrScanner onResult={handleScanQr} onClose={() => setShowScanner(false)} />}
+
+      {/* Desktop / PC Continue on Mobile Modal */}
+      {showDesktopModal && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="desktop-qr-modal-title"
+          onClick={() => setShowDesktopModal(false)}
+          className="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-sm flex items-center justify-center p-4"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-md bg-white dark:bg-[#071711] text-[#0F1F17] dark:text-slate-100 rounded-3xl p-6 sm:p-8 border border-[#D4E0D5] dark:border-emerald-500/25 shadow-2xl relative text-center"
+          >
+            {/* Close 'X' Button */}
+            <button
+              type="button"
+              onClick={() => setShowDesktopModal(false)}
+              aria-label={t.qrClose || 'Close'}
+              className="absolute top-4 right-4 sm:top-5 sm:right-5 w-9 h-9 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {/* Smartphone / QR Icon Badge */}
+            <div className="w-16 h-16 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 text-emerald-600 dark:text-[#00F5A0] flex items-center justify-center mx-auto mb-5 shadow-xs relative">
+              <Smartphone className="w-8 h-8 stroke-[1.8]" />
+              <span className="absolute -bottom-1 -right-1 w-6 h-6 rounded-lg bg-emerald-600 text-white dark:bg-[#00F5A0] dark:text-teal-950 border-2 border-white dark:border-[#071711] flex items-center justify-center shadow-xs">
+                <QrCode className="w-3.5 h-3.5" />
+              </span>
+            </div>
+
+            {/* Headline */}
+            <h3 id="desktop-qr-modal-title" className="text-xl sm:text-2xl font-bold font-display text-[#0F1F17] dark:text-white leading-snug mb-2.5">
+              {t.qrDesktopModalTitle || 'Please Continue with a mobile device'}
+            </h3>
+
+            {/* Subtitle */}
+            <p className="text-sm text-[#5C6B63] dark:text-slate-300 leading-relaxed mb-6 max-w-sm mx-auto">
+              {t.qrDesktopModalSub || 'Live camera QR scanning works best on a smartphone. Switch to your mobile browser to scan a QR code, or upload a QR image below.'}
+            </p>
+
+            {/* File Upload Error (if any) */}
+            {desktopUploadError && (
+              <div role="alert" className="mb-4 text-xs font-medium text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-500/30 rounded-xl px-3.5 py-2.5 text-center">
+                {desktopUploadError}
+              </div>
+            )}
+
+            {/* Hidden File Input */}
+            <input
+              ref={desktopFileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleDesktopFileUpload}
+              className="hidden"
+            />
+
+            {/* Secondary Action: Upload Image */}
+            <button
+              type="button"
+              onClick={() => desktopFileInputRef.current?.click()}
+              disabled={isDecodingQr}
+              className="w-full h-12 rounded-xl border border-emerald-600/30 dark:border-emerald-400/40 bg-emerald-50/70 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 font-semibold text-sm flex items-center justify-center gap-2.5 transition cursor-pointer mb-3 disabled:opacity-50"
+            >
+              {isDecodingQr ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin text-emerald-600 dark:text-[#00F5A0]" />
+                  <span>{t.qrUploading || 'Decoding QR image...'}</span>
+                </>
+              ) : (
+                <>
+                  <ImageUp className="w-4 h-4 text-emerald-600 dark:text-[#00F5A0]" />
+                  <span>{t.qrUpload || 'Upload a photo of the QR instead'}</span>
+                </>
+              )}
+            </button>
+
+            {/* Primary Action: Got it */}
+            <button
+              type="button"
+              onClick={() => setShowDesktopModal(false)}
+              className="w-full h-12 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm shadow-sm hover:shadow transition flex items-center justify-center cursor-pointer"
+            >
+              <span>{t.qrDesktopGotIt || 'Got it'}</span>
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ========================================================================= */}
       {/* 2. PREMIUM SCAM CHECK INTERFACE: CRISP SAGE-BORDERED WHITE CARD */}
