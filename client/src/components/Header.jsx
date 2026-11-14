@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
-import { PhoneCall, LogIn, LogOut, ChevronDown, Wallet, Sun, Moon, Monitor, UserPlus } from 'lucide-react';
+import { PhoneCall, LogIn, LogOut, ChevronDown, Wallet, Sun, Moon, Monitor } from 'lucide-react';
 import AuthModal from './AuthModal';
 
 const THEMES = [
@@ -206,31 +206,16 @@ export default function Header({ onHome, onOpenMoney }) {
           </button>
 
           {status !== 'loading' && !user && (
-            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-              {/* Sign In Box */}
-              <button
-                type="button"
-                onClick={() => setAuthModalMode('signin')}
-                className="flex items-center gap-1.5 h-10 px-3 sm:px-3.5 rounded-xl bg-white dark:bg-[#132219] hover:bg-[#EAF0EB] dark:hover:bg-[#1A2E22] text-[#0F1F17] dark:text-white font-bold text-xs sm:text-sm border border-[#D4E0D5] dark:border-[#22382B] shadow-xs transition active:scale-95 whitespace-nowrap shrink-0"
-                title={t.signIn}
-                aria-label={t.signIn}
-              >
-                <LogIn className="w-4 h-4 text-[#059669] dark:text-[#34D399] shrink-0" />
-                <span className="whitespace-nowrap">{t.signIn}</span>
-              </button>
-
-              {/* Create Account Box */}
-              <button
-                type="button"
-                onClick={() => setAuthModalMode('signup')}
-                className="flex items-center gap-1.5 h-10 px-3 sm:px-4 rounded-xl bg-[#059669] hover:bg-[#047857] text-white font-bold text-xs sm:text-sm shadow-[0_2px_10px_rgba(5,150,105,0.25)] border border-[#047857] transition active:scale-95 whitespace-nowrap shrink-0"
-                title={t.createAccount}
-                aria-label={t.createAccount}
-              >
-                <UserPlus className="w-4 h-4 shrink-0" />
-                <span className="whitespace-nowrap">{t.createAccount}</span>
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => setAuthModalMode('signin')}
+              className="flex items-center gap-1.5 h-10 px-3.5 sm:px-4 rounded-xl bg-[#059669] hover:bg-[#047857] text-white font-bold text-xs sm:text-sm shadow-[0_2px_10px_rgba(5,150,105,0.25)] border border-[#047857] transition active:scale-95 whitespace-nowrap shrink-0"
+              title={t.logIn || t.signIn}
+              aria-label={t.logIn || t.signIn}
+            >
+              <LogIn className="w-4 h-4 shrink-0" />
+              <span className="whitespace-nowrap">{t.logIn || t.signIn}</span>
+            </button>
           )}
           {status === 'ready' && user && <UserMenu onOpenMoney={onOpenMoney} />}
           {status === 'loading' && <span className="w-10 h-10 rounded-full bg-[#EAF0EB] animate-pulse" aria-hidden="true" />}
