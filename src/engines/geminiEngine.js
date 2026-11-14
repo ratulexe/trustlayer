@@ -104,11 +104,21 @@ Respond ONLY with valid JSON in this exact structure:
     );
 
     if (!response.ok) {
-      throw new Error(`Gemini HTTP Error: ${response.status}`);
+      // Google's error body names the cause (e.g. API_KEY_INVALID) without echoing the key
+      const errBody = await response.json().catch(() => ({}));
+      throw new Error(`Gemini HTTP ${response.status} ${errBody?.error?.status || ''} ${errBody?.error?.message || ''}`.trim());
     }
 
     const data = await response.json();
-    const textOutput = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    // Use the answer part (skip any "thought" parts) and strip ```json fences if present
+    const parts = data.candidates?.[0]?.content?.parts || [];
+    const textOutput = (parts.filter((p) => !p.thought).map((p) => p.text || '').join('') || '')
+      .trim()
+      .replace(/^```(?:json)?\s*/i, '')
+      .replace(/\s*```$/, '');
+    if (!textOutput) {
+      throw new Error(`Gemini returned no text (finishReason: ${data.candidates?.[0]?.finishReason || 'unknown'})`);
+    }
     const aiParsed = JSON.parse(textOutput);
 
     // Compute finalScore strictly from Math.max(ruleResult.score, aiParsed.score)
@@ -134,7 +144,9 @@ Respond ONLY with valid JSON in this exact structure:
       aiEnhanced: true
     };
   } catch (err) {
-    // Deterministic fallback to rule engine
+    // Deterministic fallback to rule engine. Log why (never the key or the user's message).
+    const reason = err.name === 'AbortError' ? 'timeout' : String(err.message || err).replace(/key=[^&\s]+/g, 'key=***').slice(0, 300);
+    console.warn(`[Gemini] Fallback to rule engine: ${reason}`);
     return {
       ...ruleResult,
       heuristicLatencyMs: ruleResult.latencyMs,
