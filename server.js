@@ -2,11 +2,11 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const { handleCheck, handleGetHistory } = require('./src/controllers/checkController');
-const { handlePay } = require('./src/controllers/payController');
+const { handlePay, handleParseQr, handleGetPayments } = require('./src/controllers/payController');
 const { handleGetStats } = require('./src/controllers/statsController');
 const { evaluateRisk } = require('./src/riskEngine');
 const { ledger } = require('./src/ledger');
-const { generateSimulatedMerchantHistory, calculateTrustScore, disburseWorkingCapital } = require('./src/creditEngine');
+const { generateSimulatedMerchantHistory, calculateTrustScore } = require('./src/creditEngine');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -14,9 +14,8 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Serve static assets from client/dist if built, otherwise public/
+// Serve static assets from client/dist (React + Vite PWA)
 app.use(express.static(path.join(__dirname, 'client/dist')));
-app.use(express.static(path.join(__dirname, 'public')));
 
 // --- CORE ARCHITECTURE SPECIFICATION API ENDPOINTS ---
 
@@ -25,6 +24,12 @@ app.post('/api/check', handleCheck);
 
 // 2. POST /api/pay (Verify payee & generate standard upi://pay deep-link)
 app.post('/api/pay', handlePay);
+
+// 2b. POST /api/qr/parse (Parse raw UPI QR code & run pre-flight check)
+app.post('/api/qr/parse', handleParseQr);
+
+// 2c. GET /api/payments (Audit recent verified payment intents)
+app.get('/api/payments', handleGetPayments);
 
 // 3. GET /api/history (User's scan history)
 app.get('/api/history', handleGetHistory);
@@ -74,17 +79,48 @@ app.get('/api/merchants/ramu-tea-stall/credit-profile', (req, res) => {
 });
 
 app.post('/api/credit/drawdown', (req, res) => {
-  try {
-    const { amount, tenureDays } = req.body;
-    const loan = disburseWorkingCapital({ amount, tenureDays });
-    res.json({
-      success: true,
-      message: `₹${loan.disbursedAmount.toLocaleString('en-IN')} disbursed to Ramu Tea Stall VPA (ramu.tea@upi).`,
-      loan
+  const { amount = 5000, tenureDays = 30 } = req.body;
+  const scoreData = calculateTrustScore(sampleMerchantData);
+  const loanAmount = Number(amount);
+  const tenure = Number(tenureDays);
+
+  if (!Number.isFinite(loanAmount) || loanAmount <= 0) {
+    return res.status(400).json({
+      success: false,
+      error: 'Amount must be a positive number'
     });
-  } catch (err) {
-    res.status(400).json({ success: false, error: err.message });
   }
+
+  if (!Number.isInteger(tenure) || tenure <= 0 || tenure > 365) {
+    return res.status(400).json({
+      success: false,
+      error: 'tenureDays must be a whole number between 1 and 365'
+    });
+  }
+
+  if (loanAmount > scoreData.preApprovedLimit) {
+    return res.status(400).json({
+      success: false,
+      error: `Requested amount ₹${loanAmount} exceeds pre-approved limit of ₹${scoreData.preApprovedLimit}`
+    });
+  }
+
+  const loanId = `LOAN_${Date.now()}`;
+  const dailyDeduct = Math.round((loanAmount * (1 + (scoreData.interestRateApr / 100) * (tenure / 365))) / tenure);
+
+  res.json({
+    success: true,
+    message: `₹${loanAmount.toLocaleString('en-IN')} disbursed instantly to ${sampleMerchantData.vpa} via UPI Rail!`,
+    loan: {
+      loanId,
+      amount: loanAmount,
+      tenureDays: tenure,
+      apr: scoreData.interestRateApr,
+      dailyDeduction: dailyDeduct,
+      status: 'ACTIVE_DISBURSED',
+      timestamp: new Date().toISOString()
+    }
+  });
 });
 
 app.get('/api/ledger', (req, res) => {
@@ -121,11 +157,7 @@ app.post('/api/transactions/evaluate', (req, res) => {
 
 // Fallback route to React client index.html for SPA routing
 app.use((req, res) => {
-  const clientDist = path.join(__dirname, 'client/dist/index.html');
-  const publicIndex = path.join(__dirname, 'public/index.html');
-  res.sendFile(clientDist, (err) => {
-    if (err) res.sendFile(publicIndex);
-  });
+  res.sendFile(path.join(__dirname, 'client/dist/index.html'));
 });
 
 app.listen(PORT, () => {

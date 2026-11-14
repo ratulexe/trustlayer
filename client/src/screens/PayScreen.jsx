@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { ShieldCheck, AlertTriangle, ExternalLink, ArrowLeft, CheckCircle2, ArrowRight } from 'lucide-react';
 
 export default function PayScreen({ prefilledVpa = '', onBack }) {
   const { t } = useLanguage();
@@ -59,7 +60,7 @@ export default function PayScreen({ prefilledVpa = '', onBack }) {
         {/* Golden Rule Alert */}
         <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs space-y-1">
           <div className="flex items-center gap-2 font-bold font-display">
-            <span>🛡️</span>
+            <AlertTriangle className="w-4 h-4 text-amber-700" />
             <span>{t.pinWarningTitle}</span>
           </div>
           <p className="leading-relaxed opacity-95">
@@ -131,16 +132,18 @@ export default function PayScreen({ prefilledVpa = '', onBack }) {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm shadow-float transition font-display"
+              className="w-full py-3.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm shadow-float transition font-display flex items-center justify-center gap-2"
             >
-              {isLoading ? 'Verifying with TrustLayer...' : 'Generate Verified Payment Link →'}
+              <span>{isLoading ? 'Verifying with TrustLayer...' : 'Generate Verified Payment Link'}</span>
+              <ArrowRight className="w-4 h-4" />
             </button>
           ) : (
             <div className="space-y-4 pt-2">
               <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-emerald-800 font-display">
-                    ✓ Verified Pay Ready
+                  <span className="text-xs font-bold text-emerald-800 font-display flex items-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    <span>Verified Pay Ready</span>
                   </span>
                   <span className="text-[10px] font-mono bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">
                     {paymentResult.paymentId}
@@ -155,9 +158,9 @@ export default function PayScreen({ prefilledVpa = '', onBack }) {
                 href={paymentResult.upiDeepLink}
                 className="w-full py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-md transition flex items-center justify-center gap-2 font-display text-center"
               >
-                <span>⚡</span>
+                <ShieldCheck className="w-4 h-4" />
                 <span>{t.openUpiBtn}</span>
-                <span>↗</span>
+                <ExternalLink className="w-4 h-4" />
               </a>
             </div>
           )}
@@ -166,9 +169,10 @@ export default function PayScreen({ prefilledVpa = '', onBack }) {
         {onBack && (
           <button
             onClick={onBack}
-            className="w-full py-2 text-center text-xs text-slate-500 hover:text-slate-800 transition"
+            className="w-full py-2 text-center text-xs text-slate-500 hover:text-slate-800 transition flex items-center justify-center gap-1.5"
           >
-            ← Back to Check
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>Back to Check</span>
           </button>
         )}
 

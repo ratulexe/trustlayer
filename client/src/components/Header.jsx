@@ -1,5 +1,6 @@
 import React from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { Shield, Search, CreditCard, Activity, Globe } from 'lucide-react';
 
 export default function Header({ currentScreen, setCurrentScreen }) {
   const { language, setLanguage, t } = useLanguage();
@@ -13,8 +14,8 @@ export default function Header({ currentScreen, setCurrentScreen }) {
           onClick={() => setCurrentScreen('check')} 
           className="flex items-center gap-3 cursor-pointer"
         >
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-500 text-white flex items-center justify-center font-bold text-xl shadow-md shadow-brand-500/20 font-display">
-            TL
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-500 text-white flex items-center justify-center font-bold shadow-md shadow-brand-500/20">
+            <Shield className="w-5 h-5 text-white" />
           </div>
           <div>
             <div className="flex items-center gap-2">
@@ -31,39 +32,56 @@ export default function Header({ currentScreen, setCurrentScreen }) {
         <nav className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200">
           <button
             onClick={() => setCurrentScreen('check')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 ${
               currentScreen === 'check' || currentScreen === 'result'
                 ? 'bg-surface text-slate-900 shadow-sm border border-slate-200/80 font-bold'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            {t.navCheck}
+            <Search className="w-3.5 h-3.5" />
+            <span>{t.navCheck}</span>
           </button>
           <button
             onClick={() => setCurrentScreen('pay')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 ${
               currentScreen === 'pay'
                 ? 'bg-surface text-slate-900 shadow-sm border border-slate-200/80 font-bold'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            {t.navPay}
+            <CreditCard className="w-3.5 h-3.5" />
+            <span>{t.navPay}</span>
           </button>
           <button
             onClick={() => setCurrentScreen('dashboard')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 ${
               currentScreen === 'dashboard'
                 ? 'bg-surface text-slate-900 shadow-sm border border-slate-200/80 font-bold'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            {t.navDashboard}
+            <Activity className="w-3.5 h-3.5" />
+            <span>{t.navDashboard}</span>
+          </button>
+          <button
+            onClick={() => setCurrentScreen('inclusion')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 ${
+              currentScreen === 'inclusion'
+                ? 'bg-surface text-slate-900 shadow-sm border border-slate-200/80 font-bold'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>{t.navInclusion || 'Financial Inclusion'}</span>
           </button>
         </nav>
 
         {/* Vernacular Language Switcher */}
         <div className="flex items-center gap-2">
           <div className="flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-xs font-semibold">
+            <div className="px-1.5 text-slate-400">
+              <Globe className="w-3.5 h-3.5" />
+            </div>
             <button
               onClick={() => setLanguage('en')}
               className={`px-2 py-1 rounded-md transition ${language === 'en' ? 'bg-surface text-slate-900 shadow-xs font-bold' : 'text-slate-500 hover:text-slate-900'}`}

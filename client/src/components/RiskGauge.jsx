@@ -1,20 +1,21 @@
 import React from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { ShieldCheck, AlertTriangle, ShieldAlert } from 'lucide-react';
 
 export default function RiskGauge({ score = 0, verdict = 'SAFE' }) {
   const { t } = useLanguage();
 
   const isScam = verdict === 'SCAM' || score >= 70;
   const isCaution = !isScam && (verdict === 'CAUTION' || score >= 30);
-  const isSafe = !isScam && !isCaution;
 
   const colorClass = isScam
-    ? { text: 'text-rose-600', bg: 'bg-rose-500', pillBg: 'bg-rose-50', pillBorder: 'border-rose-200', pillText: 'text-rose-700' }
+    ? { text: 'text-rose-600', bg: 'bg-rose-500', pillBg: 'bg-rose-50', pillBorder: 'border-rose-200', pillText: 'text-rose-700', Icon: ShieldAlert }
     : isCaution
-    ? { text: 'text-amber-600', bg: 'bg-amber-500', pillBg: 'bg-amber-50', pillBorder: 'border-amber-200', pillText: 'text-amber-700' }
-    : { text: 'text-emerald-600', bg: 'bg-emerald-500', pillBg: 'bg-emerald-50', pillBorder: 'border-emerald-200', pillText: 'text-emerald-700' };
+    ? { text: 'text-amber-600', bg: 'bg-amber-500', pillBg: 'bg-amber-50', pillBorder: 'border-amber-200', pillText: 'text-amber-700', Icon: AlertTriangle }
+    : { text: 'text-emerald-600', bg: 'bg-emerald-500', pillBg: 'bg-emerald-50', pillBorder: 'border-emerald-200', pillText: 'text-emerald-700', Icon: ShieldCheck };
 
   const verdictLabel = isScam ? t.scamVerdict : isCaution ? t.cautionVerdict : t.safeVerdict;
+  const StatusIcon = colorClass.Icon;
 
   return (
     <div className="flex flex-col items-center p-6 bg-slate-50 border border-slate-200 rounded-2xl w-full">
@@ -39,8 +40,9 @@ export default function RiskGauge({ score = 0, verdict = 'SAFE' }) {
       </div>
 
       {/* Verdict Pill */}
-      <div className={`mt-2 px-4 py-1.5 rounded-full text-xs font-bold font-display border ${colorClass.pillBg} ${colorClass.pillBorder} ${colorClass.pillText}`}>
-        {verdictLabel}
+      <div className={`mt-2 px-4 py-1.5 rounded-full text-xs font-bold font-display border flex items-center gap-1.5 ${colorClass.pillBg} ${colorClass.pillBorder} ${colorClass.pillText}`}>
+        <StatusIcon className="w-4 h-4" />
+        <span>{verdictLabel}</span>
       </div>
     </div>
   );

@@ -1,5 +1,12 @@
 {
   "knownMuleVpas": [
+    "kyc-update99@okaxis",
+    "sbi-kyc-desk@ybl",
+    "trai-verify@okicici",
+    "customs-india-duty@oksbi",
+    "wbsedcl-billpay@axl",
+    "tg-task-payout@ibl",
+    "lottery-claim2026@paytm",
     "lottery_reward99@okhdfc",
     "urgent_kyc_update@ybl",
     "fastcash_refund@paytm",
@@ -8,6 +15,27 @@
     "bijlibill.update@ybl"
   ],
   "verifiedMerchants": [
+    {
+      "vpa": "freshmart.kolkata@icici",
+      "name": "FreshMart Retail Kolkata",
+      "category": "Grocery",
+      "trustRating": 0.99,
+      "ageDays": 420
+    },
+    {
+      "vpa": "apollo.pharmacy@hdfcbank",
+      "name": "Apollo Pharmacy India",
+      "category": "Healthcare",
+      "trustRating": 0.99,
+      "ageDays": 1150
+    },
+    {
+      "vpa": "wbsedcl.online@sbi",
+      "name": "WBSEDCL Official Bill Desk",
+      "category": "Utility",
+      "trustRating": 0.99,
+      "ageDays": 1800
+    },
     {
       "vpa": "grocer@okaxis",
       "name": "Sharma Daily Groceries",
@@ -32,39 +60,138 @@
   ],
   "scamPatterns": [
     {
-      "id": "pattern_electricity",
-      "category": "UTILITY_DISCONNECTION",
-      "title": "Electricity Disconnection Phishing",
+      "id": "TRAI_SIM_DEACTIVATION",
+      "title": "TRAI / Telecom SIM Deactivation Scam",
       "severity": "CRITICAL",
-      "triggers": ["electricity", "power cut", "light cut", "bijli", "9.30 pm", "powerbill", "discom"],
+      "triggers": [
+        "trai",
+        "sim will be blocked",
+        "sim deactivated",
+        "sim deactivation",
+        "mobile number suspended",
+        "telecom department",
+        "pending e-kyc",
+        "sim block",
+        "trai-verify",
+        "sim card blocked",
+        "sim verification"
+      ],
       "explanations": {
-        "en": "Official state electricity boards never ask for bill payments via personal UPI IDs or threaten immediate disconnection via SMS.",
-        "hi": "सरकारी बिजली विभाग कभी भी व्यक्तिगत UPI पते पर पैसे नहीं मांगते और न ही तुरंत बिजली काटने की धमकी देते हैं।",
-        "bn": "সরকারি বিদ্যুৎ দপ্তর কখনোই ব্যক্তিগত UPI আইডিতে টাকা চায় না বা তাৎক্ষণিক লাইন কাটার হুমকি দেয় না।"
+        "en": "TRAI and telecom operators never threaten SIM disconnection over SMS/WhatsApp or demand UPI payments for KYC.",
+        "hi": "TRAI या टेलीकॉम कंपनियां कभी भी SMS/WhatsApp पर सिम बंद करने की धमकी नहीं देतीं और न ही KYC के लिए UPI भुगतान मांगती हैं।",
+        "bn": "TRAI বা টেলিকম সংস্থা কখনোই SMS/WhatsApp-এ সিম বন্ধের হুমকি দেয় না বা KYC-এর জন্য UPI পেমেন্ট চায় না।"
       }
     },
     {
-      "id": "pattern_lottery",
-      "category": "LOTTERY_KYC",
-      "title": "Fake Lottery & Processing Fee Scam",
+      "id": "TELEGRAM_PART_TIME_JOB",
+      "title": "Part-Time Job / Telegram Prepaid Task Scam",
       "severity": "CRITICAL",
-      "triggers": ["lottery", "winner", "prize", "crore", "processing fee", "reward", "congratulations"],
+      "triggers": [
+        "telegram",
+        "part-time job",
+        "part time job",
+        "prepaid task",
+        "rate hotel",
+        "like youtube video",
+        "daily income",
+        "earn money daily",
+        "daily salary",
+        "task payout",
+        "tg-task",
+        "unlock bonus",
+        "job bonus",
+        "unlock your"
+      ],
       "explanations": {
-        "en": "You never have to pay a processing fee or advance deposit to receive genuine prize or lottery money.",
-        "hi": "किसी भी वैध लॉटरी या पुरस्कार राशि प्राप्त करने के लिए आपको पहले कोई 'प्रोसेसिंग फीस' या अग्रिम जमा नहीं करना होता।",
-        "bn": "আসল লটারি বা পুরস্কারের টাকা পাওয়ার জন্য কখনোই আগে 'প্রসেসিং ফি' জমা দিতে হয় না।"
+        "en": "Genuine employers never ask job seekers to deposit money or complete prepaid UPI tasks on Telegram to unlock salaries.",
+        "hi": "असली कंपनियां वेतन पाने के लिए टेलीग्राम पर पैसे जमा करने या प्रीपेड UPI टास्क पूरा करने के लिए कभी नहीं कहतीं।",
+        "bn": "প্রকৃত নিয়োগকর্তারা বেতন পাওয়ার জন্য টেলিগ্রামে টাকা জমা দিতে বা প্রিপেইড UPI টাস্ক করতে কখনোই বলেন না।"
       }
     },
     {
-      "id": "pattern_kyc_freeze",
-      "category": "BANK_ACCOUNT_FREEZE",
-      "title": "Unauthorized KYC Expiry & Account Suspension",
-      "severity": "HIGH",
-      "triggers": ["kyc expired", "account blocked", "pan update", "sim block", "click link", "verify otp"],
+      "id": "FAKE_COURIER_CUSTOMS_FEE",
+      "title": "Fake Courier / Customs Parcel Clearance Scam",
+      "severity": "CRITICAL",
+      "triggers": [
+        "customs duty",
+        "parcel held",
+        "package seized",
+        "india post",
+        "customs clearance",
+        "redelivery fee",
+        "illegal parcel",
+        "customs fee",
+        "customs tax",
+        "parcel detained",
+        "delivery fee",
+        "customs-india"
+      ],
       "explanations": {
-        "en": "Banks never suspend accounts with short 2-hour SMS ultimatums requesting payment or OTP verification.",
-        "hi": "बैंक कभी भी SMS पर 2 घंटे की समय सीमा देकर व्यक्तिगत UPI पर शुल्क या OTP नहीं मांगते।",
-        "bn": "ব্যাংক কখনোই এসএমএসে স্বল্প সময়ের হুমকি দিয়ে ব্যক্তিগত UPI বা ওটিপি চায় না।"
+        "en": "India Post, couriers, and Customs never demand clearance fees or fines via personal UPI IDs or SMS links.",
+        "hi": "इंडिया पोस्ट, कूरियर कंपनियां या कस्टम्स कभी भी निजी UPI आईडी या SMS लिंक के जरिए क्लीयरेंस फीस नहीं मांगते।",
+        "bn": "ইন্ডিয়া পোস্ট, কুরিয়ার সংস্থা বা কাস্টমস কখনোই ব্যক্তিগত UPI আইডি বা SMS লিংকের মাধ্যমে ক্লিয়ারেন্স ফি চায় না।"
+      }
+    },
+    {
+      "id": "FAKE_BANK_KYC_EXPIRY",
+      "title": "Fake Bank KYC Expiry Alert",
+      "severity": "CRITICAL",
+      "triggers": [
+        "kyc expire",
+        "yono kyc",
+        "account will be blocked",
+        "pan update",
+        "account freeze",
+        "urgent_kyc",
+        "sbi-kyc"
+      ],
+      "explanations": {
+        "en": "Banks never send personal UPI IDs or threat messages asking for a small fee to prevent account suspension.",
+        "hi": "बैंक खाता बंद होने से रोकने के लिए कभी भी निजी UPI आईडी या शुल्क मांगने वाले संदेश नहीं भेजते।",
+        "bn": "ব্যাংক অ্যাকাউন্ট বন্ধ হওয়া আটকাতে কখনোই ব্যক্তিগত UPI আইডি বা ফি চেয়ে মেসেজ পাঠায় না।"
+      }
+    },
+    {
+      "id": "ELECTRICITY_CUT_ULTIMATUM",
+      "title": "Fake Electricity Disconnection Ultimatum",
+      "severity": "CRITICAL",
+      "triggers": [
+        "electricity",
+        "power cut",
+        "light cut",
+        "bijli",
+        "9.30 pm",
+        "powerbill",
+        "discom",
+        "disconnect tonight",
+        "wbsedcl",
+        "cesc",
+        "previous month bill"
+      ],
+      "explanations": {
+        "en": "Electricity boards never threaten same-night power cuts via personal mobile numbers or ask you to pay an officer via UPI.",
+        "hi": "बिजली विभाग कभी भी निजी नंबर से रात में बिजली काटने की धमकी नहीं देता और न ही किसी अधिकारी को UPI करने को कहता है।",
+        "bn": "বিদ্যুৎ দপ্তর কখনোই ব্যক্তিগত নম্বর থেকে রাতে সংযোগ কাটার হুমকি দেয় না বা কোনো অফিসারকে UPI করতে বলে না।"
+      }
+    },
+    {
+      "id": "REVERSE_UPI_COLLECT_TRAP",
+      "title": "Reverse UPI PIN / Lottery Collect Trap",
+      "severity": "CRITICAL",
+      "triggers": [
+        "enter your upi pin",
+        "enter upi pin to receive",
+        "processing fee",
+        "lottery",
+        "claim prize",
+        "scan qr to receive",
+        "lottery_reward",
+        "lottery-claim"
+      ],
+      "explanations": {
+        "en": "You NEVER need to enter your UPI PIN or scan a QR code to receive money—entering your PIN only deducts money.",
+        "hi": "पैसे प्राप्त करने के लिए आपको कभी भी UPI PIN डालने या QR स्कैन करने की आवश्यकता नहीं होती—PIN डालने से केवल पैसे कटते हैं।",
+        "bn": "টাকা পাওয়ার জন্য কখনোই UPI PIN দিতে বা QR কোড স্ক্যান করতে হয় না—PIN দিলে আপনার অ্যাকাউন্ট থেকেই টাকা কেটে নেওয়া হয়।"
       }
     }
   ]
