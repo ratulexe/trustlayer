@@ -70,8 +70,8 @@ export default function ResultScreen({ result, onProceedToPay, onReset }) {
 
         {/* Telemetry info */}
         <div className="flex items-center justify-between text-[11px] font-mono text-[#64748B] border-t border-slate-200/70 pt-3">
-          <span>Engine: <strong className="text-[#111827]">{engine || 'Dual-Engine Heuristic'}</strong></span>
-          <span>Latency: <strong className="text-blue-600 font-bold">{latencyMs || 18}ms</strong></span>
+          <span>{t.engineLabel}: <strong className="text-[#111827]">{engine || 'Dual-Engine Heuristic'}</strong></span>
+          <span>{t.latencyLabel}: <strong className="text-blue-600 font-bold">{latencyMs || 18}ms</strong></span>
         </div>
 
         {/* Primary Action Buttons */}
@@ -88,7 +88,7 @@ export default function ResultScreen({ result, onProceedToPay, onReset }) {
             <div className="space-y-2.5">
               <div className="p-3.5 bg-rose-100/80 border border-rose-300 rounded-xl text-center text-xs text-rose-900 font-bold flex items-center justify-center gap-2">
                 <ShieldBanIcon className="w-4 h-4 text-rose-700 shrink-0" />
-                <span>Payment Blocked by TrustLayer for Consumer Protection</span>
+                <span>{t.paymentBlockedAlert}</span>
               </div>
               <a
                 href="tel:1930"

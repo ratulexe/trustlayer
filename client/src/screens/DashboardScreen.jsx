@@ -42,7 +42,7 @@ export default function DashboardScreen() {
           {t.dashTitle}
         </h2>
         <p className="text-xs sm:text-sm text-[#64748B]">
-          Real-time aggregated threat intelligence across Indian UPI networks
+          {t.dashSubtitle}
         </p>
       </div>
 
@@ -97,7 +97,7 @@ export default function DashboardScreen() {
               {t.trendingHeader}
             </h3>
             <span className="text-[10px] font-mono font-bold bg-rose-50 text-rose-700 px-2 py-0.5 rounded-full border border-rose-200">
-              HIGH ALERT
+              {t.highAlert}
             </span>
           </div>
 
@@ -128,7 +128,7 @@ export default function DashboardScreen() {
               {t.recentHeader}
             </h3>
             <span className="text-[10px] font-mono text-[#64748B] bg-white px-2 py-0.5 rounded border border-slate-200">
-              Local Session
+              {t.localSession}
             </span>
           </div>
 
@@ -136,11 +136,11 @@ export default function DashboardScreen() {
             {isLoading ? (
               <div className="py-12 text-center text-xs text-[#64748B] flex items-center justify-center gap-2">
                 <span className="w-3.5 h-3.5 border-2 border-slate-300 border-t-blue-600 rounded-full animate-spin"></span>
-                <span>Loading intelligence feed...</span>
+                <span>{t.loadingFeed}</span>
               </div>
             ) : history.length === 0 ? (
               <div className="py-12 text-center text-xs text-[#64748B]">
-                No scans performed yet in this session.
+                {t.noScansYet}
               </div>
             ) : (
               history.slice(0, 5).map((item, i) => (

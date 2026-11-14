@@ -82,7 +82,7 @@ export default function CheckScreen({ onCheckComplete }) {
         {/* Security Beacon Pill */}
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-slate-200/90 shadow-[0_1px_2px_rgba(23,37,84,0.04)] text-[11px] font-semibold text-[#172554] mb-3">
           <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
-          <span>Zero-Trust UPI Threat Shield</span>
+          <span>{t.threatShieldBadge}</span>
         </div>
 
         <h2 className="text-2xl sm:text-3xl font-extrabold text-[#111827] tracking-tight font-display leading-tight">
@@ -119,7 +119,7 @@ export default function CheckScreen({ onCheckComplete }) {
                 className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded text-[11px] bg-slate-200/80 text-slate-600 hover:bg-slate-300 transition"
                 aria-label="Clear input text"
               >
-                Clear
+                {t.clearBtn}
               </button>
             )}
           </div>
@@ -178,20 +178,20 @@ export default function CheckScreen({ onCheckComplete }) {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
           <ScamChip
             icon={<ZapIcon className="w-4 h-4 text-amber-600" />}
-            label="Electricity Phishing"
-            subtext="Threatens power cut at 9:30 PM"
+            label={t.presetElectricityTitle}
+            subtext={t.presetElectricityDesc}
             onClick={() => loadPreset("Dear customer, your electricity power will be disconnected tonight at 9.30 PM from electricity office. Please immediately pay pending bill of ₹850 to powerbill@okaxis")}
           />
           <ScamChip
             icon={<GiftIcon className="w-4 h-4 text-rose-600" />}
-            label="₹25L Lottery Scam"
-            subtext="Demands advance tax fee"
+            label={t.presetLotteryTitle}
+            subtext={t.presetLotteryDesc}
             onClick={() => loadPreset("Congratulations! You won ₹25,00,000 in Special Lottery. To release your fund immediately transfer processing tax of ₹12,500 to lottery_reward99@okhdfc")}
           />
           <ScamChip
             icon={<CoffeeIcon className="w-4 h-4 text-emerald-600" />}
-            label="Safe Tea Vendor"
-            subtext="Verified merchant payment"
+            label={t.presetTeaTitle}
+            subtext={t.presetTeaDesc}
             onClick={() => loadPreset("Payment for evening tea and snacks at Ramu Tea Stall. Pay ₹45 to ramu.tea@upi")}
           />
         </div>

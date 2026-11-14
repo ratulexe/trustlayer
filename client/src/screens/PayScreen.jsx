@@ -92,7 +92,7 @@ export default function PayScreen({ prefilledVpa = '', onBack }) {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-[#111827] font-semibold mb-1.5">
-                Payee Name
+                {t.payeeNameLabel}
               </label>
               <input
                 type="text"
@@ -119,7 +119,7 @@ export default function PayScreen({ prefilledVpa = '', onBack }) {
 
           <div>
             <label className="block text-[#111827] font-semibold mb-1.5">
-              Payment Note
+              {t.paymentNoteLabel}
             </label>
             <input
               type="text"
@@ -143,7 +143,7 @@ export default function PayScreen({ prefilledVpa = '', onBack }) {
               className="w-full py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-[0_2px_10px_rgba(37,99,235,0.25)] hover:shadow-[0_4px_16px_rgba(37,99,235,0.35)] transition font-display cursor-pointer flex items-center justify-center gap-2"
             >
               <LockIcon className="w-4 h-4 text-white/90" />
-              <span>{isLoading ? 'Verifying with TrustLayer...' : 'Generate Verified Payment Link →'}</span>
+              <span>{isLoading ? t.verifyingPay : `${t.generatePayBtn} →`}</span>
             </button>
           ) : (
             <div className="space-y-4 pt-1">
@@ -151,7 +151,7 @@ export default function PayScreen({ prefilledVpa = '', onBack }) {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-800 font-display">
                     <CheckCircle2Icon className="w-4 h-4 text-emerald-600" />
-                    <span>Verified Pay Ready</span>
+                    <span>{t.verifiedPayReady}</span>
                   </div>
                   <span className="text-[10px] font-mono bg-white text-slate-700 px-2 py-0.5 rounded border border-slate-200">
                     {paymentResult.paymentId}
@@ -180,7 +180,7 @@ export default function PayScreen({ prefilledVpa = '', onBack }) {
             className="w-full py-2 text-center text-xs text-[#64748B] hover:text-[#111827] transition flex items-center justify-center gap-1 cursor-pointer"
           >
             <ArrowLeftIcon className="w-3.5 h-3.5" />
-            <span>Back to Check</span>
+            <span>{t.backToCheck}</span>
           </button>
         )}
 
