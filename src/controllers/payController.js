@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const scamDb = require('../data/scamDatabase.json');
 const { checkHistory } = require('./checkController');
+const { db, isFirestoreConnected } = require('../config/firebase');
 
 const paymentsHistory = [];
 const idempotencyStore = new Map();
@@ -153,6 +154,13 @@ function handlePay(req, res) {
     paymentsHistory.unshift(paymentRecord);
     if (idempotencyKey) {
       idempotencyStore.set(idempotencyKey, paymentRecord);
+    }
+
+    // Async write to Cloud Firestore if connected
+    if (isFirestoreConnected && db) {
+      db.collection('payments').doc(paymentId).set(paymentRecord).catch(err => {
+        console.error('[Firestore] Payment sync error:', err.message);
+      });
     }
 
     res.json({

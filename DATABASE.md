@@ -150,3 +150,27 @@ service cloud.firestore {
   }
 }
 ```
+
+---
+
+## 4. Initialization & Seeding Instructions
+
+### 4.1 Connecting Credentials
+Place the Firebase Service Account JSON key at:
+```
+C:\trustlayer\serviceAccountKey.json
+```
+or provide environment variables in `.env`:
+```ini
+FIREBASE_PROJECT_ID=trustlayer-xxxx
+FIREBASE_CLIENT_EMAIL=firebase-adminsdk@trustlayer-xxxx.iam.gserviceaccount.com
+FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+```
+
+### 4.2 Initial Seeding
+To populate `scamPatterns` with active Indian threat vectors (TRAI SIM deactivation, Electricity disconnection, WhatsApp lottery, Telegram tasks):
+```bash
+node src/data/seedFirestore.js
+```
+The application maintains a dual-mode fallback: if Firestore is unreachable or offline, operations seamlessly persist to deterministic in-memory structures without failing.
+

@@ -1,5 +1,6 @@
 const crypto = require('crypto');
 const { evaluateWithGemini } = require('../engines/geminiEngine');
+const { db, isFirestoreConnected } = require('../config/firebase');
 
 // In-memory store for fast local checks history (synced with Firestore when enabled)
 const checkHistory = [];
@@ -37,6 +38,13 @@ async function handleCheck(req, res) {
 
     checkHistory.unshift(record);
     if (checkHistory.length > 50) checkHistory.pop();
+
+    // Async write to Cloud Firestore if connected
+    if (isFirestoreConnected && db) {
+      db.collection('checks').doc(checkId).set(record).catch(err => {
+        console.error('[Firestore] Check sync error:', err.message);
+      });
+    }
 
     res.json({
       success: true,

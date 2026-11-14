@@ -17,7 +17,7 @@ function generateSimulatedMerchantHistory(merchantId = 'ramu-tea-stall') {
     
     for (let i = 0; i < dailyCount; i++) {
       const amount = Math.floor(15 + Math.random() * 35);
-      const payerId = `user_${Math.floor(100 + Math.random() * 400)}@upi`;
+      const payerId = `user_${Math.floor(100 + Math.random() * 1200)}@upi`;
       uniquePayers.add(payerId);
       totalVolume += amount;
       
@@ -119,7 +119,36 @@ function calculateTrustScore(merchantData) {
   };
 }
 
+function disburseWorkingCapital({ merchantId = 'ramu-tea-stall', amount, tenureDays = 30 }) {
+  const numAmount = parseFloat(amount);
+  if (!numAmount || numAmount <= 0) {
+    throw new Error('Valid loan amount is required');
+  }
+  if (numAmount > 15000) {
+    throw new Error('Requested amount exceeds pre-approved credit limit of ₹15,000');
+  }
+
+  const interestRateApr = 11.5;
+  const totalInterest = Math.round(numAmount * (interestRateApr / 100) * (tenureDays / 365));
+  const totalRepayment = numAmount + totalInterest;
+  const dailyDeduction = Math.round(totalRepayment / tenureDays);
+
+  return {
+    loanId: `LOAN_${Date.now()}`,
+    merchantId,
+    disbursedAmount: numAmount,
+    interestRateApr,
+    tenureDays,
+    totalRepayment,
+    dailyDeduction,
+    status: 'DISBURSED',
+    disbursedAt: new Date().toISOString(),
+    upiDisbursementRef: `UPI_DISB_${Date.now()}`
+  };
+}
+
 module.exports = {
   generateSimulatedMerchantHistory,
-  calculateTrustScore
+  calculateTrustScore,
+  disburseWorkingCapital
 };
