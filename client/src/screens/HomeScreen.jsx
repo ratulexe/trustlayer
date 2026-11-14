@@ -2,7 +2,7 @@ import React from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
 import {
-  ShieldCheck, Search, CreditCard, Wallet, Activity, Store, ArrowRight, Languages, Zap, KeyRound, Lock, Ban, PhoneCall
+  ShieldCheck, Search, CreditCard, Wallet, Activity, Store, ArrowRight, Languages, Zap, KeyRound, Lock, Ban, PhoneCall, Link, ShieldAlert
 } from 'lucide-react';
 
 const FEATURES = [
@@ -16,7 +16,8 @@ const FEATURES = [
 const RULES = [
   { key: 'rule1', icon: KeyRound },
   { key: 'rule2', icon: Ban },
-  { key: 'rule3', icon: PhoneCall }
+  { key: 'rule3', icon: PhoneCall },
+  { key: 'rule4', icon: Link }
 ];
 
 export default function HomeScreen({ onNavigate }) {
@@ -95,15 +96,45 @@ export default function HomeScreen({ onNavigate }) {
       {/* Golden rules */}
       <section className="space-y-4">
         <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 font-display">{t.rulesHeader}</h2>
-        <ol className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <ol className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {RULES.map(({ key, icon: Icon }, i) => (
             <li key={key} className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-card flex items-start gap-3">
               <span className="w-9 h-9 shrink-0 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-sm">{i + 1}</span>
               <span className="text-sm text-slate-700 leading-relaxed flex-1">{t[key]}</span>
-              <Icon className="w-5 h-5 text-amber-500 shrink-0" aria-hidden="true" />
+              <Icon className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" aria-hidden="true" />
             </li>
           ))}
         </ol>
+      </section>
+
+      {/* Prominent Security Advisory Banner */}
+      <section className="bg-gradient-to-r from-rose-50 via-red-50 to-amber-50 border border-rose-200 rounded-3xl p-5 sm:p-7 shadow-card space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="flex items-start sm:items-center gap-3">
+            <span className="w-10 h-10 rounded-2xl bg-rose-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-rose-500/20">
+              <ShieldAlert className="w-5 h-5" />
+            </span>
+            <div>
+              <span className="text-[11px] font-mono font-bold text-rose-700 uppercase tracking-wider block">
+                {t.securityAdvisoryTag || 'CYBER CRIME ADVISORY'}
+              </span>
+              <h3 className="font-bold text-base sm:text-lg text-slate-900 font-display">
+                {t.securityAdvisoryTitle || 'Do not click any random link — it will be a scam!'}
+              </h3>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => onNavigate('check')}
+            className="self-start sm:self-auto px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-md transition flex items-center gap-1.5 shrink-0 font-display"
+          >
+            <span>{t.homeCta || 'Check a message'}</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
+        <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
+          {t.securityAdvisoryBody}
+        </p>
       </section>
     </div>
   );
