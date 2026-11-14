@@ -14,9 +14,8 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Serve static assets from client/dist if built, otherwise public/
+// Serve static assets from client/dist (React + Vite PWA)
 app.use(express.static(path.join(__dirname, 'client/dist')));
-app.use(express.static(path.join(__dirname, 'public')));
 
 // --- CORE ARCHITECTURE SPECIFICATION API ENDPOINTS ---
 
@@ -143,11 +142,7 @@ app.post('/api/transactions/evaluate', (req, res) => {
 
 // Fallback route to React client index.html for SPA routing
 app.use((req, res) => {
-  const clientDist = path.join(__dirname, 'client/dist/index.html');
-  const publicIndex = path.join(__dirname, 'public/index.html');
-  res.sendFile(clientDist, (err) => {
-    if (err) res.sendFile(publicIndex);
-  });
+  res.sendFile(path.join(__dirname, 'client/dist/index.html'));
 });
 
 app.listen(PORT, () => {
