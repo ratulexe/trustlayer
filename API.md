@@ -11,6 +11,8 @@
 | :--- | :--- | :--- |
 | `POST` | `/api/check` | Analyze suspicious message or UPI ID for scams |
 | `POST` | `/api/pay` | Generate verified UPI deep link and log pay intent |
+| `POST` | `/api/qr/parse` | Decode raw UPI QR string & evaluate pre-flight risk |
+| `GET` | `/api/payments` | Audit recent verified payment intents |
 | `GET` | `/api/history` | Retrieve user's previous checks (paginated) |
 | `GET` | `/api/stats` | Global threat statistics and trending scam patterns |
 

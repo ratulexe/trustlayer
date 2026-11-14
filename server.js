@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const { handleCheck, handleGetHistory } = require('./src/controllers/checkController');
-const { handlePay } = require('./src/controllers/payController');
+const { handlePay, handleParseQr, handleGetPayments } = require('./src/controllers/payController');
 const { handleGetStats } = require('./src/controllers/statsController');
 const { evaluateRisk } = require('./src/riskEngine');
 const { ledger } = require('./src/ledger');
@@ -25,6 +25,12 @@ app.post('/api/check', handleCheck);
 
 // 2. POST /api/pay (Verify payee & generate standard upi://pay deep-link)
 app.post('/api/pay', handlePay);
+
+// 2b. POST /api/qr/parse (Parse raw UPI QR code & run pre-flight check)
+app.post('/api/qr/parse', handleParseQr);
+
+// 2c. GET /api/payments (Audit recent verified payment intents)
+app.get('/api/payments', handleGetPayments);
 
 // 3. GET /api/history (User's scan history)
 app.get('/api/history', handleGetHistory);
