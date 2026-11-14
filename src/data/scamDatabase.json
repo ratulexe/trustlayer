@@ -12,7 +12,12 @@
     "fastcash_refund@paytm",
     "job_guarantee_deposit@ibl",
     "powerbill@okaxis",
-    "bijlibill.update@ybl"
+    "bijlibill.update@ybl",
+    "refund-desk77@ybl",
+    "fastloan.disbursal@okaxis",
+    "cbi-cybercell.gov@oksbi",
+    "crypto-profit-daily@ibl",
+    "courier-duty-customs@paytm"
   ],
   "verifiedMerchants": [
     {
@@ -62,6 +67,11 @@
     {
       "id": "TRAI_SIM_DEACTIVATION",
       "title": "TRAI / Telecom SIM Deactivation Scam",
+      "titles": {
+        "en": "TRAI / Telecom SIM Deactivation Scam",
+        "hi": "TRAI / टेलीकॉम सिम बंद करने की धोखाधड़ी",
+        "bn": "TRAI বা টেলিকম সিম বাতিলের ভুয়ো হুমকি"
+      },
       "severity": "CRITICAL",
       "triggers": [
         "trai",
@@ -74,7 +84,15 @@
         "sim block",
         "trai-verify",
         "sim card blocked",
-        "sim verification"
+        "sim verification",
+        "sim card band",
+        "sim bondho",
+        "sim bondho hoye jabe",
+        "सिम बंद",
+        "सिम ब्लॉक",
+        "केवाईसी पेंडिंग",
+        "সিম বন্ধ",
+        "কেওয়াইসি"
       ],
       "explanations": {
         "en": "TRAI and telecom operators never threaten SIM disconnection over SMS/WhatsApp or demand UPI payments for KYC.",
@@ -85,6 +103,11 @@
     {
       "id": "TELEGRAM_PART_TIME_JOB",
       "title": "Part-Time Job / Telegram Prepaid Task Scam",
+      "titles": {
+        "en": "Part-Time Job / Telegram Prepaid Task Scam",
+        "hi": "पार्ट-टाइम नौकरी / टेलीग्राम प्रीपेड टास्क धोखाधड़ी",
+        "bn": "টেলিগ্রাম পার্ট-টাইম কাজ / প্রিপেইড টাস্ক প্রতারণা"
+      },
       "severity": "CRITICAL",
       "triggers": [
         "telegram",
@@ -100,7 +123,16 @@
         "tg-task",
         "unlock bonus",
         "job bonus",
-        "unlock your"
+        "unlock your bonus",
+        "unlock your salary",
+        "ghar baithe kamaye",
+        "ghor bose ay",
+        "roz kamaye",
+        "घर बैठे कमाएं",
+        "पार्ट-टाइम काम",
+        "टेलीग्राम",
+        "ঘরে বসে আয়",
+        "প্রিপেইড টাস্ক"
       ],
       "explanations": {
         "en": "Genuine employers never ask job seekers to deposit money or complete prepaid UPI tasks on Telegram to unlock salaries.",
@@ -111,6 +143,11 @@
     {
       "id": "FAKE_COURIER_CUSTOMS_FEE",
       "title": "Fake Courier / Customs Parcel Clearance Scam",
+      "titles": {
+        "en": "Fake Courier / Customs Parcel Clearance Scam",
+        "hi": "फर्जी कूरियर / कस्टम्स पार्सल क्लीयरेंस धोखाधड़ी",
+        "bn": "ভুয়ো কুরিয়ার / কাস্টমস পার্সেল শুল্ক প্রতারণা"
+      },
       "severity": "CRITICAL",
       "triggers": [
         "customs duty",
@@ -124,7 +161,18 @@
         "customs tax",
         "parcel detained",
         "delivery fee",
-        "customs-india"
+        "customs-india",
+        "parcel phasa hai",
+        "parcel atke geche",
+        "कस्टम्स",
+        "पार्सल अटका",
+        "कस्टम्स क्लीयरेंस",
+        "क्लीयरेंस फीस",
+        "इंडिया पोस्ट",
+        "পার্সেল আটক",
+        "কাস্টমস ডিউটি",
+        "কাস্টমস ক্লিয়ারেন্স",
+        "ইন্ডিয়া পোস্ট"
       ],
       "explanations": {
         "en": "India Post, couriers, and Customs never demand clearance fees or fines via personal UPI IDs or SMS links.",
@@ -135,6 +183,11 @@
     {
       "id": "FAKE_BANK_KYC_EXPIRY",
       "title": "Fake Bank KYC Expiry Alert",
+      "titles": {
+        "en": "Fake Bank KYC Expiry Alert",
+        "hi": "फर्जी बैंक KYC समाप्ति अलर्ट",
+        "bn": "ভুয়ো ব্যাংক কেওয়াইসি (KYC) মেয়াদোত্তীর্ণের সতর্কবার্তা"
+      },
       "severity": "CRITICAL",
       "triggers": [
         "kyc expire",
@@ -143,7 +196,18 @@
         "pan update",
         "account freeze",
         "urgent_kyc",
-        "sbi-kyc"
+        "sbi-kyc",
+        "account band",
+        "account block",
+        "khata band",
+        "kyc update karo",
+        "account bondho",
+        "पैन अपडेट",
+        "अकाउंट बंद",
+        "खाता बंद",
+        "केवाईसी अपडेट",
+        "কেওয়াইসি আপডেট",
+        "অ্যাকাউন্ট বন্ধ"
       ],
       "explanations": {
         "en": "Banks never send personal UPI IDs or threat messages asking for a small fee to prevent account suspension.",
@@ -154,19 +218,31 @@
     {
       "id": "ELECTRICITY_CUT_ULTIMATUM",
       "title": "Fake Electricity Disconnection Ultimatum",
+      "titles": {
+        "en": "Fake Electricity Disconnection Ultimatum",
+        "hi": "फर्जी बिजली कनेक्शन काटने की धमकी",
+        "bn": "ভুয়ো বিদ্যুৎ সংযোগ বিচ্ছিন্ন করার চরমপত্র"
+      },
       "severity": "CRITICAL",
       "triggers": [
-        "electricity",
+        "electricity disconnected",
+        "electricty will be disconected",
         "power cut",
         "light cut",
-        "bijli",
-        "9.30 pm",
-        "powerbill",
-        "discom",
         "disconnect tonight",
-        "wbsedcl",
-        "cesc",
-        "previous month bill"
+        "power will be disconnected",
+        "previous month bill",
+        "powerbill",
+        "bijlibill",
+        "लाइन काटी जाएगी",
+        "बिजली काट",
+        "बिजली बंद",
+        "बिजली बिल तुरंत",
+        "বিদ্যুৎ বিচ্ছিন্ন",
+        "বিদ্যুৎ বিল বাকি",
+        "আজ রাতেই লাইন কাটা",
+        "bijli band",
+        "line kategi"
       ],
       "explanations": {
         "en": "Electricity boards never threaten same-night power cuts via personal mobile numbers or ask you to pay an officer via UPI.",
@@ -177,6 +253,11 @@
     {
       "id": "REVERSE_UPI_COLLECT_TRAP",
       "title": "Reverse UPI PIN / Lottery Collect Trap",
+      "titles": {
+        "en": "Reverse UPI PIN / Lottery Collect Trap",
+        "hi": "रिवर्स UPI पिन / लॉटरी कलेक्ट ट्रैप",
+        "bn": "রিভার্স UPI পিন / লটারি প্রতারণার ফাঁদ"
+      },
       "severity": "CRITICAL",
       "triggers": [
         "enter your upi pin",
@@ -186,12 +267,175 @@
         "claim prize",
         "scan qr to receive",
         "lottery_reward",
-        "lottery-claim"
+        "lottery-claim",
+        "lottery lag gayi",
+        "inam",
+        "इनाम",
+        "ইনাম",
+        "लॉटरी",
+        "লটারি",
+        "pin dale paise paye",
+        "pin dile taka paben",
+        "पिन डालें और क्लेम करें",
+        "पिन डालें"
       ],
       "explanations": {
         "en": "You NEVER need to enter your UPI PIN or scan a QR code to receive money—entering your PIN only deducts money.",
         "hi": "पैसे प्राप्त करने के लिए आपको कभी भी UPI PIN डालने या QR स्कैन करने की आवश्यकता नहीं होती—PIN डालने से केवल पैसे कटते हैं।",
         "bn": "টাকা পাওয়ার জন্য কখনোই UPI PIN দিতে বা QR কোড স্ক্যান করতে হয় না—PIN দিলে আপনার অ্যাকাউন্ট থেকেই টাকা কেটে নেওয়া হয়।"
+      }
+    },
+    {
+      "id": "FAKE_LOAN_PROCESSING_FEE",
+      "title": "Fake Loan Approval / Upfront Processing Fee Scam",
+      "titles": {
+        "en": "Fake Loan Approval / Upfront Processing Fee Scam",
+        "hi": "फर्जी लोन मंजूरी / अग्रिम प्रोसेसिंग फीस धोखाधड़ी",
+        "bn": "ভুয়ো লোন মঞ্জুর / অগ্রিম প্রসেসিং ফি প্রতারণা"
+      },
+      "severity": "CRITICAL",
+      "triggers": [
+        "instant loan",
+        "loan approved",
+        "pre-approved loan",
+        "processing fee",
+        "disbursal fee",
+        "loan processing",
+        "loan approval",
+        "loan sanctioned",
+        "instant cash loan",
+        "bina paper loan",
+        "loan mil gaya",
+        "loan lene ke liye",
+        "advance fee for loan",
+        "लोन स्वीकृत",
+        "लोन प्रोसेसिंग फीस",
+        "अग्रिम फीस",
+        "तुरंत लोन",
+        "बिना पेपर लोन",
+        "लोन प्रोसेसिंग",
+        "লোন মঞ্জুর",
+        "লোন প্রসেসিং ফি",
+        "সহজ লোন",
+        "জরুরি লোন"
+      ],
+      "explanations": {
+        "en": "Legitimate banks and RBI-registered lenders never demand upfront processing fees via UPI before disbursing a loan.",
+        "hi": "असली बैंक या आरबीआई-पंजीकृत वित्तीय कंपनियां लोन देने से पहले कभी भी UPI से अग्रिम प्रोसेसिंग फीस नहीं मांगतीं।",
+        "bn": "প্রকৃত ব্যাংক বা আরবিআই-স্বীকৃত ঋণদাতা সংস্থা লোন দেওয়ার আগে কখনোই UPI-এর মাধ্যমে অগ্রিম প্রসেসিং ফি চায় না।"
+      }
+    },
+    {
+      "id": "INVESTMENT_DOUBLING_FRAUD",
+      "title": "Guaranteed Investment / Money Doubling Scheme",
+      "titles": {
+        "en": "Guaranteed Investment / Money Doubling Scheme",
+        "hi": "पैसे दोगुना करने वाली फर्जी निवेश योजना",
+        "bn": "টাকা দ্বিগুণ করার ভুয়ো বিনিয়োগ ফাঁদ"
+      },
+      "severity": "CRITICAL",
+      "triggers": [
+        "guaranteed returns",
+        "double in 7 days",
+        "double money",
+        "triple money",
+        "stock tip",
+        "crypto investment",
+        "crypto profit",
+        "daily return",
+        "high return guarantee",
+        "paisa double",
+        "10 din me double",
+        "guaranteed profit",
+        "investment scheme",
+        "sure shot profit",
+        "पैसा डबल",
+        "पैसे दोगुना",
+        "दोगुना करने की गारंटी",
+        "डबल स्कीम",
+        "पैसे डबल",
+        "टাকা ডবল",
+        "নিশ্চিত লাভ",
+        "বিনিয়োগ স্কিম",
+        "৭ দিনে ডবল"
+      ],
+      "explanations": {
+        "en": "No legitimate financial institution guarantees doubled money or fixed high daily returns. These are Ponzi or advance-fee scams.",
+        "hi": "कोई भी कानूनी वित्तीय संस्थान पैसे दोगुना करने या निश्चित भारी मुनाफे की गारंटी नहीं देता। यह पोंजी धोखाधड़ी है।",
+        "bn": "কোনো বৈধ আর্থিক প্রতিষ্ঠান কখনোই টাকা দ্বিগুণ করার বা নির্দিষ্ট অতিরিক্ত লাভের গ্যারান্টি দেয় না। এটি একটি আর্থিক জালিয়াতি।"
+      }
+    },
+    {
+      "id": "DIGITAL_ARREST_EXTORTION",
+      "title": "Digital Arrest / Fake Police & CBI Extortion",
+      "titles": {
+        "en": "Digital Arrest / Fake Police & CBI Extortion",
+        "hi": "डिजिटल अरेस्ट / फर्जी पुलिस-सीबीआई वसूली",
+        "bn": "ডিজিটাল অ্যারেস্ট / ভুয়ো পুলিশ ও সিবিআই হুমকি"
+      },
+      "severity": "CRITICAL",
+      "triggers": [
+        "digital arrest",
+        "cbi",
+        "money laundering case",
+        "police officer",
+        "supreme court order",
+        "narcotics bureau",
+        "illegal parcel found",
+        "arrest warrant",
+        "cyber crime police",
+        "stay on video call",
+        "clearance bond",
+        "digital hirasat",
+        "pulis arrest",
+        "police case",
+        "डिजिटल अरेस्ट",
+        "सीबीआई",
+        "मनी लॉन्ड्रिंग",
+        "डीজিটাল অ্যারেস্ট",
+        "পুলিশ কেস",
+        "সিবিআই",
+        "গ্রেফতারি পরোয়ানা",
+        "মানি লন্ডারিং"
+      ],
+      "explanations": {
+        "en": "Indian law enforcement and courts NEVER conduct 'digital arrests' over video call, nor do they demand money transfers to clear cases.",
+        "hi": "भारतीय कानून में 'डिजिटल अरेस्ट' का कोई प्रावधान नहीं है। पुलिस या सीबीआई वीडियो कॉल पर पैसे ट्रांसफर करने को कभी नहीं कहती।",
+        "bn": "ভারতীয় আইনে 'ডিজিটাল অ্যারেস্ট' বলে কিছু নেই। পুলিশ বা সিবিআই কখনোই ভিডিও কলে টাকা ট্রান্সফার করতে বলে না।"
+      }
+    },
+    {
+      "id": "FAKE_REFUND_REVERSE_PIN",
+      "title": "Fake Refund / Cashback Reverse UPI PIN Trap",
+      "titles": {
+        "en": "Fake Refund / Cashback Reverse UPI PIN Trap",
+        "hi": "फर्जी रिफंड / कैशबैक रिवर्स UPI पिन धोखा",
+        "bn": "ভুয়ো রিফান্ড / ক্যাশব্যাক রিভার্স পিন ফাঁদ"
+      },
+      "severity": "CRITICAL",
+      "triggers": [
+        "refund initiated",
+        "enter pin to receive refund",
+        "claim cashback",
+        "cashback reward",
+        "receive money in bank",
+        "scan qr to receive refund",
+        "gpay refund",
+        "phonepe cashback",
+        "paytm refund desk",
+        "cashback pane ke liye pin",
+        "refund lene ke liye pin",
+        "रिफंड",
+        "कैशबैक",
+        "पिन डालें",
+        "রিফান্ড পেতে পিন দিন",
+        "ক্যাশব্যাক দাবি",
+        "টাকা ফেরত পেতে পিন"
+      ],
+      "explanations": {
+        "en": "You NEVER need to enter your UPI PIN, scan a QR code, or accept a collect request to receive a refund or cashback.",
+        "hi": "रिफंड या कैशबैक पाने के लिए कभी भी UPI पिन दर्ज करने या QR कोड स्कैन करने की आवश्यकता नहीं होती।",
+        "bn": "টাকা ফেরত বা ক্যাশব্যাক পাওয়ার জন্য কখনোই UPI পিন দিতে বা QR কোড স্ক্যান করতে হয় না।"
       }
     }
   ]
