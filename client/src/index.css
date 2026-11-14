@@ -218,6 +218,107 @@ body {
   }
 }
 
+/* =============================================================================
+   Dark Mode: High-Contrast Obsidian & Emerald Fintech Palette
+   ============================================================================= */
+html.dark {
+  color-scheme: dark;
+}
+
+html.dark body {
+  background-color: #0B130E;
+  color: #ECFDF5;
+}
+
+html.dark header {
+  background-color: rgba(11, 19, 14, 0.92) !important;
+  border-color: #1F3327 !important;
+}
+
+html.dark .bg-white {
+  background-color: #121F17 !important;
+  color: #ECFDF5;
+}
+
+html.dark .sage-card {
+  background-color: #121F17 !important;
+  border-color: #1F3327 !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.6) !important;
+}
+
+html.dark .sage-card-hover:hover {
+  border-color: #10B981 !important;
+  box-shadow: 0 12px 32px -4px rgba(16, 185, 129, 0.15) !important;
+}
+
+html.dark .text-\[\#0F1F17\] {
+  color: #ECFDF5 !important;
+}
+
+html.dark .text-\[\#5C6B63\] {
+  color: #A3B8AC !important;
+}
+
+html.dark .text-\[\#8E9C94\] {
+  color: #718478 !important;
+}
+
+html.dark .border-\[\#D4E0D5\] {
+  border-color: #1F3327 !important;
+}
+
+html.dark .border-\[\#E2EAE3\] {
+  border-color: #17281E !important;
+}
+
+html.dark .bg-\[\#EAF0EB\] {
+  background-color: #182A20 !important;
+  color: #ECFDF5 !important;
+}
+
+html.dark .bg-\[\#F7FAF8\] {
+  background-color: #14241B !important;
+}
+
+html.dark .bg-\[\#F3F6F4\] {
+  background-color: #0B130E !important;
+}
+
+html.dark .bg-\[\#FBFDFB\] {
+  background-color: #121F17 !important;
+}
+
+html.dark input,
+html.dark textarea,
+html.dark select {
+  background-color: #14241B !important;
+  border-color: #1F3327 !important;
+  color: #ECFDF5 !important;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: #718478 !important;
+}
+
+html.dark footer {
+  background-color: #0E1812 !important;
+  border-color: #1F3327 !important;
+}
+
+html.dark .bg-sage-grid {
+  background-image: 
+    linear-gradient(to right, rgba(163, 184, 172, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(163, 184, 172, 0.04) 1px, transparent 1px);
+}
+
+html.dark .bg-organic-radial {
+  background: 
+    radial-gradient(circle at 10% 20%, rgba(5, 150, 105, 0.15) 0%, transparent 45%),
+    radial-gradient(circle at 90% 15%, rgba(16, 185, 129, 0.12) 0%, transparent 50%),
+    radial-gradient(circle at 50% 65%, rgba(14, 24, 18, 0.8) 0%, transparent 65%);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
