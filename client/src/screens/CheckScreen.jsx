@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import ScamChip from '../components/ScamChip';
-import { Clipboard, ArrowRight, Loader2, Zap, Gift, Store, X } from 'lucide-react';
+import { Clipboard, ArrowRight, Loader2, Zap, Gift, Store, X, QrCode } from 'lucide-react';
 
 export default function CheckScreen({ onCheckComplete }) {
   const { language, t } = useLanguage();
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [showQrSim, setShowQrSim] = useState(false);
 
   const handlePaste = async () => {
     try {
@@ -46,6 +47,46 @@ export default function CheckScreen({ onCheckComplete }) {
       }
     } catch (err) {
       setErrorMsg('Could not reach TrustLayer API: ' + err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleScanQr = async (qrString) => {
+    setIsLoading(true);
+    setErrorMsg('');
+    setShowQrSim(false);
+
+    try {
+      const res = await fetch('/api/qr/parse', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ qrString })
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        // Feed into regular check result flow
+        const isScam = data.preflightRisk.verdict === 'SCAM';
+        onCheckComplete({
+          success: true,
+          score: data.preflightRisk.score,
+          verdict: data.preflightRisk.verdict,
+          extractedUpi: data.parsed.upiId,
+          reasons: isScam 
+            ? [`QR Code leads to Mule VPA: ${data.parsed.upiId}`, 'Intercepted prior to transaction confirmation.']
+            : [`QR Verified: ${data.parsed.payeeName} (${data.parsed.upiId})`, 'Clean verified operational history.'],
+          vernacularExplanation: isScam
+            ? 'सावधान! यह QR कोड एक संदिग्ध धोखाधड़ी खाते से जुड़ा हुआ है।'
+            : 'सुरक्षित QR कोड: व्यापारी की पहचान सत्यापित है।',
+          engine: 'QR_PREFLIGHT_PARSER',
+          latencyMs: 14
+        });
+      } else {
+        setErrorMsg(data.message || 'QR code parsing failed');
+      }
+    } catch (err) {
+      setErrorMsg('Failed to process QR code: ' + err.message);
     } finally {
       setIsLoading(false);
     }
@@ -98,18 +139,57 @@ export default function CheckScreen({ onCheckComplete }) {
           </div>
 
           <div className="flex items-center justify-between text-xs">
-            <button
-              type="button"
-              onClick={handlePaste}
-              className="text-brand-600 hover:text-brand-700 font-semibold flex items-center gap-1.5 transition"
-            >
-              <Clipboard className="w-4 h-4" />
-              <span>{t.pasteBtn}</span>
-            </button>
+            <div className="flex items-center gap-4">
+              <button
+                type="button"
+                onClick={handlePaste}
+                className="text-brand-600 hover:text-brand-700 font-semibold flex items-center gap-1.5 transition"
+              >
+                <Clipboard className="w-4 h-4" />
+                <span>{t.pasteBtn}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowQrSim(!showQrSim)}
+                className="text-slate-600 hover:text-slate-900 font-semibold flex items-center gap-1.5 transition"
+              >
+                <QrCode className="w-4 h-4 text-brand-600" />
+                <span>Simulate UPI QR</span>
+              </button>
+            </div>
+
             <span className="text-[11px] text-slate-400 font-mono">
               Dual-Engine: Heuristics + Gemini
             </span>
           </div>
+
+          {/* QR Simulation Dropdown Panel */}
+          {showQrSim && (
+            <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-2 text-xs">
+              <span className="font-bold text-slate-800 block font-display">
+                Simulate Camera UPI QR Scan:
+              </span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleScanQr('upi://pay?pa=ramu.tea@upi&pn=Ramu%20Tea%20Stall&am=45.00&cu=INR&tn=Tea')}
+                  className="p-2.5 rounded-lg bg-surface border border-slate-200 hover:border-emerald-300 text-left transition"
+                >
+                  <span className="font-bold text-emerald-700 block">✓ Scan Merchant QR</span>
+                  <span className="text-[10px] text-slate-500 font-mono">ramu.tea@upi (₹45)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleScanQr('upi://pay?pa=lottery_reward99@okhdfc&pn=PrizeFund&am=15000.00&cu=INR&tn=Tax')}
+                  className="p-2.5 rounded-lg bg-surface border border-slate-200 hover:border-rose-300 text-left transition"
+                >
+                  <span className="font-bold text-rose-700 block">🚨 Scan Fake Mule QR</span>
+                  <span className="text-[10px] text-slate-500 font-mono">lottery_reward99@okhdfc</span>
+                </button>
+              </div>
+            </div>
+          )}
 
           {errorMsg && (
             <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs">
