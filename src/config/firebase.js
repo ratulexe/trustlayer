@@ -1,5 +1,5 @@
 const { initializeApp, getApps, cert } = require('firebase-admin/app');
-const { getFirestore } = require('firebase-admin/firestore');
+const { getFirestore, FieldValue } = require('firebase-admin/firestore');
 const path = require('path');
 const fs = require('fs');
 
@@ -72,5 +72,6 @@ module.exports = {
   db,
   isFirestoreConnected,
   projectId,
-  verifyIdToken
+  verifyIdToken,
+  FieldValue
 };
