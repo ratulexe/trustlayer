@@ -8,71 +8,101 @@ export default function RiskGauge({ score = 0, verdict = 'SAFE' }) {
   const isScam = verdict === 'SCAM' || score >= 70;
   const isCaution = !isScam && (verdict === 'CAUTION' || score >= 30);
 
-  const colorClass = isScam
-    ? { 
-        text: 'text-rose-600', 
-        bg: 'bg-rose-500', 
-        pillBg: 'bg-rose-50', 
-        pillBorder: 'border-rose-200', 
-        pillText: 'text-rose-700',
-        trackGlow: 'shadow-[0_0_12px_rgba(239,68,68,0.2)]'
+  const theme = isScam
+    ? {
+        stroke: '#F43F5E',
+        text: 'text-[#F43F5E]',
+        pillBg: 'bg-[#FFE4E6]',
+        pillBorder: 'border-[#FECDD3]',
+        pillText: 'text-[#BE123C]'
       }
     : isCaution
-    ? { 
-        text: 'text-amber-600', 
-        bg: 'bg-amber-500', 
-        pillBg: 'bg-amber-50', 
-        pillBorder: 'border-amber-200', 
-        pillText: 'text-amber-700',
-        trackGlow: 'shadow-[0_0_12px_rgba(245,158,11,0.2)]'
+    ? {
+        stroke: '#F59E0B',
+        text: 'text-[#D97706]',
+        pillBg: 'bg-[#FEF3C7]',
+        pillBorder: 'border-[#FDE68A]',
+        pillText: 'text-[#B45309]'
       }
-    : { 
-        text: 'text-emerald-600', 
-        bg: 'bg-emerald-500', 
-        pillBg: 'bg-emerald-50', 
-        pillBorder: 'border-emerald-200', 
-        pillText: 'text-emerald-700',
-        trackGlow: 'shadow-[0_0_12px_rgba(16,185,129,0.2)]'
+    : {
+        stroke: '#059669',
+        text: 'text-[#059669]',
+        pillBg: 'bg-[#E6F7EF]',
+        pillBorder: 'border-[#A7F3D0]',
+        pillText: 'text-[#047857]'
       };
 
   const verdictLabel = isScam ? t.scamVerdict : isCaution ? t.cautionVerdict : t.safeVerdict;
 
+  // SVG Circular Gauge calculations
+  const size = 180;
+  const strokeWidth = 14;
+  const radius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const normalizedScore = Math.min(100, Math.max(0, score));
+  const strokeDashoffset = circumference - (normalizedScore / 100) * circumference;
+
   return (
-    <div className="relative flex flex-col items-center p-6 bg-[#FAFAF8] border border-slate-200/90 rounded-2xl w-full shadow-[0_1px_4px_rgba(23,37,84,0.03)] overflow-hidden">
-      {/* Subtle Top Accent Hairline */}
-      <div className={`absolute top-0 inset-x-0 h-1 ${colorClass.bg}`} />
+    <div className="flex flex-col items-center justify-center p-6 sm:p-8 bg-[#F7FAF8] border border-[#D4E0D5] rounded-3xl w-full relative overflow-hidden">
+      
+      {/* Circular SVG Gauge */}
+      <div className="relative flex items-center justify-center">
+        <svg
+          width={size}
+          height={size}
+          viewBox={`0 0 ${size} ${size}`}
+          className="transform -rotate-90"
+        >
+          {/* Background Track */}
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            fill="transparent"
+            stroke="#E2EAE3"
+            strokeWidth={strokeWidth}
+          />
+          {/* Animated Value Arc */}
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            fill="transparent"
+            stroke={theme.stroke}
+            strokeWidth={strokeWidth}
+            strokeDasharray={circumference}
+            strokeDashoffset={strokeDashoffset}
+            strokeLinecap="round"
+            className="transition-all duration-1000 ease-out"
+          />
+        </svg>
 
-      <span className="text-xs uppercase tracking-wider text-[#64748B] font-semibold mb-2 font-display">
-        {t.riskScore}
-      </span>
-
-      {/* Large Score Display */}
-      <div className="flex items-baseline gap-1.5 my-1">
-        <span className={`text-6xl font-black font-mono tracking-tight ${colorClass.text}`}>
-          {score}
-        </span>
-        <span className="text-sm font-mono text-[#64748B]">/ 100</span>
+        {/* Center Score Readout */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+          <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#5C6B63]">
+            {t.riskScore}
+          </span>
+          <div className="flex items-baseline justify-center">
+            <span className={`text-5xl font-black font-mono tracking-tight tabular-nums ${theme.text}`}>
+              {score}
+            </span>
+            <span className="text-xs font-mono text-[#5C6B63] font-medium">/100</span>
+          </div>
+        </div>
       </div>
 
-      {/* Linear Meter */}
-      <div className="w-full max-w-xs bg-slate-200/80 h-2.5 rounded-full overflow-hidden my-3 border border-slate-200/60 p-0.5">
-        <div
-          className={`h-full rounded-full ${colorClass.bg} ${colorClass.trackGlow} transition-all duration-700 ease-out`}
-          style={{ width: `${Math.max(5, Math.min(100, score))}%` }}
-        />
-      </div>
-
-      {/* Verdict Pill with SVG Icon */}
-      <div className={`mt-2 px-3.5 py-1.5 rounded-full text-xs font-bold font-display border flex items-center gap-2 ${colorClass.pillBg} ${colorClass.pillBorder} ${colorClass.pillText}`}>
+      {/* Verdict Pill Badge with Status Icon */}
+      <div className={`mt-5 px-4 py-2 rounded-full text-xs font-extrabold font-sans border flex items-center gap-2 shadow-xs ${theme.pillBg} ${theme.pillBorder} ${theme.pillText}`}>
         {isScam ? (
-          <ShieldAlertIcon className="w-4 h-4 shrink-0" />
+          <ShieldAlertIcon className="w-4 h-4 shrink-0 text-[#F43F5E]" />
         ) : isCaution ? (
-          <AlertTriangleIcon className="w-4 h-4 shrink-0" />
+          <AlertTriangleIcon className="w-4 h-4 shrink-0 text-[#F59E0B]" />
         ) : (
-          <ShieldCheckIcon className="w-4 h-4 shrink-0" />
+          <ShieldCheckIcon className="w-4 h-4 shrink-0 text-[#059669]" />
         )}
         <span>{verdictLabel}</span>
       </div>
+
     </div>
   );
 }

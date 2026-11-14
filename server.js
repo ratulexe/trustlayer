@@ -114,6 +114,13 @@ app.use((req, res) => {
   });
 });
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`[TrustLayer] Rail API online at http://localhost:${PORT}`);
 });
+
+server.on('error', (err) => {
+  console.error('[TrustLayer Server Error]:', err);
+});
+
+// Explicit keep-alive for background daemons
+setInterval(() => {}, 30000);
