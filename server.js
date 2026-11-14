@@ -6,7 +6,7 @@ const { handlePay } = require('./src/controllers/payController');
 const { handleGetStats } = require('./src/controllers/statsController');
 const { evaluateRisk } = require('./src/riskEngine');
 const { ledger } = require('./src/ledger');
-const { generateSimulatedMerchantHistory, calculateTrustScore } = require('./src/creditEngine');
+const { generateSimulatedMerchantHistory, calculateTrustScore, disburseWorkingCapital } = require('./src/creditEngine');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -71,6 +71,20 @@ app.get('/api/merchants/ramu-tea-stall/credit-profile', (req, res) => {
     merchant: sampleMerchantData,
     creditAssessment: scoreData
   });
+});
+
+app.post('/api/credit/drawdown', (req, res) => {
+  try {
+    const { amount, tenureDays } = req.body;
+    const loan = disburseWorkingCapital({ amount, tenureDays });
+    res.json({
+      success: true,
+      message: `₹${loan.disbursedAmount.toLocaleString('en-IN')} disbursed to Ramu Tea Stall VPA (ramu.tea@upi).`,
+      loan
+    });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
+  }
 });
 
 app.get('/api/ledger', (req, res) => {

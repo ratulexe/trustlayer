@@ -9,6 +9,8 @@ node_modules/
 .env.development.local
 .env.test.local
 .env.production.local
+*serviceAccount*.json
+firebase-key.json
 
 # Logs
 npm-debug.log*
