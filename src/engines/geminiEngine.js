@@ -90,19 +90,21 @@ Respond ONLY with valid JSON in this exact structure:
   "vernacularExplanation": "Clear, non-technical 1-sentence warning directly addressing the user in ${language}"
 }`;
 
+    // Model is configurable because Google retires older models for new API keys
+    // (gemini-2.5-flash now returns 404 "no longer available to new users").
+    const model = (process.env.GEMINI_MODEL || 'gemini-3.8-flash').replace(/^models\//, '').trim();
+    const generationConfig = { responseMimeType: 'application/json', temperature: 0.1 };
+    // 2.5 models accept thinkingBudget 0 (much faster); other models keep their default
+    if (model.startsWith('gemini-2.5')) generationConfig.thinkingConfig = { thinkingBudget: 0 };
+
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            responseMimeType: 'application/json',
-            temperature: 0.1,
-            // A scam verdict doesn't need "thinking"; turning it off cuts latency from ~3-6 s to ~1 s
-            thinkingConfig: { thinkingBudget: 0 }
-          }
+          generationConfig
         }),
         signal: controller.signal
       }
