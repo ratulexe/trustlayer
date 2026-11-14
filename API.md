@@ -53,6 +53,7 @@ Content-Type: application/json
   ],
   "vernacularExplanation": "यह बिजली बिल का फर्जी संदेश है। सरकारी बिजली विभाग कभी भी व्यक्तिगत UPI पते पर पैसे नहीं मांगते।",
   "extractedUpi": "discom.officer@paytm",
+  "extractedUpis": ["discom.officer@paytm"],
   "latencyMs": 42,
   "timestamp": "2026-11-14T08:42:00.000Z"
 }
