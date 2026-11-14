@@ -10,21 +10,41 @@ const idempotencyStore = new Map();
 /**
  * Generates an NPCI-compliant UPI Intent URI
  */
-function buildUpiUri({ upiId, payeeName, amount, note, txnRef, merchantCode }) {
-  const params = new URLSearchParams({
-    pa: upiId.toLowerCase().trim(),
-    pn: payeeName || 'Merchant',
-    am: parseFloat(amount).toFixed(2),
-    cu: 'INR',
-    tn: note || 'TrustLayer Verified Pay',
-    tr: txnRef || `TL${Date.now()}`
-  });
+function buildUpiUri({ upiId, payeeName, amount, note, txnRef, merchantCode, isMerchant = false }) {
+  const parts = [];
+  const cleanUpi = (upiId || '').toLowerCase().trim();
+  parts.push(`pa=${encodeURIComponent(cleanUpi)}`);
 
-  if (merchantCode) {
-    params.append('mc', merchantCode);
+  if (payeeName && payeeName.trim()) {
+    parts.push(`pn=${encodeURIComponent(payeeName.trim())}`);
   }
 
-  return `upi://pay?${params.toString()}`;
+  const numAmount = parseFloat(amount);
+  if (!isNaN(numAmount) && numAmount > 0) {
+    parts.push(`am=${numAmount.toFixed(2)}`);
+  }
+
+  parts.push('cu=INR');
+
+  if (note && note.trim()) {
+    parts.push(`tn=${encodeURIComponent(note.trim())}`);
+  }
+
+  // NPCI Specification: tr (Transaction Ref) and mc (Merchant Code) are ONLY for registered merchants.
+  // Including tr or mc on a personal/P2P VPA causes bank switches (SBI, HDFC, ICICI) to treat it as
+  // an invalid merchant checkout and reject with "Your money was not debited. Check UPI limit per bank".
+  if (isMerchant || merchantCode) {
+    if (merchantCode) {
+      parts.push(`mc=${encodeURIComponent(merchantCode.trim())}`);
+    }
+    // NPCI strict: tr must be strictly alphanumeric (no underscores, no hyphens, max 35 chars)
+    const cleanTxnRef = (txnRef || `TL${Date.now()}`).replace(/[^a-zA-Z0-9]/g, '').slice(0, 35);
+    if (cleanTxnRef) {
+      parts.push(`tr=${cleanTxnRef}`);
+    }
+  }
+
+  return `upi://pay?${parts.join('&')}`;
 }
 
 /**
@@ -142,17 +162,22 @@ function handlePay(req, res) {
     }
 
     const paymentId = `pay_${crypto.randomBytes(4).toString('hex')}`;
-    const txnRef = `TL_${Date.now()}_${crypto.randomBytes(2).toString('hex').toUpperCase()}`;
+    const txnRef = `TL${Date.now()}${crypto.randomBytes(2).toString('hex').toUpperCase()}`;
     const cleanAmount = parseFloat(amount).toFixed(2);
 
-    // Build standard NPCI URI
+    // Verified merchant lookup
+    const verifiedMerchant = scamDb.verifiedMerchants.find(m => m.vpa === cleanUpi);
+    const isMerchant = Boolean(merchantCode || verifiedMerchant);
+
+    // Build standard NPCI URI (omits tr/mc for P2P so bank switches don't reject with limit errors)
     const upiDeepLink = buildUpiUri({
       upiId: cleanUpi,
       payeeName,
       amount: cleanAmount,
       note,
-      txnRef,
-      merchantCode
+      txnRef: isMerchant ? txnRef : null,
+      merchantCode: merchantCode || (verifiedMerchant ? verifiedMerchant.categoryCode || verifiedMerchant.mcc : null),
+      isMerchant
     });
 
     const isEscrowAdvised = isCaution;
@@ -166,6 +191,7 @@ function handlePay(req, res) {
       amount: parseFloat(cleanAmount),
       currency: 'INR',
       status: isEscrowAdvised ? 'ESCROW_RECOMMENDED' : 'INITIATED',
+      isMerchant,
       upiDeepLink,
       securitySeal: {
         isVerified: true,

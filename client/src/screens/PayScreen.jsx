@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getDeviceId } from '../utils/deviceId';
 import { useAuth } from '../contexts/AuthContext';
-import { ShieldCheck, AlertTriangle, ExternalLink, ArrowLeft, CheckCircle2, ArrowRight, Wallet } from 'lucide-react';
+import { ShieldCheck, AlertTriangle, ExternalLink, ArrowLeft, CheckCircle2, ArrowRight, Wallet, Copy, Check } from 'lucide-react';
 
 export default function PayScreen({ prefilledVpa = '', prefill = null, payContext = null, onBack }) {
   const { t } = useLanguage();
@@ -14,8 +14,30 @@ export default function PayScreen({ prefilledVpa = '', prefill = null, payContex
   const [paymentResult, setPaymentResult] = useState(null);
   const [errorMsg, setErrorMsg] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
   const { authFetch } = useAuth();
   const [logState, setLogState] = useState('idle'); // idle | saving | done | error
+
+  const handleCopyUpi = async () => {
+    const target = paymentResult?.upiId || upiId;
+    if (!target) return;
+    try {
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(target);
+      } else {
+        const textArea = document.createElement('textarea');
+        textArea.value = target;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+      }
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // ignore
+    }
+  };
 
   // The UPI app confirms the payment, not us — so the user taps once to log it as a UPI expense
   const handleLogPayment = async () => {
@@ -56,8 +78,9 @@ export default function PayScreen({ prefilledVpa = '', prefill = null, payContex
         body: JSON.stringify({
           upiId,
           payeeName,
-          amount: parseFloat(amount),
+          amount: parseFloat(amount) || 0,
           note,
+          merchantCode: prefill?.merchantCode || undefined,
           ...(isCheckedPayee && {
             checkId: payContext.checkId,
             cautionAcknowledged: payContext.cautionAcknowledged === true
@@ -199,14 +222,40 @@ export default function PayScreen({ prefilledVpa = '', prefill = null, payContex
                 </div>
               )}
 
-              <a
-                href={paymentResult.upiDeepLink}
-                className="w-full py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-md transition flex items-center justify-center gap-2 font-display text-center"
-              >
-                <ShieldCheck className="w-4 h-4" />
-                <span>{t.openUpiBtn}</span>
-                <ExternalLink className="w-4 h-4" />
-              </a>
+              <div className="flex flex-col sm:flex-row gap-2.5">
+                <a
+                  href={paymentResult.upiDeepLink}
+                  className="flex-1 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-md transition flex items-center justify-center gap-2 font-display text-center"
+                >
+                  <ShieldCheck className="w-4 h-4" />
+                  <span>{t.openUpiBtn}</span>
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+                <button
+                  type="button"
+                  onClick={handleCopyUpi}
+                  className="py-3 px-3.5 rounded-xl bg-white hover:bg-[#F3F6F4] border border-[#C5D3C7] text-[#0F1F17] font-bold text-xs transition flex items-center justify-center gap-1.5 font-display shadow-sm"
+                  title={t.copyUpiBtn}
+                >
+                  {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4 text-[#5C6B63]" />}
+                  <span>{copied ? t.copiedUpi : t.copyUpiBtn}</span>
+                </button>
+              </div>
+
+              {/* Bank Limit & Self-Transfer Troubleshooting Guide */}
+              <div className="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200/80 text-amber-950 text-xs space-y-1.5">
+                <div className="flex items-center gap-2 font-bold font-display text-amber-900">
+                  <AlertTriangle className="w-4 h-4 shrink-0 text-amber-700" />
+                  <span>{t.limitHelpTitle}</span>
+                </div>
+                <ul className="space-y-1 text-[11px] leading-relaxed text-amber-900/90 list-disc list-inside">
+                  <li>{t.limitReasonSelf}</li>
+                  <li>{t.limitReasonBank}</li>
+                </ul>
+                <p className="text-[11px] text-amber-800 font-medium pt-1 border-t border-amber-200/50 leading-relaxed">
+                  {t.limitFix}
+                </p>
+              </div>
 
               <button
                 type="button"

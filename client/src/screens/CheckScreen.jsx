@@ -214,6 +214,7 @@ export default function CheckScreen({ onCheckComplete, prefilledText = '' }) {
           payeeName: parsed.payeeName,
           amount: parsed.amount,
           note: parsed.note,
+          merchantCode: parsed.merchantCode || null,
           isVerifiedMerchant: preflightRisk.isVerifiedMerchant,
           isMuleFlagged: preflightRisk.isMuleFlagged,
           merchantDetails: preflightRisk.merchantDetails
