@@ -79,6 +79,36 @@ app.get('/api/merchants/ramu-tea-stall/credit-profile', (req, res) => {
   });
 });
 
+app.post('/api/credit/drawdown', (req, res) => {
+  const { amount = 5000, tenureDays = 30 } = req.body;
+  const scoreData = calculateTrustScore(sampleMerchantData);
+  const loanAmount = parseFloat(amount);
+
+  if (loanAmount > scoreData.preApprovedLimit) {
+    return res.status(400).json({
+      success: false,
+      error: `Requested amount ₹${loanAmount} exceeds pre-approved limit of ₹${scoreData.preApprovedLimit}`
+    });
+  }
+
+  const loanId = `LOAN_${Date.now()}`;
+  const dailyDeduct = Math.round((loanAmount * (1 + (scoreData.interestRateApr / 100) * (tenureDays / 365))) / tenureDays);
+
+  res.json({
+    success: true,
+    message: `₹${loanAmount.toLocaleString('en-IN')} disbursed instantly to ${sampleMerchantData.vpa} via UPI Rail!`,
+    loan: {
+      loanId,
+      amount: loanAmount,
+      tenureDays,
+      apr: scoreData.interestRateApr,
+      dailyDeduction: dailyDeduct,
+      status: 'ACTIVE_DISBURSED',
+      timestamp: new Date().toISOString()
+    }
+  });
+});
+
 app.get('/api/ledger', (req, res) => {
   res.json({
     chainLength: ledger.entries.length,

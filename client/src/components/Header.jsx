@@ -63,6 +63,17 @@ export default function Header({ currentScreen, setCurrentScreen }) {
             <Activity className="w-3.5 h-3.5" />
             <span>{t.navDashboard}</span>
           </button>
+          <button
+            onClick={() => setCurrentScreen('inclusion')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 ${
+              currentScreen === 'inclusion'
+                ? 'bg-surface text-slate-900 shadow-sm border border-slate-200/80 font-bold'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>{t.navInclusion || 'Financial Inclusion'}</span>
+          </button>
         </nav>
 
         {/* Vernacular Language Switcher */}

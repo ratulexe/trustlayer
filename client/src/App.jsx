@@ -5,6 +5,7 @@ import CheckScreen from './screens/CheckScreen';
 import ResultScreen from './screens/ResultScreen';
 import PayScreen from './screens/PayScreen';
 import DashboardScreen from './screens/DashboardScreen';
+import InclusionScreen from './screens/InclusionScreen';
 
 function MainApp() {
   const [currentScreen, setCurrentScreen] = useState('check');
@@ -52,6 +53,10 @@ function MainApp() {
 
         {currentScreen === 'dashboard' && (
           <DashboardScreen />
+        )}
+
+        {currentScreen === 'inclusion' && (
+          <InclusionScreen />
         )}
       </main>
 
