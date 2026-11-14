@@ -166,26 +166,47 @@ export default function CheckScreen({ onCheckComplete }) {
 
           {/* QR Simulation Dropdown Panel */}
           {showQrSim && (
-            <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-2 text-xs">
-              <span className="font-bold text-slate-800 block font-display">
-                Simulate Camera UPI QR Scan:
-              </span>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3 text-xs">
+              <div>
+                <span className="font-bold text-slate-800 block font-display">
+                  Simulate Camera QR Scan (Point phone at real-world QR):
+                </span>
+                <p className="text-[11px] text-slate-500 mt-0.5">
+                  The user never knows in advance if a QR is genuine. TrustLayer inspects the raw payload before payment:
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 <button
                   type="button"
                   onClick={() => handleScanQr('upi://pay?pa=ramu.tea@upi&pn=Ramu%20Tea%20Stall&am=45.00&cu=INR&tn=Tea')}
-                  className="p-2.5 rounded-lg bg-surface border border-slate-200 hover:border-emerald-300 text-left transition"
+                  className="p-3 rounded-xl bg-surface border border-slate-200 hover:border-brand-300 text-left transition shadow-xs group"
                 >
-                  <span className="font-bold text-emerald-700 block">✓ Scan Merchant QR</span>
-                  <span className="text-[10px] text-slate-500 font-mono">ramu.tea@upi (₹45)</span>
+                  <span className="font-bold text-slate-800 group-hover:text-brand-600 block font-display">
+                    Local Shop Counter Standee
+                  </span>
+                  <span className="text-[11px] text-slate-500 block mt-0.5">
+                    Physical QR displayed at Tea Stall (₹45)
+                  </span>
+                  <span className="text-[10px] font-mono text-slate-400 mt-1 block">
+                    Payload: ramu.tea@upi
+                  </span>
                 </button>
+
                 <button
                   type="button"
                   onClick={() => handleScanQr('upi://pay?pa=lottery_reward99@okhdfc&pn=PrizeFund&am=15000.00&cu=INR&tn=Tax')}
-                  className="p-2.5 rounded-lg bg-surface border border-slate-200 hover:border-rose-300 text-left transition"
+                  className="p-3 rounded-xl bg-surface border border-slate-200 hover:border-brand-300 text-left transition shadow-xs group"
                 >
-                  <span className="font-bold text-rose-700 block">🚨 Scan Fake Mule QR</span>
-                  <span className="text-[10px] text-slate-500 font-mono">lottery_reward99@okhdfc</span>
+                  <span className="font-bold text-slate-800 group-hover:text-brand-600 block font-display">
+                    WhatsApp Flyer QR Code
+                  </span>
+                  <span className="text-[11px] text-slate-500 block mt-0.5">
+                    "Scan to Claim ₹25 Lakh Prize" (₹15,000 fee)
+                  </span>
+                  <span className="text-[10px] font-mono text-slate-400 mt-1 block">
+                    Payload: lottery_reward99@okhdfc
+                  </span>
                 </button>
               </div>
             </div>
