@@ -2,7 +2,7 @@ import React from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
 import {
-  ShieldCheck, Search, CreditCard, Wallet, Activity, Store, ArrowRight, Languages, Zap, KeyRound, Lock, Ban, PhoneCall, Link, ShieldAlert
+  ShieldCheck, Search, CreditCard, Wallet, Activity, Store, ArrowRight, Languages, Zap, KeyRound, Lock, PhoneCall, Link, ShieldAlert, Landmark, Clock, Smartphone
 } from 'lucide-react';
 
 const FEATURES = [
@@ -13,11 +13,67 @@ const FEATURES = [
   { id: 'inclusion', icon: Store, titleKey: 'navInclusion', descKey: 'feat_inclusion_desc', tone: 'bg-sky-50 text-sky-600 border-sky-100', ring: 'hover:border-sky-200' }
 ];
 
-const RULES = [
-  { key: 'rule1', icon: KeyRound },
-  { key: 'rule2', icon: Ban },
-  { key: 'rule3', icon: PhoneCall },
-  { key: 'rule4', icon: Link }
+const SECURITY_POINTS = [
+  {
+    id: 'link',
+    icon: Link,
+    tagKey: 'secPoint1Tag',
+    titleKey: 'secPoint1Title',
+    descKey: 'secPoint1Desc',
+    badgeTone: 'bg-rose-50 text-rose-700 border-rose-200',
+    iconTone: 'bg-rose-50 text-rose-600 border-rose-100',
+    numTone: 'bg-rose-100 text-rose-800'
+  },
+  {
+    id: 'pin',
+    icon: KeyRound,
+    tagKey: 'secPoint2Tag',
+    titleKey: 'secPoint2Title',
+    descKey: 'secPoint2Desc',
+    badgeTone: 'bg-amber-50 text-amber-700 border-amber-200',
+    iconTone: 'bg-amber-50 text-amber-600 border-amber-100',
+    numTone: 'bg-amber-100 text-amber-800'
+  },
+  {
+    id: 'vpa',
+    icon: Landmark,
+    tagKey: 'secPoint3Tag',
+    titleKey: 'secPoint3Title',
+    descKey: 'secPoint3Desc',
+    badgeTone: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+    iconTone: 'bg-indigo-50 text-indigo-600 border-indigo-100',
+    numTone: 'bg-indigo-100 text-indigo-800'
+  },
+  {
+    id: 'urgency',
+    icon: Clock,
+    tagKey: 'secPoint4Tag',
+    titleKey: 'secPoint4Title',
+    descKey: 'secPoint4Desc',
+    badgeTone: 'bg-purple-50 text-purple-700 border-purple-200',
+    iconTone: 'bg-purple-50 text-purple-600 border-purple-100',
+    numTone: 'bg-purple-100 text-purple-800'
+  },
+  {
+    id: 'screen',
+    icon: Smartphone,
+    tagKey: 'secPoint5Tag',
+    titleKey: 'secPoint5Title',
+    descKey: 'secPoint5Desc',
+    badgeTone: 'bg-red-50 text-red-700 border-red-200',
+    iconTone: 'bg-red-50 text-red-600 border-red-100',
+    numTone: 'bg-red-100 text-red-800'
+  },
+  {
+    id: 'helpline',
+    icon: PhoneCall,
+    tagKey: 'secPoint6Tag',
+    titleKey: 'secPoint6Title',
+    descKey: 'secPoint6Desc',
+    badgeTone: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+    iconTone: 'bg-emerald-50 text-emerald-600 border-emerald-100',
+    numTone: 'bg-emerald-100 text-emerald-800'
+  }
 ];
 
 export default function HomeScreen({ onNavigate }) {
@@ -93,48 +149,75 @@ export default function HomeScreen({ onNavigate }) {
         </div>
       </section>
 
-      {/* Golden rules */}
-      <section className="space-y-4">
-        <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 font-display">{t.rulesHeader}</h2>
-        <ol className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {RULES.map(({ key, icon: Icon }, i) => (
-            <li key={key} className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-card flex items-start gap-3">
-              <span className="w-9 h-9 shrink-0 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-sm">{i + 1}</span>
-              <span className="text-sm text-slate-700 leading-relaxed flex-1">{t[key]}</span>
-              <Icon className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" aria-hidden="true" />
-            </li>
-          ))}
-        </ol>
-      </section>
-
-      {/* Prominent Security Advisory Banner */}
-      <section className="bg-gradient-to-r from-rose-50 via-red-50 to-amber-50 border border-rose-200 rounded-3xl p-5 sm:p-7 shadow-card space-y-3">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div className="flex items-start sm:items-center gap-3">
-            <span className="w-10 h-10 rounded-2xl bg-rose-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-rose-500/20">
-              <ShieldAlert className="w-5 h-5" />
+      {/* Point-wise Security & Cyber Crime Advisory Section */}
+      <section className="bg-gradient-to-b from-rose-50/60 via-slate-50 to-white border border-rose-200/90 rounded-3xl p-5 sm:p-8 shadow-card space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-rose-100 pb-5">
+          <div className="flex items-start sm:items-center gap-3.5">
+            <span className="w-11 h-11 rounded-2xl bg-rose-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-rose-600/20">
+              <ShieldAlert className="w-6 h-6" />
             </span>
             <div>
-              <span className="text-[11px] font-mono font-bold text-rose-700 uppercase tracking-wider block">
-                {t.securityAdvisoryTag || 'CYBER CRIME ADVISORY'}
-              </span>
-              <h3 className="font-bold text-base sm:text-lg text-slate-900 font-display">
-                {t.securityAdvisoryTitle || 'Do not click any random link — it will be a scam!'}
-              </h3>
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-mono font-bold text-rose-700 uppercase tracking-wider">
+                  {t.securityAdvisoryTag || 'CYBER CRIME & FRAUD ADVISORY'}
+                </span>
+                <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
+              </div>
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 font-display">
+                {t.securityChecklistTitle || 'Security Rules & Scam Defense Guide'}
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-600 mt-0.5">
+                {t.securityChecklistSub || 'Essential rules verified by Cyber Crime Cell — remember these before clicking or paying:'}
+              </p>
             </div>
           </div>
           <button
             type="button"
             onClick={() => onNavigate('check')}
-            className="self-start sm:self-auto px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-md transition flex items-center gap-1.5 shrink-0 font-display"
+            className="self-start sm:self-auto px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs sm:text-sm shadow-md transition flex items-center gap-2 shrink-0 font-display"
           >
-            <span>{t.homeCta || 'Check a message'}</span>
+            <Search className="w-4 h-4" />
+            <span>{t.homeCta}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
-        <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
-          {t.securityAdvisoryBody}
-        </p>
+
+        {/* 6 Point-Wise Separate Boxes */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {SECURITY_POINTS.map((pt, index) => {
+            const Icon = pt.icon;
+            return (
+              <div
+                key={pt.id}
+                className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-sm hover:border-rose-300 hover:shadow-md transition flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center justify-between gap-2 mb-3">
+                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-mono font-bold ${pt.numTone}`}>
+                      {t.pointLabel || 'Point'} {index + 1}
+                    </span>
+                    <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border ${pt.badgeTone}`}>
+                      {t[pt.tagKey]}
+                    </span>
+                  </div>
+
+                  <div className="flex items-start gap-2.5">
+                    <span className={`w-8 h-8 rounded-xl border flex items-center justify-center shrink-0 mt-0.5 ${pt.iconTone}`}>
+                      <Icon className="w-4 h-4" />
+                    </span>
+                    <h3 className="font-bold text-sm sm:text-base text-slate-900 font-display leading-snug">
+                      {t[pt.titleKey]}
+                    </h3>
+                  </div>
+
+                  <p className="mt-2.5 text-xs sm:text-sm text-slate-600 leading-relaxed pl-10.5">
+                    {t[pt.descKey]}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </section>
     </div>
   );
