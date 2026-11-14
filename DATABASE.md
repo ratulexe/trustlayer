@@ -46,6 +46,38 @@ erDiagram
         int reportCount
         boolean active
     }
+
+    STATS {
+        string id PK
+        int totalChecks
+        int scamDetected
+        int cautionDetected
+        int safeDetected
+        int paymentsBlocked
+        float amountProtectedInr
+        int communityReports
+        map byPattern
+    }
+
+    REPORTS {
+        string id PK
+        string checkId FK
+        string owner
+        string extractedUpi
+        string verdict
+        timestamp timestamp
+    }
+
+    LEDGER {
+        string id PK
+        int index
+        string txnId
+        timestamp timestamp
+        map payload
+        string prevHash
+        string entryHash
+        string status
+    }
 ```
 
 ---
@@ -118,6 +150,70 @@ Repository of active Indian scam vectors used by the Heuristic Rule Engine and G
   ],
   "reportCount": 1420,
   "active": true
+}
+```
+
+---
+
+### 2.4. `stats` Collection (Document `stats/global`)
+Maintains real-time atomic telemetry counters aggregated across all transactions and checks.
+
+```json
+{
+  "totalChecks": 145,
+  "scamDetected": 32,
+  "cautionDetected": 18,
+  "safeDetected": 95,
+  "paymentsBlocked": 12,
+  "amountProtectedInr": 184500.00,
+  "communityReports": 24,
+  "byPattern": {
+    "ELECTRICITY_DISCONNECTION": 15,
+    "TRAI_SIM_DEACTIVATION": 9,
+    "PART_TIME_JOB": 8
+  }
+}
+```
+
+---
+
+### 2.5. `reports` Collection
+Stores user-flagged scams from ResultScreen to build crowdsourced threat intelligence.
+
+```json
+{
+  "id": "chk_89f72b14_dev_93fa88",
+  "checkId": "chk_89f72b14",
+  "owner": "dev_93fa88",
+  "extractedUpi": "powerbill@okaxis",
+  "verdict": "SCAM",
+  "timestamp": "2026-11-14T13:20:00.000Z"
+}
+```
+
+---
+
+### 2.6. `ledger` Collection
+Stores the immutable, SHA-256 hash-chained cryptographic audit ledger for post-restart resilience.
+
+```json
+{
+  "index": 1,
+  "txnId": "TL_1794630539539_CDC3FA",
+  "timestamp": "2026-11-14T04:28:59.539Z",
+  "payload": {
+    "txnId": "TL_1794630539539_CDC3FA",
+    "payerMasked": "pr***a@okaxis",
+    "payeeVpa": "ramu.tea@upi",
+    "amount": 45.00,
+    "decision": "APPROVE",
+    "riskScore": 5,
+    "escrowDelaySeconds": 0,
+    "timestamp": "2026-11-14T04:28:59.539Z"
+  },
+  "prevHash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "entryHash": "e7725779711c97675dfbec2994b18abe6f811d6f1540d17e782b86f88404e2f7",
+  "status": "SETTLED"
 }
 ```
 
