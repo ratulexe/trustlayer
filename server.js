@@ -81,7 +81,22 @@ app.get('/api/merchants/ramu-tea-stall/credit-profile', (req, res) => {
 app.post('/api/credit/drawdown', (req, res) => {
   const { amount = 5000, tenureDays = 30 } = req.body;
   const scoreData = calculateTrustScore(sampleMerchantData);
-  const loanAmount = parseFloat(amount);
+  const loanAmount = Number(amount);
+  const tenure = Number(tenureDays);
+
+  if (!Number.isFinite(loanAmount) || loanAmount <= 0) {
+    return res.status(400).json({
+      success: false,
+      error: 'Amount must be a positive number'
+    });
+  }
+
+  if (!Number.isInteger(tenure) || tenure <= 0 || tenure > 365) {
+    return res.status(400).json({
+      success: false,
+      error: 'tenureDays must be a whole number between 1 and 365'
+    });
+  }
 
   if (loanAmount > scoreData.preApprovedLimit) {
     return res.status(400).json({
@@ -91,7 +106,7 @@ app.post('/api/credit/drawdown', (req, res) => {
   }
 
   const loanId = `LOAN_${Date.now()}`;
-  const dailyDeduct = Math.round((loanAmount * (1 + (scoreData.interestRateApr / 100) * (tenureDays / 365))) / tenureDays);
+  const dailyDeduct = Math.round((loanAmount * (1 + (scoreData.interestRateApr / 100) * (tenure / 365))) / tenure);
 
   res.json({
     success: true,
@@ -99,7 +114,7 @@ app.post('/api/credit/drawdown', (req, res) => {
     loan: {
       loanId,
       amount: loanAmount,
-      tenureDays,
+      tenureDays: tenure,
       apr: scoreData.interestRateApr,
       dailyDeduction: dailyDeduct,
       status: 'ACTIVE_DISBURSED',

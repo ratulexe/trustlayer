@@ -6,7 +6,6 @@ export default function DashboardScreen() {
   const { t } = useLanguage();
   const [stats, setStats] = useState(null);
   const [history, setHistory] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData() {
@@ -22,8 +21,6 @@ export default function DashboardScreen() {
         if (historyData.success) setHistory(historyData.history || []);
       } catch (err) {
         console.error('Failed to load dashboard data', err);
-      } finally {
-        setIsLoading(false);
       }
     }
     fetchData();

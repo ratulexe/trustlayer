@@ -7,7 +7,6 @@ export default function RiskGauge({ score = 0, verdict = 'SAFE' }) {
 
   const isScam = verdict === 'SCAM' || score >= 70;
   const isCaution = !isScam && (verdict === 'CAUTION' || score >= 30);
-  const isSafe = !isScam && !isCaution;
 
   const colorClass = isScam
     ? { text: 'text-rose-600', bg: 'bg-rose-500', pillBg: 'bg-rose-50', pillBorder: 'border-rose-200', pillText: 'text-rose-700', Icon: ShieldAlert }

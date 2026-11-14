@@ -1,20 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useLanguage } from '../contexts/LanguageContext';
-import { 
-  Coins, 
-  TrendingUp, 
-  Users, 
-  ShieldCheck, 
-  CheckCircle2, 
-  ArrowRight, 
-  Lock, 
-  Sparkles,
-  Store,
-  FileText
-} from 'lucide-react';
+import { Coins, Lock, Sparkles, Store } from 'lucide-react';
 
 export default function InclusionScreen() {
-  const { t } = useLanguage();
   const [profile, setProfile] = useState(null);
   const [ledgerEntries, setLedgerEntries] = useState([]);
   const [loanAmount, setLoanAmount] = useState('10000');
