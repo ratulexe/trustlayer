@@ -66,41 +66,41 @@ export default function InclusionScreen() {
           <Sparkles className="w-3.5 h-3.5" />
           <span>FINANCIAL INCLUSION & ALTERNATIVE CREDIT RAIL</span>
         </div>
-        <h2 className="text-2xl font-bold text-slate-900 tracking-tight font-display">
+        <h2 className="text-2xl font-bold text-[#0F1F17] tracking-tight font-display">
           Informal Merchant Cashflow Underwriting
         </h2>
-        <p className="text-sm text-slate-500 max-w-xl mx-auto">
+        <p className="text-sm text-[#5C6B63] max-w-xl mx-auto">
           Unlocking formal credit for 60M+ street vendors with zero CIBIL history using real-time UPI transaction continuity.
         </p>
       </div>
 
       {/* Top Banner: Merchant Profile & TrustScore */}
-      <div className="bg-surface rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-card">
+      <div className="sage-card rounded-3xl p-4 sm:p-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-brand-600 to-indigo-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-brand-500/20">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#047857] to-[#059669] text-white flex items-center justify-center shrink-0 shadow-md shadow-brand-500/20">
               <Store className="w-7 h-7 text-white" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-bold text-lg text-slate-900 font-display">
+                <h3 className="font-bold text-lg text-[#0F1F17] font-display">
                   {merchant?.name || 'Ramu Tea & Snacks Corner'}
                 </h3>
                 <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200 uppercase font-mono">
                   Nano-Merchant
                 </span>
               </div>
-              <p className="text-xs text-slate-500 mt-1">
-                VPA: <strong className="font-mono text-slate-700">{merchant?.vpa || 'ramu.tea@upi'}</strong> • Indiranagar, Bengaluru • Bureau History: <span className="text-rose-600 font-semibold font-mono">CIBIL Invisible</span>
+              <p className="text-xs text-[#5C6B63] mt-1">
+                VPA: <strong className="font-mono text-[#24352C]">{merchant?.vpa || 'ramu.tea@upi'}</strong> • Indiranagar, Bengaluru • Bureau History: <span className="text-rose-600 font-semibold font-mono">CIBIL Invisible</span>
               </p>
             </div>
           </div>
 
           {/* Dynamic TrustScore Box */}
-          <div className="flex items-center gap-6 bg-slate-50 border border-slate-200 px-6 py-3.5 rounded-2xl shrink-0">
+          <div className="flex items-center gap-6 bg-[#F7FAF8] border border-[#D4E0D5] px-6 py-3.5 rounded-2xl shrink-0">
             <div>
-              <span className="text-[11px] text-slate-500 uppercase tracking-wider font-semibold block font-mono">
+              <span className="text-[11px] text-[#5C6B63] uppercase tracking-wider font-semibold block font-mono">
                 TrustScore (300-900)
               </span>
               <div className="flex items-baseline gap-2">
@@ -112,8 +112,8 @@ export default function InclusionScreen() {
                 </span>
               </div>
             </div>
-            <div className="border-l border-slate-200 pl-6">
-              <span className="text-[11px] text-slate-500 uppercase tracking-wider font-semibold block font-mono">
+            <div className="border-l border-[#D4E0D5] pl-6">
+              <span className="text-[11px] text-[#5C6B63] uppercase tracking-wider font-semibold block font-mono">
                 Pre-Approved Working Capital
               </span>
               <span className="text-2xl font-black text-emerald-600 font-mono">
@@ -129,17 +129,17 @@ export default function InclusionScreen() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
         {/* Left: 4 Scoring Pillars */}
-        <div className="lg:col-span-7 bg-surface rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-card space-y-4">
-          <div className="border-b border-slate-100 pb-3 flex items-center justify-between">
+        <div className="lg:col-span-7 sage-card rounded-3xl p-4 sm:p-6 space-y-4">
+          <div className="border-b border-[#E2EAE3] pb-3 flex items-center justify-between">
             <div>
-              <h4 className="font-bold text-sm text-slate-900 font-display">
+              <h4 className="font-bold text-sm text-[#0F1F17] font-display">
                 Algorithmic Underwriting Pillars
               </h4>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-[#5C6B63]">
                 Evaluating 30-day UPI cashflows instead of traditional collateral
               </p>
             </div>
-            <span className="text-[11px] font-mono font-bold bg-slate-100 px-2 py-0.5 rounded text-slate-600">
+            <span className="text-[11px] font-mono font-bold bg-[#EAF0EB] px-2 py-0.5 rounded text-[#5C6B63]">
               3,120 Txns
             </span>
           </div>
@@ -151,19 +151,19 @@ export default function InclusionScreen() {
               { pillar: 'Revenue Regularity', weight: '30%', score: 280, status: 'Strong' },
               { pillar: 'Dispute & Chargeback Resilience', weight: '20%', score: 195, status: 'Near-Zero' }
             ]).map((item, idx) => (
-              <div key={idx} className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+              <div key={idx} className="p-3.5 rounded-xl bg-[#F7FAF8] border border-[#D4E0D5] flex items-center justify-between">
                 <div className="space-y-0.5">
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-xs text-slate-800 font-display">{item.pillar}</span>
-                    <span className="text-[11px] font-mono text-slate-400">({item.weight} wt)</span>
+                    <span className="font-bold text-xs text-[#0F1F17] font-display">{item.pillar}</span>
+                    <span className="text-[11px] font-mono text-[#8E9C94]">({item.weight} wt)</span>
                   </div>
-                  <span className="text-xs text-slate-500 font-mono">
+                  <span className="text-xs text-[#5C6B63] font-mono">
                     Status: <strong className="text-emerald-700">{item.status}</strong>
                   </span>
                 </div>
                 <div className="text-right">
                   <span className="text-base font-black font-mono text-brand-600">{item.score}</span>
-                  <span className="text-[11px] text-slate-400 block font-mono">Points</span>
+                  <span className="text-[11px] text-[#8E9C94] block font-mono">Points</span>
                 </div>
               </div>
             ))}
@@ -171,36 +171,36 @@ export default function InclusionScreen() {
 
           {/* Key Metrics Row */}
           <div className="grid grid-cols-3 gap-2 pt-2 text-xs font-mono">
-            <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
-              <span className="text-[11px] text-slate-400 block">DAILY VOLUME:</span>
-              <span className="font-bold text-slate-900">₹2,840/day</span>
+            <div className="p-2.5 rounded-xl bg-[#F7FAF8] border border-[#D4E0D5]">
+              <span className="text-[11px] text-[#8E9C94] block">DAILY VOLUME:</span>
+              <span className="font-bold text-[#0F1F17]">₹2,840/day</span>
             </div>
-            <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
-              <span className="text-[11px] text-slate-400 block">UNIQUE PAYERS:</span>
-              <span className="font-bold text-slate-900">342 Customers</span>
+            <div className="p-2.5 rounded-xl bg-[#F7FAF8] border border-[#D4E0D5]">
+              <span className="text-[11px] text-[#8E9C94] block">UNIQUE PAYERS:</span>
+              <span className="font-bold text-[#0F1F17]">342 Customers</span>
             </div>
-            <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
-              <span className="text-[11px] text-slate-400 block">STABILITY:</span>
+            <div className="p-2.5 rounded-xl bg-[#F7FAF8] border border-[#D4E0D5]">
+              <span className="text-[11px] text-[#8E9C94] block">STABILITY:</span>
               <span className="font-bold text-emerald-600">94.8% Active</span>
             </div>
           </div>
         </div>
 
         {/* Right: Instant 1-Click Working Capital Loan Simulator */}
-        <div className="lg:col-span-5 bg-surface rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-card flex flex-col justify-between">
+        <div className="lg:col-span-5 sage-card rounded-3xl p-4 sm:p-6 flex flex-col justify-between">
           <div>
-            <div className="border-b border-slate-100 pb-3 mb-4">
-              <h4 className="font-bold text-sm text-slate-900 font-display">
+            <div className="border-b border-[#E2EAE3] pb-3 mb-4">
+              <h4 className="font-bold text-sm text-[#0F1F17] font-display">
                 1-Click Micro-Credit Drawdown
               </h4>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-[#5C6B63]">
                 Working capital disbursed instantly to merchant UPI VPA
               </p>
             </div>
 
             <form onSubmit={handleDrawdown} className="space-y-4 text-xs">
               <div>
-                <label className="block text-slate-700 font-semibold mb-1">
+                <label className="block text-[#24352C] font-semibold mb-1">
                   Loan Amount (Max: ₹15,000)
                 </label>
                 <input
@@ -210,25 +210,25 @@ export default function InclusionScreen() {
                   min="1000"
                   max="15000"
                   step="500"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-slate-900 font-mono font-bold text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition"
+                  className="w-full bg-[#F7FAF8] border border-[#D4E0D5] rounded-xl px-3 py-2.5 text-[#0F1F17] font-mono font-bold text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition"
                   required
                 />
               </div>
 
-              <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2 text-xs font-mono">
+              <div className="p-3.5 bg-[#F7FAF8] rounded-xl border border-[#D4E0D5] space-y-2 text-xs font-mono">
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Interest (APR):</span>
-                  <span className="text-slate-900 font-bold">11.5%</span>
+                  <span className="text-[#5C6B63]">Interest (APR):</span>
+                  <span className="text-[#0F1F17] font-bold">11.5%</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Tenure:</span>
-                  <span className="text-slate-900 font-bold">30 Days</span>
+                  <span className="text-[#5C6B63]">Tenure:</span>
+                  <span className="text-[#0F1F17] font-bold">30 Days</span>
                 </div>
-                <div className="flex justify-between border-t border-slate-200 pt-1.5">
-                  <span className="text-slate-500">Auto Daily Repayment:</span>
+                <div className="flex justify-between border-t border-[#D4E0D5] pt-1.5">
+                  <span className="text-[#5C6B63]">Auto Daily Repayment:</span>
                   <span className="text-emerald-600 font-bold">₹{Math.round(parseFloat(loanAmount || 0) * 1.009 / 30)}/day</span>
                 </div>
-                <span className="text-[11px] text-slate-400 block italic">
+                <span className="text-[11px] text-[#8E9C94] block italic">
                   Deducted automatically from daily incoming UPI settlements.
                 </span>
               </div>
@@ -258,15 +258,15 @@ export default function InclusionScreen() {
       </div>
 
       {/* Bottom: Cryptographic Audit Ledger */}
-      <div className="bg-surface rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-card space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+      <div className="sage-card rounded-3xl p-4 sm:p-6 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#E2EAE3] pb-3">
           <div className="flex items-center gap-2">
             <Lock className="w-4 h-4 text-brand-600" />
-            <h4 className="font-bold text-sm text-slate-900 font-display">
+            <h4 className="font-bold text-sm text-[#0F1F17] font-display">
               Cryptographic Audit Ledger (Non-Repudiation)
             </h4>
           </div>
-          <span className="text-[11px] font-mono text-slate-500">
+          <span className="text-[11px] font-mono text-[#5C6B63]">
             Chained Hash: SHA-256 with Masked PII
           </span>
         </div>
@@ -274,7 +274,7 @@ export default function InclusionScreen() {
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs font-mono">
             <thead>
-              <tr className="border-b border-slate-200 text-slate-500 uppercase text-[11px] bg-slate-50">
+              <tr className="border-b border-[#D4E0D5] text-[#5C6B63] uppercase text-[11px] bg-[#F7FAF8]">
                 <th className="py-2.5 px-3 rounded-l-lg">#</th>
                 <th className="py-2.5 px-3">Txn ID</th>
                 <th className="py-2.5 px-3">Payer (Masked)</th>
@@ -285,22 +285,22 @@ export default function InclusionScreen() {
                 <th className="py-2.5 px-3 rounded-r-lg">Entry Hash</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-[#E2EAE3]">
               {ledgerEntries.length === 0 ? (
                 <tr>
-                  <td colSpan="8" className="py-4 text-center text-slate-400">
+                  <td colSpan="8" className="py-4 text-center text-[#8E9C94]">
                     No transactions committed to chain yet.
                   </td>
                 </tr>
               ) : (
                 ledgerEntries.slice(0, 5).map((entry, idx) => (
-                  <tr key={idx} className="hover:bg-slate-50 transition">
-                    <td className="py-2.5 px-3 text-slate-400">{entry.index}</td>
-                    <td className="py-2.5 px-3 font-semibold text-slate-800">{entry.txnId}</td>
-                    <td className="py-2.5 px-3 text-slate-500">{entry.payload?.payerMasked}</td>
+                  <tr key={idx} className="hover:bg-[#F7FAF8] transition">
+                    <td className="py-2.5 px-3 text-[#8E9C94]">{entry.index}</td>
+                    <td className="py-2.5 px-3 font-semibold text-[#0F1F17]">{entry.txnId}</td>
+                    <td className="py-2.5 px-3 text-[#5C6B63]">{entry.payload?.payerMasked}</td>
                     <td className="py-2.5 px-3 text-brand-600 font-medium">{entry.payload?.payeeVpa}</td>
-                    <td className="py-2.5 px-3 text-slate-900 font-bold">₹{entry.payload?.amount}</td>
-                    <td className="py-2.5 px-3 font-bold text-slate-700">{entry.payload?.riskScore}</td>
+                    <td className="py-2.5 px-3 text-[#0F1F17] font-bold">₹{entry.payload?.amount}</td>
+                    <td className="py-2.5 px-3 font-bold text-[#24352C]">{entry.payload?.riskScore}</td>
                     <td className="py-2.5 px-3">
                       <span className={`px-2 py-0.5 rounded text-[11px] font-bold ${
                         entry.status === 'SETTLED' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'
@@ -308,7 +308,7 @@ export default function InclusionScreen() {
                         {entry.status}
                       </span>
                     </td>
-                    <td className="py-2.5 px-3 text-slate-400 text-[11px]">{entry.entryHash?.substring(0, 12)}...</td>
+                    <td className="py-2.5 px-3 text-[#8E9C94] text-[11px]">{entry.entryHash?.substring(0, 12)}...</td>
                   </tr>
                 ))
               )}

@@ -19,6 +19,9 @@ services:
         value: "20"
       - key: GEMINI_API_KEY
         sync: false
+      # Second AI model (xAI Grok), combined with Gemini
+      - key: XAI_API_KEY
+        sync: false
       # Google sign-in (Firebase web app config)
       - key: FIREBASE_WEB_API_KEY
         sync: false

@@ -1,4 +1,5 @@
-const { db, isFirestoreConnected, verifyIdToken } = require('../config/firebase');
+const { db, isFirestoreConnected } = require('../config/firebase');
+const { resolveOwner } = require('../config/owner');
 const { checkHistory } = require('./checkController');
 const { recordCommunityReportStat } = require('./statsController');
 
@@ -16,17 +17,11 @@ async function handleReport(req, res) {
       });
     }
 
-    const authHeader = req.headers.authorization;
-    const idToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
-    const user = await verifyIdToken(idToken);
-    const owner = user?.uid ? `uid_${user.uid}` : deviceId;
-
-    if (!owner || typeof owner !== 'string' || !owner.trim()) {
-      return res.status(400).json({
-        success: false,
-        error: 'deviceId or valid Bearer token is required'
-      });
+    const resolved = await resolveOwner(req, deviceId);
+    if (!resolved.owner) {
+      return res.status(resolved.status).json({ success: false, error: resolved.error });
     }
+    const owner = resolved.owner;
 
     // Retrieve the check to validate ownership and verdict
     let check = checkHistory.find(c => c.id === checkId);

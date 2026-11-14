@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const { evaluateWithGemini } = require('../engines/geminiEngine');
-const { db, isFirestoreConnected, verifyIdToken } = require('../config/firebase');
+const { db, isFirestoreConnected } = require('../config/firebase');
+const { resolveOwner } = require('../config/owner');
 const { recordCheckStat } = require('./statsController');
 
 // In-memory store for fast local checks history (synced with Firestore when enabled)
@@ -29,11 +30,9 @@ async function handleCheck(req, res) {
       });
     }
 
-    // Determine owner from Bearer token if signed in, otherwise deviceId
-    const authHeader = req.headers.authorization;
-    const idToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
-    const user = await verifyIdToken(idToken);
-    const owner = user?.uid ? `uid_${user.uid}` : (deviceId || 'anon_device');
+    // Owner = verified Google account, or a valid anonymous device ID.
+    // Anyone may run a check; without a valid owner it simply isn't added to any history.
+    const { owner = null } = await resolveOwner(req, deviceId);
 
     const evaluation = await evaluateWithGemini({ rawInput, language });
     const checkId = `chk_${crypto.randomBytes(4).toString('hex')}`;
@@ -81,8 +80,12 @@ async function handleCheck(req, res) {
       reasons: record.reasons,
       vernacularExplanation: record.vernacularExplanation,
       extractedUpi: record.extractedUpi,
+      extractedUpis: evaluation.extractedUpis || (record.extractedUpi ? [record.extractedUpi] : []),
       engine: record.engine,
       aiEnhanced: record.aiEnhanced,
+      // Per-engine scores (Rules / Gemini / Grok) and whether the AI models agreed
+      aiOpinions: evaluation.aiOpinions || null,
+      agreement: evaluation.agreement || null,
       latencyMs: record.latencyMs,
       timestamp,
       cautionRequired: isCautionTier(record),
@@ -99,18 +102,12 @@ async function handleCheck(req, res) {
 
 async function handleGetHistory(req, res) {
   try {
-    const authHeader = req.headers.authorization;
-    const idToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
-    const user = await verifyIdToken(idToken);
-    const owner = user?.uid ? `uid_${user.uid}` : req.query.deviceId;
-
-    // Reject if no owner identified (neither valid token nor deviceId)
-    if (!owner || typeof owner !== 'string' || !owner.trim()) {
-      return res.status(400).json({
-        success: false,
-        error: 'deviceId query parameter or Authorization Bearer token is required'
-      });
+    // Only the verified account or the real anonymous device may read its own history
+    const resolved = await resolveOwner(req, req.query.deviceId);
+    if (!resolved.owner) {
+      return res.status(resolved.status).json({ success: false, error: resolved.error });
     }
+    const owner = resolved.owner;
 
     let records = [];
 

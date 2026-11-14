@@ -10,6 +10,7 @@
 - **Frontend**: React 18+ with Vite (PWA template), Tailwind CSS (Bright & Minimal theme).
 - **Backend**: Node.js 20+ with Express.js (`cors`, `express.json`).
 - **AI / LLM**: Google Gemini API (`gemini-1.5-flash` or `gemini-2.0-flash`).
+- **AI / LLM (second model)**: xAI Grok via its OpenAI-compatible REST API (plain fetch), combined with Gemini in an ensemble — added at the evaluators' request.
 - **Database**: Cloud Firestore (via `firebase-admin` or official Firebase Client SDK).
 - **Payment Link**: Standard NPCI `upi://pay` URI specification.
 

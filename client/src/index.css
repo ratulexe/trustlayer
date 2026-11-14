@@ -1,11 +1,177 @@
 @import "tailwindcss";
 
-/* Design tokens — see DESIGN.md (bright, minimal, high-trust) */
 @theme {
-  /* Latin brand font first, then native Devanagari / Bengali fonts for Hindi & Bengali */
-  --font-sans: 'Kanchenjunga', 'Noto Sans Devanagari', 'Noto Sans Bengali', system-ui, -apple-system, sans-serif;
-  --font-display: 'Kanchenjunga', 'Noto Sans Devanagari', 'Noto Sans Bengali', sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --font-serif: 'Newsreader', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', 'Inter', 'Noto Sans Devanagari', 'Noto Sans Bengali', system-ui, sans-serif;
+  --font-display: 'Newsreader', Georgia, serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Premium Sage & Mint Fintech Palette */
+  --color-canvas-sage: #F3F6F4;
+  --color-surface-white: #FFFFFF;
+  --color-surface-sage: #EAF0EB;
+  --color-surface-sage-light: #F7FAF8;
+
+  --color-text-primary: #0F1F17;
+  --color-text-secondary: #5C6B63;
+  --color-text-muted: #8E9C94;
+
+  --color-emerald-deep: #059669;
+  --color-emerald-dark: #047857;
+  --color-emerald-light: #E6F7EF;
+  --color-mint-glow: #A7F3D0;
+  --color-mint-pill: #D1FAE5;
+
+  --color-amber-warm: #F59E0B;
+  --color-amber-light: #FEF3C7;
+
+  --color-rose-coral: #F43F5E;
+  --color-rose-light: #FFE4E6;
+
+  --color-border-sage: #D4E0D5;
+  --color-border-sage-subtle: #E2EAE3;
+}
+
+body {
+  margin: 0;
+  background-color: #F3F6F4;
+  color: #0F1F17;
+  font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+  overflow-x: hidden;
+  letter-spacing: -0.012em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Serif typography helper */
+.font-serif-editorial {
+  font-family: 'Newsreader', Georgia, serif;
+  letter-spacing: -0.025em;
+}
+
+/* Subtle organic grain and data-stream grid */
+.bg-sage-grid {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(92, 107, 99, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(92, 107, 99, 0.04) 1px, transparent 1px);
+}
+
+.bg-organic-radial {
+  background: 
+    radial-gradient(circle at 10% 20%, rgba(167, 243, 208, 0.35) 0%, transparent 45%),
+    radial-gradient(circle at 90% 15%, rgba(209, 250, 229, 0.45) 0%, transparent 50%),
+    radial-gradient(circle at 50% 65%, rgba(234, 240, 235, 0.7) 0%, transparent 65%);
+}
+
+/* Premium elevated cards */
+.sage-card {
+  background: #FFFFFF;
+  border: 1px solid #D4E0D5;
+  box-shadow: 
+    0 1px 3px rgba(15, 31, 23, 0.02),
+    0 8px 24px -4px rgba(15, 31, 23, 0.04),
+    0 24px 48px -12px rgba(15, 31, 23, 0.03);
+}
+
+.sage-card-hover {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.sage-card-hover:hover {
+  transform: translateY(-2px);
+  border-color: #059669;
+  box-shadow: 
+    0 4px 12px rgba(15, 31, 23, 0.04),
+    0 16px 36px -4px rgba(5, 150, 105, 0.08);
+}
+
+/* Stream animations for wave lines */
+@keyframes stream-flow {
+  0% {
+    stroke-dashoffset: 100;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animate-stream-flow {
+  stroke-dasharray: 8 12;
+  animation: stream-flow 20s linear infinite;
+}
+
+@keyframes stream-flow-fast {
+  0% {
+    stroke-dashoffset: 160;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animate-stream-flow-fast {
+  stroke-dasharray: 12 16;
+  animation: stream-flow-fast 12s linear infinite;
+}
+
+@keyframes float-gentle {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.animate-float-gentle {
+  animation: float-gentle 5s ease-in-out infinite;
+}
+
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(0.98);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 4s ease-in-out infinite;
+}
+
+/* Tabular figures */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .animate-stream-flow,
+  .animate-stream-flow-fast,
+  .animate-float-gentle,
+  .animate-pulse-soft {
+    animation: none !important;
+  }
+}
+
+/* =============================================================================
+   Integration layer: keeps screens from main (Home, My Money, Inclusion, Caution
+   flow, QR scanner, sign-in) in the sage & mint design without rewriting each one.
+   ============================================================================= */
+@theme {
+  /* "brand" now means the redesign's emerald instead of the old indigo */
+  --color-brand-50: #E6F7EF;
+  --color-brand-100: #D1FAE5;
+  --color-brand-200: #A7F3D0;
+  --color-brand-500: #059669;
+  --color-brand-600: #047857;
+  --color-brand-700: #065F46;
+
+  --color-canvas: #F3F6F4;
+  --color-surface: #FFFFFF;
 
   /* Readable on small phones and for older users: xs = 13px, sm = 15px */
   --text-xs: 0.8125rem;
@@ -13,56 +179,14 @@
   --text-sm: 0.9375rem;
   --text-sm--line-height: 1.45rem;
 
-  --color-canvas: #F8FAFC;
-  --color-surface: #FFFFFF;
-
-  --color-brand-50: #EEF2FF;
-  --color-brand-100: #E0E7FF;
-  --color-brand-200: #C7D2FE;
-  --color-brand-500: #4F46E5;
-  --color-brand-600: #4338CA;
-  --color-brand-700: #3730A3;
-
-  --color-safe-50: #ECFDF5;
-  --color-safe-200: #A7F3D0;
-  --color-safe-500: #10B981;
-  --color-safe-600: #059669;
-  --color-safe-700: #047857;
-
-  --color-caution-50: #FFFBEB;
-  --color-caution-200: #FDE68A;
-  --color-caution-500: #F59E0B;
-  --color-caution-600: #D97706;
-  --color-caution-700: #B45309;
-
-  --color-scam-50: #FEF2F2;
-  --color-scam-200: #FECACA;
-  --color-scam-500: #EF4444;
-  --color-scam-600: #DC2626;
-  --color-scam-700: #B91C1C;
-
-  /* Shadows from DESIGN.md (were referenced by components but never defined) */
-  --shadow-subtle: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.04);
-  --shadow-card: 0 4px 20px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
-  --shadow-float: 0 12px 32px -4px rgba(79, 70, 229, 0.28);
+  --shadow-subtle: 0 1px 2px rgba(15, 31, 23, 0.03), 0 1px 3px rgba(15, 31, 23, 0.03);
+  --shadow-card: 0 1px 3px rgba(15, 31, 23, 0.02), 0 8px 24px -4px rgba(15, 31, 23, 0.04), 0 24px 48px -12px rgba(15, 31, 23, 0.03);
+  --shadow-float: 0 12px 32px -6px rgba(5, 150, 105, 0.28);
 }
 
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
-  }
-
-  body {
-    margin: 0;
-    color: #0F172A;
-    font-family: var(--font-sans);
-    background-color: #F8FAFC;
-    /* Soft brand glow at the top keeps the canvas bright but not flat */
-    background-image:
-      radial-gradient(60rem 28rem at 50% -8rem, rgba(99, 102, 241, 0.10), transparent 70%),
-      radial-gradient(40rem 20rem at 100% 0, rgba(16, 185, 129, 0.06), transparent 70%);
-    background-repeat: no-repeat;
-    min-height: 100vh;
   }
 
   button:not(:disabled),
@@ -73,15 +197,15 @@
   }
 
   :focus-visible {
-    outline: 3px solid rgba(79, 70, 229, 0.45);
+    outline: 3px solid rgba(5, 150, 105, 0.45);
     outline-offset: 2px;
   }
 
-  /* Comfortable tap targets on phones */
+  /* Stops iOS zooming into form fields */
   input,
   select,
   textarea {
-    font-size: max(16px, 1em); /* stops iOS zooming into fields */
+    font-size: max(16px, 1em);
   }
 }
 

@@ -1,154 +1,136 @@
-// Google Gemini AI Engine with deterministic fallback
+// AI scam engine: rule engine first, then Gemini + Grok in parallel, combined into one verdict.
+// The function keeps its original name (evaluateWithGemini) so callers don't change.
 const { performance } = require('perf_hooks');
-const fs = require('fs');
-const path = require('path');
+const crypto = require('crypto');
 const { runRuleEngine } = require('./ruleEngine');
+const scamDb = require('../data/scamDatabase.json');
+const { buildPrompt, redact, gemini, grok, getGeminiApiKey } = require('./llmProviders');
+const { combineOpinions } = require('./aiEnsemble');
 
-function getGeminiApiKey() {
-  if (
-    process.env.GEMINI_API_KEY &&
-    process.env.GEMINI_API_KEY !== 'your_gemini_api_key_here'
-  ) {
-    return process.env.GEMINI_API_KEY;
-  }
+const PROVIDERS = [gemini, grok];
 
-  // Load from .env if present in root
-  try {
-    const envPath = path.resolve(__dirname, '../../.env');
-    if (fs.existsSync(envPath)) {
-      const content = fs.readFileSync(envPath, 'utf8');
-      const match = content.match(/^\s*GEMINI_API_KEY\s*=\s*(.+)$/m);
-      if (match) {
-        let key = match[1].trim();
-        if (
-          (key.startsWith('"') && key.endsWith('"')) ||
-          (key.startsWith("'") && key.endsWith("'"))
-        ) {
-          key = key.slice(1, -1);
-        }
-        if (key && key !== 'your_gemini_api_key_here') {
-          process.env.GEMINI_API_KEY = key;
-          return key;
-        }
-      }
-    }
-  } catch (_) {}
+function getGeminiTimeout() {
+  const envVal = parseInt(process.env.GEMINI_TIMEOUT_MS, 10);
+  // Default 3000 ms: real AI replies take ~1-3 s, so 1000 ms (AGENTS.md rule 5) would make
+  // every call fall back. Team decision pending — override with GEMINI_TIMEOUT_MS.
+  return Number.isInteger(envVal) && envVal > 0 ? envVal : 3000;
+}
 
-  return null;
+// ---- Quota savers ---------------------------------------------------------------
+// Free AI tiers are tiny (e.g. 20 requests/day per Gemini model), so only ask the AI when it
+// can change the answer, reuse answers for repeated messages, and back off per provider on 429.
+const VERIFIED_VPAS = new Set((scamDb.verifiedMerchants || []).map((m) => String(m.vpa).toLowerCase()));
+const CONFIDENT_SCAM_SCORE = 85;
+const AI_CACHE_TTL_MS = 60 * 60 * 1000;
+const AI_CACHE_MAX = 300;
+const QUOTA_PAUSE_MS = 60 * 1000;
+const aiCache = new Map(); // key → { opinions, at }
+const pausedUntil = { gemini: 0, grok: 0 };
+
+function cacheKey(text, language) {
+  const normalized = String(text || '').toLowerCase().replace(/\s+/g, ' ').trim();
+  return crypto.createHash('sha256').update(`${language}|${normalized}`).digest('hex');
+}
+
+function isConfidentRuleResult(ruleResult) {
+  if (ruleResult.score >= CONFIDENT_SCAM_SCORE) return true;
+  const upis = ruleResult.extractedUpis || (ruleResult.extractedUpi ? [ruleResult.extractedUpi] : []);
+  // Paying only verified merchants with no scam signals → already safe
+  return ruleResult.score <= 10 && upis.length > 0 && upis.every((u) => VERIFIED_VPAS.has(String(u).toLowerCase()));
+}
+
+function withRuleFields(ruleResult, combined, extra) {
+  return {
+    ...combined,
+    extractedUpi: ruleResult.extractedUpi,
+    extractedUpis: ruleResult.extractedUpis,
+    heuristicLatencyMs: ruleResult.latencyMs,
+    ...extra
+  };
 }
 
 async function evaluateWithGemini({ rawInput, language = 'en' }) {
-  const apiKey = getGeminiApiKey();
-
-  // Run fast heuristic rule engine as primary baseline (<20ms SLA)
   const ruleResult = runRuleEngine({ rawInput, language });
+  const configured = PROVIDERS.filter((p) => p.isConfigured());
 
-  // If no Gemini API key configured, use high-speed heuristic result
-  if (!apiKey) {
-    return {
-      ...ruleResult,
-      heuristicLatencyMs: ruleResult.latencyMs,
-      latencyMs: ruleResult.latencyMs,
-      engine: 'HEURISTIC_RULE_ENGINE',
-      aiEnhanced: false
-    };
+  // No AI keys at all → rule engine only (works offline)
+  if (configured.length === 0) {
+    return { ...ruleResult, engine: 'HEURISTIC_RULE_ENGINE', aiEnhanced: false };
   }
 
-  // If Gemini API key is provided, perform deep contextual analysis
+  // 1. Rule engine already certain → don't spend AI quota
+  if (isConfidentRuleResult(ruleResult)) {
+    return { ...ruleResult, engine: 'HEURISTIC_RULE_ENGINE', aiEnhanced: false, aiSkipped: 'confident' };
+  }
+
+  // 2. Same message checked recently → reuse the AI answers
+  const key = cacheKey(rawInput, language);
+  const cached = aiCache.get(key);
+  if (cached && Date.now() - cached.at < AI_CACHE_TTL_MS) {
+    const combined = combineOpinions(ruleResult, cached.opinions, language);
+    return withRuleFields(ruleResult, combined, { latencyMs: ruleResult.latencyMs, aiCached: true });
+  }
+
+  // 3. Skip providers that just ran out of quota
+  const active = configured.filter((p) => Date.now() >= pausedUntil[p.name]);
+  if (active.length === 0) {
+    return { ...ruleResult, engine: 'HEURISTIC_FALLBACK', aiEnhanced: false, fallbackReason: 'AI_QUOTA_PAUSED' };
+  }
+
+  // 4. Ask every active provider in parallel, sharing one time limit
+  const prompt = buildPrompt(rawInput, language);
   const aiStart = performance.now();
+  const timeoutMs = getGeminiTimeout();
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 3000); // Strict 3000ms SLA for live network calls
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  const elapsed = () => performance.now() - aiStart;
 
+  let settled;
   try {
-    const prompt = `You are TrustLayer, an expert AI cybersecurity & UPI scam detection engine designed for digital payment safety in India.
-Analyze the following message, UPI handle, or payment request for financial fraud, phishing, and social engineering targeting Indian consumers.
-
-SPECIFIC SCAM VECTORS TO DETECT:
-1. TRAI / Telecom SIM Deactivation Scam (threats of SIM block/suspension, asking for KYC verification fee via UPI).
-2. Telegram Part-Time Job & Prepaid Task Scam (liking YouTube videos, rating hotels, paying deposit/advance money to "unlock" bonus or salary).
-3. Fake Courier / India Post / Customs Parcel Duty Scam (unpaid parcel fee, illegal parcel detained, redelivery charge).
-4. Electricity Disconnection Ultimatum (tonight power cut threats by discoms like WBSEDCL/CESC/TPDDL, paying officer via personal UPI).
-5. Fake Bank KYC Expiry Alert (YONO, PAN update, account freeze threats).
-6. Reverse UPI PIN Collect Trap (asking user to scan QR or enter UPI PIN to receive prize/refund/lottery).
-7. Disguised Hinglish / Banglish Coercion, Sarcasm & Reverse Psychology:
-   - Phrases like "No hurry bro, just send ₹2000 first to unlock your ₹50k job bonus"
-   - "Arey tension mat lo bhai, bas ₹500 verification fee bhej do"
-   - "Kono chap nei dada, 1000 taka advance pathiye 30k commission tule nin"
-   - Casual or sarcastic language pretending to be helpful while demanding upfront funds to unlock money or rewards.
-
-User Preferred Language: ${language} (en = English, hi = Hindi, bn = Bengali).
-Input Text: "${rawInput}"
-
-Respond ONLY with valid JSON in this exact structure:
-{
-  "score": number, // 0 to 100 (where 0 is completely safe and 100 is confirmed fraud)
-  "verdict": "SAFE" | "CAUTION" | "SCAM",
-  "reasons": ["short bullet reason 1", "short bullet reason 2"],
-  "vernacularExplanation": "Clear, non-technical 1-sentence warning directly addressing the user in ${language}"
-}`;
-
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            responseMimeType: 'application/json',
-            temperature: 0.1
-          }
-        }),
-        signal: controller.signal
-      }
+    settled = await Promise.allSettled(
+      active.map((p) => p.ask({ prompt, signal: controller.signal, elapsed, timeoutMs }).then((r) => ({ ...r, provider: p.name, label: p.label })))
     );
-
-    if (!response.ok) {
-      throw new Error(`Gemini HTTP Error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const textOutput = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    const aiParsed = JSON.parse(textOutput);
-
-    // Compute finalScore strictly from Math.max(ruleResult.score, aiParsed.score)
-    const aiScore = Number(aiParsed.score) || 0;
-    const finalScore = Math.max(ruleResult.score, aiScore);
-    const finalVerdict =
-      finalScore >= 70 ? 'SCAM' : finalScore >= 30 ? 'CAUTION' : 'SAFE';
-
-    const totalLatencyMs = Number(
-      (ruleResult.latencyMs + (performance.now() - aiStart)).toFixed(2)
-    );
-
-    return {
-      score: finalScore,
-      verdict: finalVerdict,
-      reasons: [...new Set([...ruleResult.reasons, ...(aiParsed.reasons || [])])],
-      vernacularExplanation:
-        aiParsed.vernacularExplanation || ruleResult.vernacularExplanation,
-      extractedUpi: ruleResult.extractedUpi,
-      heuristicLatencyMs: ruleResult.latencyMs,
-      latencyMs: totalLatencyMs,
-      engine: 'GEMINI_HYBRID_AI',
-      aiEnhanced: true
-    };
-  } catch (err) {
-    // Deterministic fallback to rule engine
-    return {
-      ...ruleResult,
-      heuristicLatencyMs: ruleResult.latencyMs,
-      latencyMs: ruleResult.latencyMs,
-      engine: 'HEURISTIC_FALLBACK',
-      aiEnhanced: false,
-      fallbackReason: err.message
-    };
   } finally {
     clearTimeout(timeoutId);
   }
+
+  const opinions = [];
+  const failures = [];
+  settled.forEach((s, i) => {
+    const p = active[i];
+    if (s.status === 'fulfilled') {
+      opinions.push(s.value);
+    } else {
+      const err = s.reason || {};
+      if (err.status === 429) pausedUntil[p.name] = Date.now() + QUOTA_PAUSE_MS;
+      const reason = err.name === 'AbortError' ? 'timeout' : redact(err.message || err).slice(0, 300);
+      failures.push(`${p.label}: ${reason}`);
+      // Never logs keys or the user's message
+      console.warn(`[${p.label}] Fallback: ${reason}`);
+    }
+  });
+
+  if (opinions.length === 0) {
+    return {
+      ...ruleResult,
+      engine: 'HEURISTIC_FALLBACK',
+      aiEnhanced: false,
+      fallbackReason: failures.join(' | ')
+    };
+  }
+
+  if (aiCache.size >= AI_CACHE_MAX) aiCache.delete(aiCache.keys().next().value);
+  aiCache.set(key, { opinions, at: Date.now() });
+
+  const combined = combineOpinions(ruleResult, opinions, language);
+  return withRuleFields(ruleResult, combined, {
+    latencyMs: Number((ruleResult.latencyMs + elapsed()).toFixed(2)),
+    ...(failures.length ? { partialFailure: failures.join(' | ') } : {})
+  });
 }
 
 module.exports = {
   evaluateWithGemini,
-  getGeminiApiKey
+  getGeminiApiKey,
+  getGeminiTimeout
 };
