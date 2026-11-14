@@ -1,0 +1,29 @@
+# Render Blueprint — one web service serves both the React app and the API.
+# Secrets are NOT stored here: fill them in on the Render dashboard (sync: false).
+services:
+  - type: web
+    name: trustlayer
+    runtime: node
+    plan: free
+    region: singapore
+    branch: main
+    buildCommand: npm run setup
+    startCommand: npm start
+    healthCheckPath: /api/stats
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      # Short Caution cool-down for live demos; remove for the real 15-minute default
+      - key: CAUTION_COOLDOWN_SECONDS
+        value: "20"
+      - key: GEMINI_API_KEY
+        sync: false
+      # Firestore: either upload serviceAccountKey.json as a Secret File,
+      # or fill in these three values
+      - key: FIREBASE_PROJECT_ID
+        sync: false
+      - key: FIREBASE_CLIENT_EMAIL
+        sync: false
+      - key: FIREBASE_PRIVATE_KEY
+        sync: false

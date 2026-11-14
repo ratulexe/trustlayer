@@ -1,123 +1,154 @@
 # TrustLayer (ट्रस्टलेयर / ট্রাস্টলেয়ার)
 
-> **Submission Track**: Financial Technology & Payments  
-> **Tagline**: The Zero-Trust Vernacular Scam Guard & Safe Payment Companion for First-Time UPI Users.  
-> **Live Demo**: [http://localhost:3000](http://localhost:3000) (Local Prototype Active)
+> **Track**: Financial Technology & Payments
+> **Tagline**: The vernacular scam guard and safe payment companion for first-time UPI users.
+> **Live demo**: _link added after the Render deploy_ · Runs locally at http://localhost:3000
 
 ---
 
-## 1. What TrustLayer Does
+## 1. What TrustLayer does
 
-TrustLayer protects first-time digital payment adopters, senior citizens, and rural users from social engineering scams, coercive phishing, and fraudulent UPI collect requests.
+UPI payments are instant and cannot be reversed. First-time users, senior citizens and non-English speakers are targeted by fake electricity-bill threats, lottery "processing fees", KYC-expiry alerts and fake parcel/customs messages. Bank warnings arrive in technical English, after the money is gone.
 
-Settlements over UPI are instantaneous and irreversible. When a vulnerable user is deceived into transferring funds or entering their UPI PIN under false pretenses (e.g., fake electricity bill disconnection, fake lottery wins, unauthorized KYC alerts), money is lost forever with near-zero bank recovery rates.
+**TrustLayer checks a payment _before_ the user presses Pay:**
 
-**TrustLayer acts as an intelligent safety shield:**
-1. **Instant Scam Check**: Users paste any suspicious SMS, WhatsApp message, or UPI handle.
-2. **Dual-Engine Threat Analysis**: Evaluates patterns in milliseconds using a local Heuristic Rule Engine combined with Google Gemini AI.
-3. **Vernacular Plain-Talk Explanations**: Delivers clear, non-technical safety verdicts in **English**, **हिन्दी (Hindi)**, and **বাংলা (Bengali)**.
-4. **Safe UPI Pay**: Generates verified, tamper-proof `upi://pay` deep links for trusted recipients, while hard-blocking confirmed scams.
-5. **Community Scam Intelligence**: Live dashboard tracking trending scam vectors across Indian states.
-
----
-
-## 2. Key Screenshots & Screens
-
-```
-┌─────────────────────────────────┐   ┌─────────────────────────────────┐
-│     Screen 1: Check Message     │   │      Screen 2: Risk Verdict     │
-│   [English] [हिन्दी] [বাংলা]     │   │                                 │
-│  ┌───────────────────────────┐  │   │     🚨 SCAM DETECTED (92/100)   │
-│  │ Paste SMS / UPI ID...     │  │   │  "बिजली विभाग कभी भी व्यक्तिगत  │
-│  └───────────────────────────┘  │   │   UPI पर भुगतान नहीं मांगता।"   │
-│  [🔍 Check Security / जांचें]   │   │  [❌ Payment Halted for Safety] │
-└─────────────────────────────────┘   └─────────────────────────────────┘
-┌─────────────────────────────────┐   ┌─────────────────────────────────┐
-│       Screen 3: Safe Pay        │   │      Screen 4: Dashboard        │
-│   Payee: Ramu Tea Stall         │   │   🛡️ 1,420+ Scams Blocked      │
-│   Amount: ₹350                  │   │   💰 ₹48.2 Lakhs Protected      │
-│   [🛡️ TrustLayer Verified]      │   │   🔥 Trending: Bijli Bill Scam  │
-│   [⚡ Open UPI App (GPay/PhonePe)│  │   Recent User Scans History     │
-└─────────────────────────────────┘   └─────────────────────────────────┘
-```
+1. **Scam check** — paste an SMS, WhatsApp message or UPI ID, or scan a UPI QR code.
+2. **Two engines** — a rule engine (under 1 ms, works offline) plus Google Gemini 2.5 Flash for context. The final score is the higher of the two, and the rule engine takes over if the AI is slow or unavailable.
+3. **Clear verdict in three languages** — **Safe / Caution / Scam** with a 0–100 score, explained in **English, हिन्दी, বাংলা**.
+4. **Safe UPI Pay**
+   - **Safe** → a verified `upi://pay` link that opens GPay / PhonePe / Paytm.
+   - **Caution** → a safety checklist, a cool-down timer and a second confirmation, enforced by the server.
+   - **Scam** → payment blocked, with one tap to call the 1930 cyber-crime helpline.
+5. **Threat feed** — trending scam types and the user's own check history.
+6. **Financial inclusion** — a 300–900 trust score for a street vendor built from UPI sales, with an instant small loan.
+7. **Tamper-proof ledger** — every evaluated transaction is SHA-256 hash-chained, with payer IDs masked.
+8. **Installable app** — add it to a phone's home screen like a native app.
 
 ---
 
-## 3. Architecture & Tech Stack
+## 2. Screens
+
+| Screen | What it shows |
+| :--- | :--- |
+| **Scam Check** | Paste box, language switch, demo QR scans |
+| **Result** | Risk gauge, reasons, vernacular explanation, and the Safe / Caution / Scam action |
+| **Safe Pay** | Payee, amount, verified UPI link, PIN safety rule |
+| **Threat Feed** | Community stats, trending scams, recent checks |
+| **Financial Inclusion** | Merchant trust score, loan offer, audit ledger |
+
+_Screenshots: add to `docs/screenshots/` and link here._
+
+---
+
+## 3. Architecture & tech stack
 
 ```mermaid
 flowchart LR
-    PWA["React + Vite PWA<br>(Mobile-First, Tailwind)"] --> Express["Express.js API"]
-    Express --> RuleEngine["Heuristic Rule Engine<br>(<20ms Regex & Mule Blacklist)"]
-    Express --> Gemini["Google Gemini Flash<br>(Multilingual Scam Reasoning)"]
-    Express --> Firestore[("Cloud Firestore<br>(Checks & Payments)")]
-    Express --> UPILink["Verified upi://pay Intent"]
+    PWA["React + Vite PWA<br>(Tailwind, mobile-first)"] --> Express["Express.js API"]
+    Express --> RuleEngine["Rule engine<br>(mule list, scam patterns, under 1 ms)"]
+    Express --> Gemini["Google Gemini 2.5 Flash<br>(multilingual reasoning)"]
+    Express --> Firestore[("Cloud Firestore<br>checks, payments")]
+    Express --> UPILink["upi://pay deep link"]
 ```
 
-- **Frontend**: React 18, Vite PWA, Tailwind CSS (Minimalist & Bright system).
-- **Backend**: Node.js, Express.js.
-- **AI / LLM**: Google Gemini API (`gemini-1.5-flash`).
-- **Database**: Google Cloud Firestore.
-- **Payment Protocol**: Standard NPCI `upi://pay` deep links.
+- **Frontend**: React 19, Vite, Tailwind CSS, Lucide icons, installable PWA (manifest + service worker)
+- **Backend**: Node.js 20+, Express 5
+- **AI**: Google Gemini 2.5 Flash, with the rule engine as automatic fallback
+- **Database**: Cloud Firestore via `firebase-admin` (in-memory fallback when no credentials)
+- **Payments**: Standard NPCI `upi://pay` intent links
 
 ---
 
-## 4. How to Run Locally
+## 4. Run locally
 
-### Prerequisites
-- Node.js v18+ (tested on Node v20+)
-- npm or pnpm
-
-### Quick Setup
+**Requirements:** Node.js 20.19 or newer.
 
 ```bash
-# 1. Clone repository & navigate to workspace
-cd TrustLayer
-
-# 2. Install backend dependencies
-npm install
-
-# 3. Configure environment variables
-# Copy .env.example to .env and add your GEMINI_API_KEY if testing live AI calls
-# (Note: Heuristic rule engine runs fully offline even without a key!)
-
-# 4. Start the application
-node server.js
-
-# 5. Open in browser
-http://localhost:3000
+npm run setup     # installs server + client and builds the React app
+npm start         # http://localhost:3000
 ```
 
+> **Windows PowerShell:** if `npm` says "running scripts is disabled", use `npm.cmd run setup` and `npm.cmd start`.
+
+**Optional keys** (the app works without them, using the rule engine and in-memory data):
+
+- **Gemini**: copy `.env.example` to `.env` and set `GEMINI_API_KEY`.
+- **Firestore**: Firebase console → Project settings → Service accounts → *Generate new private key*. Save it as `serviceAccountKey.json` in the project root. It is gitignored — **never commit it**.
+
+**Demo setting:** the Caution cool-down is 15 minutes by default. For a live demo, shorten it:
+
+```bash
+# PowerShell
+$env:CAUTION_COOLDOWN_SECONDS=20; npm.cmd start
+# macOS / Linux
+CAUTION_COOLDOWN_SECONDS=20 npm start
+```
+
+**Developing the frontend with hot reload:** run `npm start` in one terminal and `npm run client` in another, then open http://localhost:5173.
+
 ---
 
-## 5. Track Alignment & Requirements Matrix
+## 5. Deploy (Render)
 
-| Hackathon Focus Area | How TrustLayer Implements It |
+The repo includes a `render.yaml` blueprint: one free web service that builds the React app and serves it together with the API.
+
+1. Sign in at [render.com](https://render.com) with GitHub.
+2. **New → Blueprint** → choose this repository → **Apply**.
+3. When asked for environment values:
+   - `GEMINI_API_KEY` — your Gemini key (optional).
+   - Firestore — leave the three `FIREBASE_*` values empty and instead add `serviceAccountKey.json` under **Environment → Secret Files**.
+4. Wait for the build, then open the `https://trustlayer-….onrender.com` URL.
+
+The free plan sleeps after about 15 minutes idle and takes 30–60 seconds to wake. Open the link a minute before presenting.
+
+---
+
+## 6. Track alignment
+
+| Theme | How TrustLayer covers it |
 | :--- | :--- |
-| **UPI Integration & Payment Rails** | Native `upi://pay` RFC intent generation with verified payee VPA sanitization. |
-| **Fraud Mitigation** | Multi-factor scam detection: coercion keyword heuristics, mule accounts, utility phishing triggers. |
-| **Financial Inclusion Tools** | Full vernacular UI in Hindi & Bengali, removing literacy barriers for first-time digital users. |
-| **Data Security & Transaction Reliability** | PII masking (payer handle anonymization) and cryptographic state chaining. |
-| **Seamless User Experience** | Bright, accessible mobile UI with sub-second analysis latency and 1-tap clipboard paste. |
+| **Fraud Mitigation** | Two-engine scam scoring, mule-account blocking, Caution checklist + cool-down, 1930 helpline |
+| **UPI Integration & Payment Rails** | `upi://pay` links, UPI QR parsing, duplicate-payment protection, hash-chained ledger |
+| **Credit & Risk Scoring Models** | 0–100 scam score, payment risk score, 300–900 merchant trust score with loan limits |
+| **Financial Inclusion Tools** | Hindi & Bengali throughout, built for first-time users, seniors and street vendors |
+| **Personal Finance Management** | Personal check history; every payment is checked before it leaves the account |
 
 ---
 
-## 6. Project Documentation Index
+## 7. Demo script (about 3 minutes)
 
-- [PRD.md](file:///c:/TrustLayer/PRD.md) — Product Requirements & User Journeys
-- [DESIGN.md](file:///c:/TrustLayer/DESIGN.md) — Bright & Minimal Design System, Tailwind Tokens, 4 Screens
-- [ARCHITECTURE.md](file:///c:/TrustLayer/ARCHITECTURE.md) — System Architecture & Integrations (Gemini, UPI, Firebase)
-- [DATABASE.md](file:///c:/TrustLayer/DATABASE.md) — Firestore Collections (`checks`, `payments`, `scamPatterns`)
-- [API.md](file:///c:/TrustLayer/API.md) — API Reference (`/api/check`, `/api/pay`, `/api/history`, `/api/stats`)
-- [AGENTS.md](file:///c:/TrustLayer/AGENTS.md) — AI Coding Rules, Tech Stack & Hackathon Roadmap
+Paste these in order:
+
+| # | Message | Expected |
+| :--- | :--- | :--- |
+| 1 | `Dear consumer, your electricity power will be disconnected tonight at 9.30 PM. Please immediately pay pending bill to powerbill@okaxis` | **Scam**, payment blocked, 1930 button |
+| 2 | Same result → switch to **বাংলা** / **हिन्दी** | Warning in the user's language |
+| 3 | `Bhai please send 2000 to release my parcel, pay to ravi.kumar@ybl` | **Caution** (50): checklist → cool-down → confirm → pay |
+| 4 | `Payment for weekly household groceries at Sharma Store. Pay ₹350 to grocer@okaxis` | **Safe**, verified UPI link |
+| 5 | **Financial Inclusion** tab → request ₹5,000 | Trust score, loan approved, ledger entry |
+
+Talking point: _"Banks protect you after the money is gone. TrustLayer protects you before you press Pay."_
+
+> The dashboard headline numbers are sample data; "Your Recent Scans" is live.
 
 ---
 
-## 7. The Team
+## 8. Documentation
 
-- **Team Name**: TrustLayer Builders
-- **Track**: Financial Technology & Payments
+- [PRD.md](PRD.md) — product requirements and user journey
+- [DESIGN.md](DESIGN.md) — design system and screens
+- [ARCHITECTURE.md](ARCHITECTURE.md) — system architecture and integrations
+- [DATABASE.md](DATABASE.md) — Firestore collections
+- [API.md](API.md) — API reference
+- [AGENTS.md](AGENTS.md) — coding rules, stack and roadmap
+
+---
+
+## 9. Team
+
+- **Team**: TrustLayer Builders · **Track**: Financial Technology & Payments
 - **Roles**:
-  - Full-Stack Architecture & UPI Integrations
-  - Threat Modeling, Rule Engine & Gemini Prompts
-  - Vernacular UX (Hindi & Bengali) & Design System
+  - Full-stack architecture, UPI integration and deployment
+  - Threat modelling, rule engine and Gemini prompts
+  - Backend, Firestore, credit engine and audit ledger
+  - Vernacular UX (Hindi & Bengali), financial inclusion and design
