@@ -10,7 +10,7 @@ export default function PayScreen({ prefilledVpa = '', prefill = null, payContex
   const [payeeName, setPayeeName] = useState(prefill?.payeeName || 'Verified Merchant');
   // Empty by default (shows a grey "0"); a scanned QR's amount is pre-filled
   const [amount, setAmount] = useState(prefill?.amount ? String(prefill.amount) : '');
-  const [note, setNote] = useState(prefill?.note || 'TrustLayer Verified Pay');
+  const [note, setNote] = useState(prefill?.note || 'Payment');
   const [paymentResult, setPaymentResult] = useState(null);
   const [errorMsg, setErrorMsg] = useState('');
   const [isLoading, setIsLoading] = useState(false);

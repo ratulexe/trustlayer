@@ -14,7 +14,7 @@ describe('TrustLayer UPI Intent URI & Pay Rail Compliance', () => {
     });
 
     assert.ok(uri.startsWith('upi://pay?'), 'URI must begin with upi://pay?');
-    assert.ok(uri.includes('pa=theratulkole%40okhdfcbank'), 'Must include properly encoded payee address');
+    assert.ok(uri.includes('pa=theratulkole@okhdfcbank'), 'Must include clean unencoded payee address');
     assert.ok(uri.includes('pn=Ratul%20Kole'), 'Must use %20 instead of + for spaces');
     assert.ok(uri.includes('am=150.00'), 'Must include 2-decimal formatted amount');
     assert.ok(uri.includes('cu=INR'), 'Must include INR currency');
@@ -34,7 +34,7 @@ describe('TrustLayer UPI Intent URI & Pay Rail Compliance', () => {
       isMerchant: true
     });
 
-    assert.ok(uri.includes('pa=ramu.tea%40upi'));
+    assert.ok(uri.includes('pa=ramu.tea@upi'));
     assert.ok(uri.includes('mc=5499'), 'Merchant payments must include mc');
     assert.ok(uri.includes('tr='), 'Merchant payments must include tr');
     assert.ok(!uri.includes('_'), 'NPCI mandate: tr must NOT contain underscores or special chars');
@@ -50,7 +50,7 @@ describe('TrustLayer UPI Intent URI & Pay Rail Compliance', () => {
     });
 
     assert.strictEqual(uri.includes('am='), false, 'Zero amount should not be appended');
-    assert.ok(uri.includes('pa=grocer%40okaxis'));
+    assert.ok(uri.includes('pa=grocer@okaxis'));
   });
 
   test('parseUpiQr correctly extracts parameters from raw UPI intent', () => {
@@ -116,7 +116,7 @@ describe('TrustLayer UPI Intent URI & Pay Rail Compliance', () => {
 
     assert.strictEqual(jsonResponse.success, true);
     assert.strictEqual(jsonResponse.isMerchant, false);
-    assert.ok(jsonResponse.upiDeepLink.includes('pa=theratulkole%40okhdfcbank'));
+    assert.ok(jsonResponse.upiDeepLink.includes('pa=theratulkole@okhdfcbank'));
     assert.strictEqual(jsonResponse.upiDeepLink.includes('tr='), false, 'Personal VPA deep link must not contain tr');
   });
 
@@ -143,7 +143,7 @@ describe('TrustLayer UPI Intent URI & Pay Rail Compliance', () => {
 
     assert.strictEqual(jsonResponse.success, true);
     assert.strictEqual(jsonResponse.isMerchant, true);
-    assert.ok(jsonResponse.upiDeepLink.includes('pa=ramu.tea%40upi'));
+    assert.ok(jsonResponse.upiDeepLink.includes('pa=ramu.tea@upi'));
     assert.ok(jsonResponse.upiDeepLink.includes('tr='), 'Verified merchant deep link must contain tr');
     assert.ok(!jsonResponse.upiDeepLink.includes('_'), 'tr must not contain underscores');
   });
