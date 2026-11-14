@@ -35,60 +35,42 @@ const SECURITY_POINTS = [
     icon: Link,
     tagKey: 'secPoint1Tag',
     titleKey: 'secPoint1Title',
-    descKey: 'secPoint1Desc',
-    badgeTone: 'bg-rose-50 text-rose-700 border-rose-200',
-    iconTone: 'bg-rose-50 text-rose-600 border-rose-100',
-    numTone: 'bg-rose-100 text-rose-800'
+    descKey: 'secPoint1Desc'
   },
   {
     id: 'pin',
     icon: KeyRound,
     tagKey: 'secPoint2Tag',
     titleKey: 'secPoint2Title',
-    descKey: 'secPoint2Desc',
-    badgeTone: 'bg-amber-50 text-amber-700 border-amber-200',
-    iconTone: 'bg-amber-50 text-amber-600 border-amber-100',
-    numTone: 'bg-amber-100 text-amber-800'
+    descKey: 'secPoint2Desc'
   },
   {
     id: 'vpa',
     icon: Landmark,
     tagKey: 'secPoint3Tag',
     titleKey: 'secPoint3Title',
-    descKey: 'secPoint3Desc',
-    badgeTone: 'bg-indigo-50 text-indigo-700 border-indigo-200',
-    iconTone: 'bg-indigo-50 text-indigo-600 border-indigo-100',
-    numTone: 'bg-indigo-100 text-indigo-800'
+    descKey: 'secPoint3Desc'
   },
   {
     id: 'urgency',
     icon: Clock,
     tagKey: 'secPoint4Tag',
     titleKey: 'secPoint4Title',
-    descKey: 'secPoint4Desc',
-    badgeTone: 'bg-purple-50 text-purple-700 border-purple-200',
-    iconTone: 'bg-purple-50 text-purple-600 border-purple-100',
-    numTone: 'bg-purple-100 text-purple-800'
+    descKey: 'secPoint4Desc'
   },
   {
     id: 'screen',
     icon: Smartphone,
     tagKey: 'secPoint5Tag',
     titleKey: 'secPoint5Title',
-    descKey: 'secPoint5Desc',
-    badgeTone: 'bg-red-50 text-red-700 border-red-200',
-    iconTone: 'bg-red-50 text-red-600 border-red-100',
-    numTone: 'bg-red-100 text-red-800'
+    descKey: 'secPoint5Desc'
   },
   {
     id: 'helpline',
     icon: PhoneCall,
     tagKey: 'secPoint6Tag',
     titleKey: 'secPoint6Title',
-    descKey: 'secPoint6Desc',
-    badgeTone: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-    iconTone: 'bg-emerald-50 text-emerald-600 border-emerald-100',
-    numTone: 'bg-emerald-100 text-emerald-800'
+    descKey: 'secPoint6Desc'
   }
 ];
 
@@ -361,31 +343,25 @@ export default function HomeScreen({ onNavigate }) {
       </section>
 
       {/* Point-wise Security & Cyber Crime Advisory Section */}
-      <section className="bg-gradient-to-b from-rose-50/60 via-slate-50 to-white border border-rose-200/90 rounded-3xl p-5 sm:p-8 shadow-card space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-rose-100 pb-5">
-          <div className="flex items-start sm:items-center gap-3.5">
-            <span className="w-11 h-11 rounded-2xl bg-rose-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-rose-600/20">
-              <ShieldAlert className="w-6 h-6" />
-            </span>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-[11px] font-mono font-bold text-rose-700 uppercase tracking-wider">
-                  {t.securityAdvisoryTag || 'CYBER CRIME & FRAUD ADVISORY'}
-                </span>
-                <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
-              </div>
-              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 font-display">
-                {t.securityChecklistTitle || 'Security Rules & Scam Defense Guide'}
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-600 mt-0.5">
-                {t.securityChecklistSub || 'Essential rules verified by Cyber Crime Cell — remember these before clicking or paying:'}
-              </p>
+      <section className="space-y-6 sm:space-y-8">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 border-b border-[#D4E0D5]/70 pb-5">
+          <div className="space-y-2 max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFE4E6] border border-[#FECDD3] text-[10px] font-mono text-[#BE123C] uppercase tracking-wider font-semibold">
+              <ShieldAlert className="w-3.5 h-3.5 text-[#BE123C]" />
+              <span>{t.securityAdvisoryTag || 'CYBER CRIME & FRAUD ADVISORY'}</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#BE123C] animate-pulse" />
             </div>
+            <h2 className="text-3xl sm:text-4xl font-serif-editorial text-[#0F1F17] tracking-tight">
+              {t.securityChecklistTitle || 'Security Rules & Scam Defense Guide'}
+            </h2>
+            <p className="text-xs sm:text-sm text-[#5C6B63] leading-relaxed">
+              {t.securityChecklistSub || 'Essential rules verified by Cyber Crime Cell — remember these before clicking or paying:'}
+            </p>
           </div>
           <button
             type="button"
             onClick={() => onNavigate('check')}
-            className="self-start sm:self-auto px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs sm:text-sm shadow-md transition flex items-center gap-2 shrink-0 font-display"
+            className="self-start sm:self-auto px-5 py-3 rounded-xl bg-[#059669] hover:bg-[#047857] text-white font-bold text-xs sm:text-sm shadow-[0_4px_16px_rgba(5,150,105,0.2)] hover:-translate-y-0.5 active:translate-y-0 transition flex items-center gap-2 shrink-0 font-sans cursor-pointer"
           >
             <Search className="w-4 h-4" />
             <span>{t.homeCta}</span>
@@ -394,36 +370,44 @@ export default function HomeScreen({ onNavigate }) {
         </div>
 
         {/* 6 Point-Wise Separate Boxes */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {SECURITY_POINTS.map((pt, index) => {
             const Icon = pt.icon;
             return (
               <div
                 key={pt.id}
-                className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-sm hover:border-rose-300 hover:shadow-md transition flex flex-col justify-between"
+                className="group bg-white p-6 rounded-3xl border border-[#D4E0D5] hover:border-[#059669] transition shadow-[0_4px_16px_rgba(15,31,23,0.02)] hover:shadow-[0_12px_32px_rgba(15,31,23,0.06)] flex flex-col justify-between space-y-4"
               >
-                <div>
-                  <div className="flex items-center justify-between gap-2 mb-3">
-                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-mono font-bold ${pt.numTone}`}>
-                      {t.pointLabel || 'Point'} {index + 1}
+                <div className="space-y-3.5">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-xs font-bold text-[#059669] bg-[#E6F7EF] border border-[#A7F3D0] px-2.5 py-0.5 rounded-lg">
+                      {t.pointLabel || 'Point'} 0{index + 1}
                     </span>
-                    <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border ${pt.badgeTone}`}>
+                    <span className="text-[10px] font-mono font-semibold text-[#5C6B63] bg-[#F7FAF8] border border-[#E2EAE3] px-2.5 py-0.5 rounded-full uppercase tracking-wider">
                       {t[pt.tagKey]}
                     </span>
                   </div>
 
-                  <div className="flex items-start gap-2.5">
-                    <span className={`w-8 h-8 rounded-xl border flex items-center justify-center shrink-0 mt-0.5 ${pt.iconTone}`}>
-                      <Icon className="w-4 h-4" />
-                    </span>
-                    <h3 className="font-bold text-sm sm:text-base text-slate-900 font-display leading-snug">
+                  <div className="space-y-2.5">
+                    <div className="w-10 h-10 rounded-xl bg-[#E6F7EF] border border-[#A7F3D0] flex items-center justify-center text-[#059669] group-hover:bg-[#059669] group-hover:text-white transition">
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    <h3 className="text-base font-bold text-[#0F1F17] font-sans leading-snug">
                       {t[pt.titleKey]}
                     </h3>
                   </div>
 
-                  <p className="mt-2.5 text-xs sm:text-sm text-slate-600 leading-relaxed pl-10.5">
+                  <p className="text-xs sm:text-sm text-[#5C6B63] leading-relaxed">
                     {t[pt.descKey]}
                   </p>
+                </div>
+
+                <div className="pt-3 border-t border-[#EAF0EB] flex items-center justify-between text-[11px] font-mono">
+                  <span className="flex items-center gap-1.5 text-[#059669] font-medium">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#059669]" />
+                    <span>ZERO-TRUST GUARD</span>
+                  </span>
+                  <span className="text-[#8E9C94]">100% VERIFIED</span>
                 </div>
               </div>
             );
