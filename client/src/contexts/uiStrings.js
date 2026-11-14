@@ -38,7 +38,21 @@ export const UI_STRINGS = {
     alreadyReported: 'Already reported',
     communityReports: 'Community Reports',
     liveBadge: 'Live',
-    sessionBadge: 'This session'
+    sessionBadge: 'This session',
+    advisoryTitle: 'Cyber Security Advisories & Scam Defense',
+    advisorySub: 'Essential rules and alerts to protect yourself against online fraud and malicious links.',
+    tipLinkTag: 'NEVER CLICK',
+    tipLinkTitle: 'Do not click random links in SMS or WhatsApp',
+    tipLinkDesc: 'Scammers send shortened links (bit.ly, tinyurl) or fake APK downloads claiming your electricity bill is unpaid or courier parcel is held. Clicking random links can install spyware or take you to cloned phishing sites designed to steal your credentials.',
+    tipPinTag: 'NO PIN FOR REFUNDS',
+    tipPinTitle: 'You never need a UPI PIN to receive money',
+    tipPinDesc: 'Fraudsters on OLX and Facebook Marketplace send "Collect Requests" or QR codes claiming you must scan and enter your PIN to receive money. Remember: your PIN is only entered to transfer funds OUT of your account.',
+    tipUrgencyTag: 'FAKE URGENCY',
+    tipUrgencyTitle: 'Beware of artificial panic and countdowns',
+    tipUrgencyDesc: 'Threats like "power cut tonight at 9:30 PM", "SIM blocked in 2 hours", or "Police warrant issued" are designed to stop you from thinking clearly. Official departments never demand payments on private UPI IDs.',
+    tipHelplineTag: 'GOLDEN HOUR',
+    tipHelplineTitle: 'Report immediately to National Cyber Cell (1930)',
+    tipHelplineDesc: 'If you suspect you shared sensitive information or transferred money to a scammer, immediately call 1930 or visit cybercrime.gov.in. Early reporting allows authorities to freeze recipient accounts in the golden hour.'
   },
   hi: {
     home: 'होम',
@@ -78,7 +92,21 @@ export const UI_STRINGS = {
     alreadyReported: 'पहले ही रिपोर्ट किया गया',
     communityReports: 'सामुदायिक रिपोर्ट',
     liveBadge: 'लाइव',
-    sessionBadge: 'इस सत्र'
+    sessionBadge: 'इस सत्र',
+    advisoryTitle: 'साइबर सुरक्षा सलाह और बचाव',
+    advisorySub: 'ऑनलाइन धोखाधड़ी और संदिग्ध लिंक से सुरक्षित रहने के महत्वपूर्ण नियम।',
+    tipLinkTag: 'क्लिक न करें',
+    tipLinkTitle: 'SMS या WhatsApp पर अनजान लिंक पर कभी क्लिक न करें',
+    tipLinkDesc: 'धोखेबाज बिजली बिल बकाया या कूरियर पार्सल के नाम पर फर्जी लिंक (bit.ly, .apk) भेजते हैं। अनजान लिंक पर क्लिक करने से आपके फोन में वायरस आ सकता है या नकली वेबसाइट पर बैंक खाते की जानकारी चोरी हो सकती है।',
+    tipPinTag: 'पैसे पाने पर PIN नहीं',
+    tipPinTitle: 'पैसे प्राप्त करने के लिए कभी UPI PIN दर्ज न करें',
+    tipPinDesc: 'OLX और सोशल मीडिया पर धोखेबाज "कलेक्ट रिक्वेस्ट" या QR कोड भेजते हैं और कहते हैं कि पैसे लेने के लिए PIN डालें। याद रखें: PIN केवल आपके खाते से पैसे कटने के लिए होता है, पैसे पाने के लिए नहीं।',
+    tipUrgencyTag: 'झूठी जल्दबाजी',
+    tipUrgencyTitle: 'डर और झूठी जल्दबाजी से सावधान रहें',
+    tipUrgencyDesc: '"आज रात 9:30 बजे बिजली कट जाएगी" या "2 घंटे में सिम ब्लॉक" जैसे संदेश केवल आपको डराने के लिए होते हैं। सरकारी विभाग या बैंक कभी भी निजी UPI आईडी (@okaxis, @ybl) पर पैसे नहीं मांगते।',
+    tipHelplineTag: 'गोल्डन ऑवर',
+    tipHelplineTitle: 'तुरंत राष्ट्रीय साइबर हेल्पलाइन (1930) पर कॉल करें',
+    tipHelplineDesc: 'यदि आपने धोखेबाज को पैसे भेज दिए हैं, तो बिना देर किए 1930 पर कॉल करें। शुरुआती घंटों में शिकायत करने से पुलिस धोखेबाज के बैंक खाते को फ्रीज कर सकती है।'
   },
   bn: {
     home: 'হোম',
@@ -118,6 +146,20 @@ export const UI_STRINGS = {
     alreadyReported: 'ইতিমধ্যে রিপোর্ট করা হয়েছে',
     communityReports: 'কমিউনিটি রিপোর্ট',
     liveBadge: 'লাইভ',
-    sessionBadge: 'এই সেশন'
+    sessionBadge: 'এই সেশন',
+    advisoryTitle: 'সাইবার সুরক্ষা সতর্কতা ও প্রতিকার',
+    advisorySub: 'অনলাইন প্রতারণা ও ক্ষতিকারক লিংক থেকে সুরক্ষিত থাকার জরুরি পরামর্শ।',
+    tipLinkTag: 'ক্লিক করবেন না',
+    tipLinkTitle: 'SMS বা WhatsApp-এ অপরিচিত লিংকে কখনো ক্লিক করবেন না',
+    tipLinkDesc: 'প্রতারকরা বিদ্যুৎ বিল বকেয়া বা কুরিয়ার পার্সেলের নামে ভুয়া লিংক (bit.ly, .apk) পাঠায়। অপরিচিত লিংকে ক্লিক করলে ফোনে স্পাইওয়্যার ইনস্টল হতে পারে বা ব্যাংকের তথ্য চুরি হতে পারে।',
+    tipPinTag: 'টাকা পেতে PIN নয়',
+    tipPinTitle: 'টাকা পেতে কখনো UPI PIN দিতে হয় না',
+    tipPinDesc: 'OLX বা সোশাল মিডিয়ায় প্রতারকরা ভুয়া QR কোড বা "কালেক্ট রিকোয়েস্ট" পাঠিয়ে PIN দিতে বলে। মনে রাখবেন: PIN শুধুমাত্র আপনার অ্যাকাউন্ট থেকে টাকা পাঠানোর জন্য লাগে, টাকা নেওয়ার জন্য কখনোই নয়।',
+    tipUrgencyTag: 'ভুয়া জরুরি অবস্থা',
+    tipUrgencyTitle: 'ভুয়া ভয় ও মিথ্যা তাড়াহুড়ো থেকে সতর্ক থাকুন',
+    tipUrgencyDesc: '"আজ রাত ৯:৩০ টায় বিদ্যুৎ লাইন কাটা যাবে" বা "২ ঘণ্টায় সিম বন্ধ" ইত্যাদি মেসেজ মানুষকে আতঙ্কিত করে টাকা আদায় করার কৌশল। কোনো সরকারি দপ্তর ব্যক্তিগত UPI-তে টাকা চায় না।',
+    tipHelplineTag: 'গোল্ডেন আওয়ার',
+    tipHelplineTitle: 'অবিলম্বে সাইবার সেল হেল্পলাইন ১৯৩০-এ ফোন করুন',
+    tipHelplineDesc: 'প্রতারণার শিকার হলে বা টাকা পাঠিয়ে ফেললে অবিলম্বে ১৯৩০ নম্বরে ফোন করুন। প্রথম কয়েক ঘণ্টায় অভিযোগ দায়ের করলে পুলিশ প্রতারকের অ্যাকাউন্ট ফ্রিজ করতে পারে।'
   }
 };
