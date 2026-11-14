@@ -8,7 +8,8 @@ export default function PayScreen({ prefilledVpa = '', prefill = null, payContex
   const { t } = useLanguage();
   const [upiId, setUpiId] = useState(prefilledVpa || 'grocer@okaxis');
   const [payeeName, setPayeeName] = useState(prefill?.payeeName || 'Verified Merchant');
-  const [amount, setAmount] = useState(prefill?.amount ? String(prefill.amount) : '350');
+  // Empty by default (shows a grey "0"); a scanned QR's amount is pre-filled
+  const [amount, setAmount] = useState(prefill?.amount ? String(prefill.amount) : '');
   const [note, setNote] = useState(prefill?.note || 'TrustLayer Verified Pay');
   const [paymentResult, setPaymentResult] = useState(null);
   const [errorMsg, setErrorMsg] = useState('');
@@ -138,6 +139,8 @@ export default function PayScreen({ prefilledVpa = '', prefill = null, payContex
                 type="number"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
+                placeholder="0"
+                inputMode="decimal"
                 min="1"
                 required
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-slate-900 font-mono font-bold text-xs focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition"
