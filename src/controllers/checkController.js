@@ -5,6 +5,18 @@ const { db, isFirestoreConnected } = require('../config/firebase');
 // In-memory store for fast local checks history (synced with Firestore when enabled)
 const checkHistory = [];
 
+// PRD 3.2: moderate-risk (Caution) payments need a cool-down and explicit confirmation.
+// Override for live demos, e.g. CAUTION_COOLDOWN_SECONDS=20
+const parsedCooldown = parseInt(process.env.CAUTION_COOLDOWN_SECONDS, 10);
+const CAUTION_COOLDOWN_SECONDS = Number.isInteger(parsedCooldown) && parsedCooldown >= 0 ? parsedCooldown : 15 * 60;
+
+// Same tiers as the UI: Scam >= 70 (or SCAM verdict), Safe < 30 with SAFE verdict, Caution otherwise
+function isCautionTier({ score, verdict }) {
+  const isScam = verdict === 'SCAM' || score >= 70;
+  const isSafe = verdict === 'SAFE' && score < 30;
+  return !isScam && !isSafe;
+}
+
 async function handleCheck(req, res) {
   try {
     const { rawInput, language = 'en', deviceId = 'anon_device' } = req.body;
@@ -57,7 +69,9 @@ async function handleCheck(req, res) {
       engine: record.engine,
       aiEnhanced: record.aiEnhanced,
       latencyMs: record.latencyMs,
-      timestamp
+      timestamp,
+      cautionRequired: isCautionTier(record),
+      cooldownSeconds: isCautionTier(record) ? CAUTION_COOLDOWN_SECONDS : 0
     });
   } catch (err) {
     res.status(500).json({
@@ -93,5 +107,7 @@ function handleGetHistory(req, res) {
 module.exports = {
   handleCheck,
   handleGetHistory,
-  checkHistory
+  checkHistory,
+  isCautionTier,
+  CAUTION_COOLDOWN_SECONDS
 };

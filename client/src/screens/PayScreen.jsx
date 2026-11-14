@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { ShieldCheck, AlertTriangle, ExternalLink, ArrowLeft, CheckCircle2, ArrowRight } from 'lucide-react';
 
-export default function PayScreen({ prefilledVpa = '', onBack }) {
+export default function PayScreen({ prefilledVpa = '', payContext = null, onBack }) {
   const { t } = useLanguage();
   const [upiId, setUpiId] = useState(prefilledVpa || 'grocer@okaxis');
   const [payeeName, setPayeeName] = useState('Verified Merchant');
@@ -17,6 +17,10 @@ export default function PayScreen({ prefilledVpa = '', onBack }) {
     setIsLoading(true);
     setErrorMsg('');
 
+    // Link to the scam check only while paying the same payee that was checked
+    const isCheckedPayee = payContext?.checkId &&
+      (!payContext.checkedUpi || payContext.checkedUpi.toLowerCase() === upiId.trim().toLowerCase());
+
     try {
       const res = await fetch('/api/pay', {
         method: 'POST',
@@ -25,7 +29,11 @@ export default function PayScreen({ prefilledVpa = '', onBack }) {
           upiId,
           payeeName,
           amount: parseFloat(amount),
-          note
+          note,
+          ...(isCheckedPayee && {
+            checkId: payContext.checkId,
+            cautionAcknowledged: payContext.cautionAcknowledged === true
+          })
         })
       });
 
@@ -154,6 +162,13 @@ export default function PayScreen({ prefilledVpa = '', onBack }) {
                 </div>
               </div>
 
+              {paymentResult.securitySeal?.escrowAdvisory && (
+                <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 shrink-0 text-amber-700" />
+                  <span>{t.cautionPayNote}</span>
+                </div>
+              )}
+
               <a
                 href={paymentResult.upiDeepLink}
                 className="w-full py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-md transition flex items-center justify-center gap-2 font-display text-center"
@@ -172,7 +187,7 @@ export default function PayScreen({ prefilledVpa = '', onBack }) {
             className="w-full py-2 text-center text-xs text-slate-500 hover:text-slate-800 transition flex items-center justify-center gap-1.5"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Back to Check</span>
+            <span>{t.backLink}</span>
           </button>
         )}
 

@@ -11,23 +11,37 @@ function MainApp() {
   const [currentScreen, setCurrentScreen] = useState('check');
   const [lastCheckResult, setLastCheckResult] = useState(null);
   const [targetVpa, setTargetVpa] = useState('');
+  const [payContext, setPayContext] = useState(null);
 
   const handleCheckComplete = (resultData) => {
-    setLastCheckResult(resultData);
+    // receivedAt anchors the Caution cool-down so it survives screen changes
+    setLastCheckResult({ ...resultData, receivedAt: Date.now() });
     if (resultData.extractedUpi) {
       setTargetVpa(resultData.extractedUpi);
     }
+    setPayContext(null);
     setCurrentScreen('result');
   };
 
-  const handleProceedToPay = (upi) => {
+  const handleProceedToPay = (upi, { cautionAcknowledged = false } = {}) => {
     if (upi) setTargetVpa(upi);
+    setPayContext({
+      checkId: lastCheckResult?.checkId || null,
+      checkedUpi: upi || null,
+      cautionAcknowledged
+    });
     setCurrentScreen('pay');
+  };
+
+  const handleNavigate = (screen) => {
+    // Opening Safe Pay from the header is a fresh payment, not tied to the last check
+    if (screen === 'pay') setPayContext(null);
+    setCurrentScreen(screen);
   };
 
   return (
     <div className="min-h-screen bg-canvas text-slate-900 flex flex-col justify-between selection:bg-brand-500 selection:text-white">
-      <Header currentScreen={currentScreen} setCurrentScreen={setCurrentScreen} />
+      <Header currentScreen={currentScreen} setCurrentScreen={handleNavigate} />
 
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-8">
         {currentScreen === 'check' && (
@@ -46,7 +60,9 @@ function MainApp() {
 
         {currentScreen === 'pay' && (
           <PayScreen
+            key={payContext?.checkId || 'direct'}
             prefilledVpa={targetVpa}
+            payContext={payContext}
             onBack={() => setCurrentScreen('check')}
           />
         )}
