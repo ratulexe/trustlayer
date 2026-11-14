@@ -5,36 +5,40 @@ export default function Header({ currentScreen, setCurrentScreen }) {
   const { language, setLanguage, t } = useLanguage();
 
   return (
-    <header className="bg-surface border-b border-slate-200 sticky top-0 z-50 shadow-subtle">
+    <header className="bg-[#FAFAF8]/95 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-50">
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
         
         {/* Brand */}
         <div 
           onClick={() => setCurrentScreen('check')} 
-          className="flex items-center gap-3 cursor-pointer"
+          className="flex items-center gap-3 cursor-pointer group"
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setCurrentScreen('check'); }}
+          aria-label="TrustLayer Home"
         >
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-500 text-white flex items-center justify-center font-bold text-xl shadow-md shadow-brand-500/20 font-display">
+          <div className="w-10 h-10 rounded-xl bg-[#172554] text-white flex items-center justify-center font-bold text-lg border border-blue-500/30 shadow-[0_2px_8px_-2px_rgba(23,37,84,0.25)] font-display transition group-hover:border-blue-400">
             TL
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-bold text-lg tracking-tight text-slate-900 font-display">TrustLayer</span>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-brand-50 text-brand-600 border border-brand-100 font-bold uppercase tracking-wider">
-                FinTech
+              <span className="font-bold text-lg tracking-tight text-[#111827] font-display">TrustLayer</span>
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#F1F5F9] text-[#172554] border border-slate-200 font-semibold tracking-wider">
+                FinTech Rail
               </span>
             </div>
-            <p className="text-[11px] text-slate-400 hidden sm:block">{t.brandTag}</p>
+            <p className="text-[11px] text-[#64748B] hidden sm:block leading-none mt-0.5">{t.brandTag}</p>
           </div>
         </div>
 
         {/* Navigation Tabs */}
-        <nav className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200">
+        <nav className="flex items-center gap-1 bg-[#F1F5F9] p-1 rounded-xl border border-slate-200/80">
           <button
             onClick={() => setCurrentScreen('check')}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
               currentScreen === 'check' || currentScreen === 'result'
-                ? 'bg-surface text-slate-900 shadow-sm border border-slate-200/80 font-bold'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white text-[#111827] shadow-[0_1px_3px_rgba(23,37,84,0.06)] border border-slate-200/80 font-bold'
+                : 'text-[#64748B] hover:text-[#111827]'
             }`}
           >
             {t.navCheck}
@@ -43,8 +47,8 @@ export default function Header({ currentScreen, setCurrentScreen }) {
             onClick={() => setCurrentScreen('pay')}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
               currentScreen === 'pay'
-                ? 'bg-surface text-slate-900 shadow-sm border border-slate-200/80 font-bold'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white text-[#111827] shadow-[0_1px_3px_rgba(23,37,84,0.06)] border border-slate-200/80 font-bold'
+                : 'text-[#64748B] hover:text-[#111827]'
             }`}
           >
             {t.navPay}
@@ -53,8 +57,8 @@ export default function Header({ currentScreen, setCurrentScreen }) {
             onClick={() => setCurrentScreen('dashboard')}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
               currentScreen === 'dashboard'
-                ? 'bg-surface text-slate-900 shadow-sm border border-slate-200/80 font-bold'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white text-[#111827] shadow-[0_1px_3px_rgba(23,37,84,0.06)] border border-slate-200/80 font-bold'
+                : 'text-[#64748B] hover:text-[#111827]'
             }`}
           >
             {t.navDashboard}
@@ -63,22 +67,25 @@ export default function Header({ currentScreen, setCurrentScreen }) {
 
         {/* Vernacular Language Switcher */}
         <div className="flex items-center gap-2">
-          <div className="flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-xs font-semibold">
+          <div className="flex items-center bg-[#F1F5F9] p-0.5 rounded-lg border border-slate-200/80 text-xs font-semibold">
             <button
               onClick={() => setLanguage('en')}
-              className={`px-2 py-1 rounded-md transition ${language === 'en' ? 'bg-surface text-slate-900 shadow-xs font-bold' : 'text-slate-500 hover:text-slate-900'}`}
+              className={`px-2 py-1 rounded-md transition ${language === 'en' ? 'bg-white text-[#111827] shadow-[0_1px_2px_rgba(23,37,84,0.05)] font-bold' : 'text-[#64748B] hover:text-[#111827]'}`}
+              aria-label="Switch to English"
             >
               EN
             </button>
             <button
               onClick={() => setLanguage('hi')}
-              className={`px-2 py-1 rounded-md transition ${language === 'hi' ? 'bg-surface text-slate-900 shadow-xs font-bold' : 'text-slate-500 hover:text-slate-900'}`}
+              className={`px-2 py-1 rounded-md transition ${language === 'hi' ? 'bg-white text-[#111827] shadow-[0_1px_2px_rgba(23,37,84,0.05)] font-bold' : 'text-[#64748B] hover:text-[#111827]'}`}
+              aria-label="हिन्दी में बदलें"
             >
               हिन्दी
             </button>
             <button
               onClick={() => setLanguage('bn')}
-              className={`px-2 py-1 rounded-md transition ${language === 'bn' ? 'bg-surface text-slate-900 shadow-xs font-bold' : 'text-slate-500 hover:text-slate-900'}`}
+              className={`px-2 py-1 rounded-md transition ${language === 'bn' ? 'bg-white text-[#111827] shadow-[0_1px_2px_rgba(23,37,84,0.05)] font-bold' : 'text-[#64748B] hover:text-[#111827]'}`}
+              aria-label="বাংলায় পরিবর্তন করুন"
             >
               বাংলা
             </button>
