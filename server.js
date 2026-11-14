@@ -206,9 +206,14 @@ app.use((req, res) => {
   res.sendFile(path.join(__dirname, 'client/dist/index.html'));
 });
 
-app.listen(PORT, () => {
+// Listen on all interfaces so phones on the same network can reach a local server
+const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`[TrustLayer] Rail API online at http://localhost:${PORT}`);
   ledger.initLedger().catch(err => {
     console.error('[TrustLayer] Ledger init error on start:', err.message);
   });
+});
+
+server.on('error', (err) => {
+  console.error('[TrustLayer Server Error]:', err);
 });

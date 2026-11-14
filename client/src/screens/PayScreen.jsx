@@ -83,15 +83,15 @@ export default function PayScreen({ prefilledVpa = '', prefill = null, payContex
       
       {/* Title */}
       <div className="text-center space-y-1.5">
-        <h2 className="text-2xl font-bold text-slate-900 tracking-tight font-display">
+        <h2 className="text-2xl font-bold text-[#0F1F17] tracking-tight font-display">
           {t.payTitle}
         </h2>
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-[#5C6B63]">
           {t.paySubtitle}
         </p>
       </div>
 
-      <div className="bg-surface rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-card space-y-5">
+      <div className="sage-card rounded-3xl p-4 sm:p-6 space-y-5">
         
         {/* Golden Rule Alert */}
         <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs space-y-1">
@@ -106,7 +106,7 @@ export default function PayScreen({ prefilledVpa = '', prefill = null, payContex
 
         <form onSubmit={handleGeneratePay} className="space-y-4 text-xs">
           <div>
-            <label className="block text-slate-700 font-semibold mb-1">
+            <label className="block text-[#24352C] font-semibold mb-1">
               {t.payeeLabel}
             </label>
             <input
@@ -114,13 +114,13 @@ export default function PayScreen({ prefilledVpa = '', prefill = null, payContex
               value={upiId}
               onChange={(e) => setUpiId(e.target.value)}
               required
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-slate-900 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition"
+              className="w-full bg-[#F7FAF8] border border-[#D4E0D5] rounded-xl px-3 py-2.5 text-[#0F1F17] font-mono text-xs focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-slate-700 font-semibold mb-1">
+              <label className="block text-[#24352C] font-semibold mb-1">
                 Payee Name
               </label>
               <input
@@ -128,11 +128,11 @@ export default function PayScreen({ prefilledVpa = '', prefill = null, payContex
                 value={payeeName}
                 onChange={(e) => setPayeeName(e.target.value)}
                 required
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition"
+                className="w-full bg-[#F7FAF8] border border-[#D4E0D5] rounded-xl px-3 py-2.5 text-[#0F1F17] text-xs focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition"
               />
             </div>
             <div>
-              <label className="block text-slate-700 font-semibold mb-1">
+              <label className="block text-[#24352C] font-semibold mb-1">
                 {t.amountLabel}
               </label>
               <input
@@ -143,20 +143,20 @@ export default function PayScreen({ prefilledVpa = '', prefill = null, payContex
                 inputMode="decimal"
                 min="1"
                 required
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-slate-900 font-mono font-bold text-xs focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition"
+                className="w-full bg-[#F7FAF8] border border-[#D4E0D5] rounded-xl px-3 py-2.5 text-[#0F1F17] font-mono font-bold text-xs focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-slate-700 font-semibold mb-1">
+            <label className="block text-[#24352C] font-semibold mb-1">
               Payment Note
             </label>
             <input
               type="text"
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition"
+              className="w-full bg-[#F7FAF8] border border-[#D4E0D5] rounded-xl px-3 py-2.5 text-[#0F1F17] text-xs focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition"
             />
           </div>
 
@@ -187,7 +187,7 @@ export default function PayScreen({ prefilledVpa = '', prefill = null, payContex
                     {paymentResult.paymentId}
                   </span>
                 </div>
-                <div className="text-xs font-mono text-slate-600 break-all bg-white p-2.5 rounded-lg border border-emerald-100">
+                <div className="text-xs font-mono text-[#5C6B63] break-all bg-white p-2.5 rounded-lg border border-emerald-100">
                   {paymentResult.upiDeepLink}
                 </div>
               </div>
@@ -212,7 +212,7 @@ export default function PayScreen({ prefilledVpa = '', prefill = null, payContex
                 type="button"
                 onClick={handleLogPayment}
                 disabled={logState === 'saving' || logState === 'done'}
-                className="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 disabled:opacity-80 border border-slate-300 text-slate-800 font-bold text-xs transition flex items-center justify-center gap-2 font-display"
+                className="w-full py-2.5 rounded-xl bg-[#EAF0EB] hover:bg-[#DDE7DF] disabled:opacity-80 border border-[#C5D3C7] text-[#0F1F17] font-bold text-xs transition flex items-center justify-center gap-2 font-display"
               >
                 <Wallet className="w-4 h-4" />
                 <span>{logState === 'done' ? t.loggedPayment : logState === 'error' ? t.errorGeneric : t.logPayment}</span>
@@ -224,7 +224,7 @@ export default function PayScreen({ prefilledVpa = '', prefill = null, payContex
         {onBack && (
           <button
             onClick={onBack}
-            className="w-full py-2 text-center text-xs text-slate-500 hover:text-slate-800 transition flex items-center justify-center gap-1.5"
+            className="w-full py-2 text-center text-xs text-[#5C6B63] hover:text-[#0F1F17] transition flex items-center justify-center gap-1.5"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>{t.backLink}</span>

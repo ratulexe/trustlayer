@@ -59,7 +59,7 @@ function CautionGate({ result, onProceed }) {
       {/* Cool-down timer */}
       <div
         className={`p-3 rounded-xl border text-xs flex items-center gap-3 ${
-          secondsLeft > 0 ? 'bg-slate-50 border-slate-200 text-slate-700' : 'bg-emerald-50 border-emerald-200 text-emerald-800'
+          secondsLeft > 0 ? 'bg-[#F7FAF8] border-[#D4E0D5] text-[#24352C]' : 'bg-emerald-50 border-emerald-200 text-emerald-800'
         }`}
         aria-live="polite"
       >
@@ -78,7 +78,7 @@ function CautionGate({ result, onProceed }) {
         <button
           onClick={() => setIsConfirming(true)}
           disabled={!isUnlocked}
-          className="w-full py-3.5 rounded-xl bg-amber-600 hover:bg-amber-700 disabled:bg-slate-200 disabled:text-slate-500 disabled:cursor-not-allowed text-white font-bold text-sm shadow-md transition flex items-center justify-center gap-2 font-display"
+          className="w-full py-3.5 rounded-xl bg-amber-600 hover:bg-amber-700 disabled:bg-[#DDE7DF] disabled:text-[#5C6B63] disabled:cursor-not-allowed text-white font-bold text-sm shadow-md transition flex items-center justify-center gap-2 font-display"
         >
           {isUnlocked ? <ArrowRight className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
           <span>{isUnlocked ? t.cautionProceedBtn : t.cautionLockedBtn}</span>
@@ -86,16 +86,16 @@ function CautionGate({ result, onProceed }) {
       ) : (
         <div role="alertdialog" aria-labelledby="caution-confirm-title" className="p-4 rounded-xl bg-white border-2 border-amber-400 space-y-3">
           <div>
-            <div id="caution-confirm-title" className="font-bold text-sm text-slate-900 font-display flex items-center gap-2">
+            <div id="caution-confirm-title" className="font-bold text-sm text-[#0F1F17] font-display flex items-center gap-2">
               <AlertTriangle className="w-4 h-4 text-amber-600" />
               {t.cautionConfirmTitle}
             </div>
-            <p className="text-xs text-slate-600 mt-1">{t.cautionConfirmDesc}</p>
+            <p className="text-xs text-[#5C6B63] mt-1">{t.cautionConfirmDesc}</p>
           </div>
           <div className="grid grid-cols-2 gap-2">
             <button
               onClick={() => setIsConfirming(false)}
-              className="py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-800 font-bold text-xs transition font-display"
+              className="py-2.5 rounded-xl bg-[#EAF0EB] hover:bg-[#DDE7DF] border border-[#C5D3C7] text-[#0F1F17] font-bold text-xs transition font-display"
             >
               {t.cautionConfirmNo}
             </button>
@@ -155,7 +155,7 @@ export default function ResultScreen({ result, onProceedToPay, onReset }) {
     <div className="max-w-2xl mx-auto space-y-6">
 
       {/* Risk Gauge Visual Card */}
-      <div className="bg-surface rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-card space-y-6">
+      <div className="sage-card rounded-3xl p-4 sm:p-6 space-y-6">
 
         <RiskGauge score={score} verdict={verdict} />
 
@@ -179,12 +179,12 @@ export default function ResultScreen({ result, onProceedToPay, onReset }) {
         {/* Reasons & Signals List */}
         {reasons.length > 0 && (
           <div className="space-y-2">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 font-display">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-[#5C6B63] font-display">
               {t.reasonsHeader}
             </h4>
             <div className="space-y-1.5">
               {reasons.map((r, i) => (
-                <div key={i} className="flex items-start gap-2 p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-700">
+                <div key={i} className="flex items-start gap-2 p-2.5 rounded-lg bg-[#F7FAF8] border border-[#D4E0D5] text-xs text-[#24352C]">
                   <span className="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0 mt-1.5" />
                   <span>{r}</span>
                 </div>
@@ -197,7 +197,7 @@ export default function ResultScreen({ result, onProceedToPay, onReset }) {
         {Array.isArray(result.aiOpinions) && result.aiOpinions.length > 1 && (
           <div className="space-y-2">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 font-display">{t.aiCheckLabel}</h4>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-[#5C6B63] font-display">{t.aiCheckLabel}</h4>
               {result.agreement && (
                 <span
                   className={`text-xs font-bold px-2.5 py-1 rounded-full border ${
@@ -205,7 +205,7 @@ export default function ResultScreen({ result, onProceedToPay, onReset }) {
                       ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
                       : result.agreement === 'disagree'
                       ? 'bg-amber-50 border-amber-200 text-amber-800'
-                      : 'bg-slate-50 border-slate-200 text-slate-600'
+                      : 'bg-[#F7FAF8] border-[#D4E0D5] text-[#5C6B63]'
                   }`}
                 >
                   {result.agreement === 'agree' ? t.aiAgree : result.agreement === 'disagree' ? t.aiDisagree : result.agreement === 'partial' ? t.aiPartial : t.aiSingle}
@@ -234,8 +234,8 @@ export default function ResultScreen({ result, onProceedToPay, onReset }) {
         )}
 
         {/* Telemetry info */}
-        <div className="flex items-center justify-between text-xs font-mono text-slate-400 border-t border-slate-100 pt-3">
-          <span>Engine: <strong className="text-slate-600">{engine || 'Heuristic Shield'}</strong></span>
+        <div className="flex items-center justify-between text-xs font-mono text-[#8E9C94] border-t border-[#E2EAE3] pt-3">
+          <span>Engine: <strong className="text-[#5C6B63]">{engine || 'Heuristic Shield'}</strong></span>
           <span>Latency: <strong className="text-brand-600">{latencyMs || 18}ms</strong></span>
         </div>
 
@@ -285,7 +285,7 @@ export default function ResultScreen({ result, onProceedToPay, onReset }) {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <a
                   href="tel:1930"
-                  className="py-3 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-800 font-bold text-xs transition flex items-center justify-center gap-2 font-display text-center"
+                  className="py-3 px-3 rounded-xl bg-[#EAF0EB] hover:bg-[#DDE7DF] border border-[#C5D3C7] text-[#0F1F17] font-bold text-xs transition flex items-center justify-center gap-2 font-display text-center"
                 >
                   <PhoneCall className="w-4 h-4 shrink-0" />
                   <span>{t.reportScam}</span>
@@ -311,7 +311,7 @@ export default function ResultScreen({ result, onProceedToPay, onReset }) {
 
           <button
             onClick={onReset}
-            className="w-full py-2.5 rounded-xl text-slate-600 hover:text-slate-900 text-xs font-semibold transition flex items-center justify-center gap-1.5"
+            className="w-full py-2.5 rounded-xl text-[#5C6B63] hover:text-[#0F1F17] text-xs font-semibold transition flex items-center justify-center gap-1.5"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>{t.backToCheck}</span>

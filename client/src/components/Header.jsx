@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
-import { Shield, PhoneCall, Globe, LogIn, LogOut, ChevronDown, Wallet } from 'lucide-react';
+import { PhoneCall, LogIn, LogOut, ChevronDown, Wallet } from 'lucide-react';
 
 const LANGUAGES = [
-  { code: 'en', label: 'English' },
-  { code: 'hi', label: 'हिन्दी' },
-  { code: 'bn', label: 'বাংলা' }
+  { code: 'en', label: 'EN', aria: 'Switch to English' },
+  { code: 'hi', label: 'हिन्दी', aria: 'Switch to Hindi' },
+  { code: 'bn', label: 'বাংলা', aria: 'Switch to Bengali' }
 ];
 
 function UserMenu({ onOpenMoney }) {
@@ -38,22 +38,22 @@ function UserMenu({ onOpenMoney }) {
         onClick={() => setOpen((o) => !o)}
         aria-haspopup="menu"
         aria-expanded={open}
-        className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white p-0.5 pr-2 hover:border-brand-200 transition"
+        className="flex items-center gap-1.5 rounded-full border border-[#D4E0D5] bg-white p-0.5 pr-2 hover:border-[#059669] transition"
       >
         {user.photo ? (
           <img src={user.photo} alt="" referrerPolicy="no-referrer" className="w-8 h-8 rounded-full" />
         ) : (
-          <span className="w-8 h-8 rounded-full bg-brand-500 text-white flex items-center justify-center text-sm font-bold">{initial}</span>
+          <span className="w-8 h-8 rounded-full bg-[#059669] text-white flex items-center justify-center text-sm font-bold">{initial}</span>
         )}
-        <ChevronDown className="w-4 h-4 text-slate-500" />
+        <ChevronDown className="w-4 h-4 text-[#5C6B63]" />
       </button>
 
       {open && (
-        <div role="menu" className="absolute right-0 mt-2 w-64 rounded-2xl bg-white border border-slate-200 shadow-card p-2 z-50">
-          <div className="px-3 py-2 border-b border-slate-100 mb-1">
-            <div className="text-xs text-slate-500">{t.signedInAs}</div>
-            <div className="text-sm font-bold text-slate-900 truncate">{user.name || user.email}</div>
-            {user.name && user.email && <div className="text-xs text-slate-500 truncate">{user.email}</div>}
+        <div role="menu" className="absolute right-0 mt-2 w-64 rounded-2xl sage-card p-2 z-50">
+          <div className="px-3 py-2 border-b border-[#E2EAE3] mb-1">
+            <div className="text-xs text-[#5C6B63]">{t.signedInAs}</div>
+            <div className="text-sm font-bold text-[#0F1F17] truncate">{user.name || user.email}</div>
+            {user.name && user.email && <div className="text-xs text-[#5C6B63] truncate">{user.email}</div>}
           </div>
           <button
             role="menuitem"
@@ -62,7 +62,7 @@ function UserMenu({ onOpenMoney }) {
               setOpen(false);
               onOpenMoney();
             }}
-            className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm text-slate-700 hover:bg-slate-50"
+            className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm text-[#0F1F17] hover:bg-[#F3F6F4]"
           >
             <Wallet className="w-4 h-4 text-amber-600" />
             {t.navMoney}
@@ -74,9 +74,9 @@ function UserMenu({ onOpenMoney }) {
               setOpen(false);
               signOut();
             }}
-            className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm text-slate-700 hover:bg-slate-50"
+            className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm text-[#0F1F17] hover:bg-[#F3F6F4]"
           >
-            <LogOut className="w-4 h-4 text-slate-500" />
+            <LogOut className="w-4 h-4 text-[#5C6B63]" />
             {t.signOut}
           </button>
         </div>
@@ -89,52 +89,79 @@ export default function Header({ onHome, onOpenMoney }) {
   const { language, setLanguage, t } = useLanguage();
   const { status, user, signIn, error } = useAuth();
 
+  const cycleLanguage = () => {
+    const i = LANGUAGES.findIndex((l) => l.code === language);
+    setLanguage(LANGUAGES[(i + 1) % LANGUAGES.length].code);
+  };
+
   return (
-    <header className="sticky top-0 z-40 bg-white/85 backdrop-blur-md border-b border-slate-200/80">
-      <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-2">
-        {/* Brand → home */}
-        <button type="button" onClick={onHome} className="flex items-center gap-2.5 min-w-0 text-left" aria-label={`TrustLayer · ${t.home}`}>
-          <span className="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br from-brand-500 to-violet-500 text-white flex items-center justify-center shadow-float">
-            <Shield className="w-5 h-5" />
+    <header className="sticky top-0 z-50 border-b border-[#D4E0D5] bg-white/90 backdrop-blur-md shadow-[0_1px_3px_rgba(15,31,23,0.02)]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-3">
+        {/* Brand → Home */}
+        <button type="button" onClick={onHome} className="flex items-center gap-3 group shrink-0 min-w-0 text-left" aria-label={`TrustLayer · ${t.home}`}>
+          <span className="relative w-10 h-10 rounded-xl bg-[#059669] text-white flex items-center justify-center shadow-[0_2px_10px_rgba(5,150,105,0.25)] border border-[#047857] transition group-hover:bg-[#047857] group-hover:scale-105">
+            <span className="tracking-tight font-extrabold text-sm">TL</span>
+            <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-[#A7F3D0] animate-pulse" />
           </span>
-          <span className="min-w-0 hidden min-[400px]:block">
-            <span className="block font-bold text-lg leading-tight tracking-tight text-slate-900 font-display">TrustLayer</span>
-            <span className="hidden sm:block text-xs text-slate-500 truncate">{t.brandTag}</span>
+          <span className="min-w-0 hidden min-[420px]:block">
+            <span className="flex items-center gap-2">
+              <span className="font-extrabold text-lg sm:text-xl tracking-tight text-[#0F1F17]">TrustLayer</span>
+              <span className="hidden sm:inline text-[10px] px-2 py-0.5 rounded-full bg-[#E6F7EF] text-[#047857] border border-[#A7F3D0] font-mono font-semibold tracking-wider uppercase">
+                FinTech Rail
+              </span>
+            </span>
+            <span className="text-[11px] text-[#5C6B63] hidden md:block leading-none mt-0.5 font-medium">{t.brandTag}</span>
           </span>
         </button>
 
         {/* Utilities */}
         <div className="flex items-center gap-2">
+          <span className="hidden xl:inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#E6F7EF] border border-[#A7F3D0] text-[10px] font-mono text-[#047857]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#059669] animate-pulse" />
+            <span className="font-semibold">{t.engineStatus}</span>
+          </span>
+
           <a
             href="tel:1930"
             aria-label={t.helplineAria}
-            className="flex items-center gap-1.5 h-10 px-3 rounded-xl bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 font-bold text-sm transition"
+            className="flex items-center gap-1.5 h-10 px-3 rounded-xl bg-[#FFE4E6] text-[#BE123C] border border-[#FECDD3] hover:bg-[#FFD5DA] font-bold text-sm transition"
           >
             <PhoneCall className="w-4 h-4" />
             <span className="hidden md:inline">{t.helpline}</span>
             <span className="md:hidden">1930</span>
           </a>
 
-          <label className="relative flex items-center h-10 rounded-xl border border-slate-200 bg-white hover:border-brand-200 transition">
-            <Globe className="w-4 h-4 text-slate-500 absolute left-2.5 pointer-events-none" />
-            <span className="sr-only">{t.languageLabel}</span>
-            <select
-              value={language}
-              onChange={(e) => setLanguage(e.target.value)}
-              className="appearance-none bg-transparent h-full pl-8 pr-7 text-sm font-semibold text-slate-800 rounded-xl focus:outline-none"
-            >
-              {LANGUAGES.map((l) => (
-                <option key={l.code} value={l.code}>{l.label}</option>
-              ))}
-            </select>
-            <ChevronDown className="w-4 h-4 text-slate-400 absolute right-2 pointer-events-none" />
-          </label>
+          {/* Language: segmented control on larger screens, one tap to cycle on phones */}
+          <div className="hidden sm:flex items-center bg-[#EAF0EB] p-0.5 rounded-xl border border-[#D4E0D5] text-xs font-semibold" role="group" aria-label={t.languageLabel}>
+            {LANGUAGES.map((l) => (
+              <button
+                key={l.code}
+                type="button"
+                onClick={() => setLanguage(l.code)}
+                aria-pressed={language === l.code}
+                aria-label={l.aria}
+                className={`px-2.5 py-1.5 rounded-lg transition-all ${
+                  language === l.code ? 'bg-white text-[#0F1F17] shadow-xs font-bold border border-[#D4E0D5]' : 'text-[#5C6B63] hover:text-[#0F1F17]'
+                }`}
+              >
+                {l.label}
+              </button>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={cycleLanguage}
+            aria-label={t.languageLabel}
+            className="sm:hidden h-10 px-3 rounded-xl bg-[#EAF0EB] text-[#0F1F17] text-sm font-bold border border-[#D4E0D5]"
+          >
+            {LANGUAGES.find((l) => l.code === language)?.label}
+          </button>
 
           {status === 'ready' && !user && (
             <button
               type="button"
               onClick={signIn}
-              className="flex items-center gap-1.5 h-10 px-3 sm:px-4 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-sm shadow-float transition"
+              className="flex items-center gap-1.5 h-10 px-3 sm:px-4 rounded-xl bg-[#059669] hover:bg-[#047857] text-white font-bold text-sm shadow-[0_2px_10px_rgba(5,150,105,0.25)] border border-[#047857] transition"
               title={t.signInGoogle}
               aria-label={t.signInGoogle}
             >
@@ -143,12 +170,12 @@ export default function Header({ onHome, onOpenMoney }) {
             </button>
           )}
           {status === 'ready' && user && <UserMenu onOpenMoney={onOpenMoney} />}
-          {status === 'loading' && <span className="w-10 h-10 rounded-full bg-slate-100 animate-pulse" aria-hidden="true" />}
+          {status === 'loading' && <span className="w-10 h-10 rounded-full bg-[#EAF0EB] animate-pulse" aria-hidden="true" />}
         </div>
       </div>
 
       {error && (
-        <div role="alert" className="bg-rose-50 border-t border-rose-200 text-rose-700 text-sm text-center px-4 py-2">
+        <div role="alert" className="bg-[#FFE4E6] border-t border-[#FECDD3] text-[#BE123C] text-sm text-center px-4 py-2">
           {error === 'unauthorized-domain' ? t.signInDomain : t.signInFailed}
         </div>
       )}

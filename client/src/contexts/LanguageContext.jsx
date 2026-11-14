@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState } from 'react';
 import { MONEY_STRINGS } from './moneyStrings';
 import { UI_STRINGS } from './uiStrings';
 import { QR_STRINGS } from './qrStrings';
+// Redesign (sage & mint) wording for the redesigned screens; overrides the older defaults
+import { DICTIONARY as REDESIGN_STRINGS } from './translations';
 
 const LanguageContext = createContext();
 
@@ -209,7 +211,8 @@ export const LanguageProvider = ({ children }) => {
     ...(UI_STRINGS[language] || UI_STRINGS.en),
     ...(QR_STRINGS[language] || QR_STRINGS.en),
     ...(MONEY_STRINGS[language] || MONEY_STRINGS.en),
-    ...(DICTIONARY[language] || DICTIONARY.en)
+    ...(DICTIONARY[language] || DICTIONARY.en),
+    ...(REDESIGN_STRINGS[language] || REDESIGN_STRINGS.en)
   };
 
   return (
