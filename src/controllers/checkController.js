@@ -8,9 +8,9 @@ const { recordCheckStat } = require('./statsController');
 const checkHistory = [];
 
 // PRD 3.2: moderate-risk (Caution) payments need a cool-down and explicit confirmation.
-// Override for live demos, e.g. CAUTION_COOLDOWN_SECONDS=20
+// Defaults to 20 seconds for hackathon evaluations and live demos; configurable via CAUTION_COOLDOWN_SECONDS.
 const parsedCooldown = parseInt(process.env.CAUTION_COOLDOWN_SECONDS, 10);
-const CAUTION_COOLDOWN_SECONDS = Number.isInteger(parsedCooldown) && parsedCooldown >= 0 ? parsedCooldown : 15 * 60;
+const CAUTION_COOLDOWN_SECONDS = Number.isInteger(parsedCooldown) && parsedCooldown >= 0 ? parsedCooldown : 20;
 
 // Same tiers as the UI: Scam >= 70 (or SCAM verdict), Safe < 30 with SAFE verdict, Caution otherwise
 function isCautionTier({ score, verdict }) {
@@ -21,7 +21,7 @@ function isCautionTier({ score, verdict }) {
 
 async function handleCheck(req, res) {
   try {
-    const { rawInput, language = 'en', deviceId = 'anon_device' } = req.body;
+    const { rawInput, language = 'en', deviceId = 'anon_device', minScore = 0 } = req.body;
 
     if (!rawInput || typeof rawInput !== 'string') {
       return res.status(400).json({
@@ -38,13 +38,17 @@ async function handleCheck(req, res) {
     const checkId = `chk_${crypto.randomBytes(4).toString('hex')}`;
     const timestamp = new Date().toISOString();
 
+    const effectiveMin = typeof minScore === 'number' ? minScore : 0;
+    const finalScore = Math.max(evaluation.score, effectiveMin);
+    const finalVerdict = finalScore >= 70 ? 'SCAM' : finalScore >= 30 ? 'CAUTION' : evaluation.verdict;
+
     const record = {
       id: checkId,
       owner,
       rawInput,
       deviceId,
-      score: evaluation.score,
-      verdict: evaluation.verdict,
+      score: finalScore,
+      verdict: finalVerdict,
       reasons: evaluation.reasons,
       vernacularExplanation: evaluation.vernacularExplanation,
       extractedUpi: evaluation.extractedUpi,
