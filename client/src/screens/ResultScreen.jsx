@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useAuth } from '../contexts/AuthContext';
+import { getDeviceId } from '../utils/deviceId';
 import RiskGauge from '../components/RiskGauge';
-import { ShieldCheck, ShieldAlert, AlertTriangle, Ban, PhoneCall, ArrowRight, ArrowLeft, Timer, Lock } from 'lucide-react';
+import { ShieldCheck, ShieldAlert, AlertTriangle, Ban, PhoneCall, ArrowRight, ArrowLeft, Timer, Lock, Flag, CheckCircle } from 'lucide-react';
 
 const DEFAULT_COOLDOWN_SECONDS = 15 * 60;
 const CHECKLIST_KEYS = ['cautionCheck1', 'cautionCheck2', 'cautionCheck3', 'cautionCheck4'];
@@ -112,6 +114,33 @@ function CautionGate({ result, onProceed }) {
 
 export default function ResultScreen({ result, onProceedToPay, onReset }) {
   const { t } = useLanguage();
+  const auth = useAuth();
+  const authFetch = auth?.authFetch || fetch;
+  const [reportState, setReportState] = useState('idle'); // idle | reporting | reported | error
+
+  const handleReportScam = async () => {
+    if (!result?.checkId || reportState === 'reporting' || reportState === 'reported') return;
+    setReportState('reporting');
+
+    try {
+      const res = await authFetch('/api/report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          checkId: result.checkId,
+          deviceId: getDeviceId()
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setReportState('reported');
+      } else {
+        setReportState('error');
+      }
+    } catch {
+      setReportState('error');
+    }
+  };
 
   if (!result) return null;
 
@@ -183,11 +212,28 @@ export default function ResultScreen({ result, onProceedToPay, onReset }) {
           )}
 
           {isCaution && (
-            <CautionGate
-              key={result.checkId || result.receivedAt}
-              result={result}
-              onProceed={() => onProceedToPay(extractedUpi, { cautionAcknowledged: true })}
-            />
+            <div className="space-y-3">
+              <CautionGate
+                key={result.checkId || result.receivedAt}
+                result={result}
+                onProceed={() => onProceedToPay(extractedUpi, { cautionAcknowledged: true })}
+              />
+              {reportState === 'reported' ? (
+                <div className="py-2.5 px-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center justify-center gap-1.5 font-display text-center">
+                  <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>{t.reportSuccess || 'Reported. Thank you for protecting others.'}</span>
+                </div>
+              ) : (
+                <button
+                  onClick={handleReportScam}
+                  disabled={reportState === 'reporting'}
+                  className="w-full py-2.5 px-3 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-900 font-bold text-xs transition flex items-center justify-center gap-2 font-display disabled:opacity-50"
+                >
+                  <Flag className="w-4 h-4 text-amber-700 shrink-0" />
+                  <span>{reportState === 'reporting' ? (t.reporting || 'Reporting...') : (t.reportThisScam || 'Report this scam')}</span>
+                </button>
+              )}
+            </div>
           )}
 
           {isScam && (
@@ -196,13 +242,30 @@ export default function ResultScreen({ result, onProceedToPay, onReset }) {
                 <Ban className="w-4 h-4" />
                 <span>{t.paymentBlocked}</span>
               </div>
-              <a
-                href="tel:1930"
-                className="w-full py-3 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-800 font-bold text-xs transition flex items-center justify-center gap-2 font-display"
-              >
-                <PhoneCall className="w-4 h-4" />
-                <span>{t.reportScam}</span>
-              </a>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <a
+                  href="tel:1930"
+                  className="py-3 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-800 font-bold text-xs transition flex items-center justify-center gap-2 font-display text-center"
+                >
+                  <PhoneCall className="w-4 h-4 shrink-0" />
+                  <span>{t.reportScam}</span>
+                </a>
+                {reportState === 'reported' ? (
+                  <div className="py-3 px-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center justify-center gap-1.5 font-display text-center">
+                    <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>{t.reportSuccess || 'Reported. Thank you for protecting others.'}</span>
+                  </div>
+                ) : (
+                  <button
+                    onClick={handleReportScam}
+                    disabled={reportState === 'reporting'}
+                    className="py-3 px-3 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-800 font-bold text-xs transition flex items-center justify-center gap-2 font-display disabled:opacity-50 text-center"
+                  >
+                    <Flag className="w-4 h-4 text-rose-600 shrink-0" />
+                    <span>{reportState === 'reporting' ? (t.reporting || 'Reporting...') : (t.reportThisScam || 'Report this scam')}</span>
+                  </button>
+                )}
+              </div>
             </div>
           )}
 

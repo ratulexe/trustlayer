@@ -31,7 +31,14 @@ export const UI_STRINGS = {
     rule1: 'You never need your UPI PIN to receive money.',
     rule2: 'Banks and offices never ask for fees on a personal UPI ID.',
     rule3: 'Lost money? Call 1930 at once: the first hours matter most.',
-    footerTag: 'Financial Technology & Payments'
+    footerTag: 'Financial Technology & Payments',
+    reportThisScam: 'Report this scam',
+    reporting: 'Reporting...',
+    reportSuccess: 'Reported. Thank you for protecting others.',
+    alreadyReported: 'Already reported',
+    communityReports: 'Community Reports',
+    liveBadge: 'Live',
+    sessionBadge: 'This session'
   },
   hi: {
     home: 'होम',
@@ -64,7 +71,14 @@ export const UI_STRINGS = {
     rule1: 'पैसे पाने के लिए कभी UPI PIN की ज़रूरत नहीं होती।',
     rule2: 'बैंक और दफ्तर कभी निजी UPI ID पर फीस नहीं मांगते।',
     rule3: 'पैसे गए? तुरंत 1930 पर कॉल करें: शुरुआती घंटे सबसे ज़रूरी हैं।',
-    footerTag: 'वित्तीय प्रौद्योगिकी और भुगतान'
+    footerTag: 'वित्तीय प्रौद्योगिकी और भुगतान',
+    reportThisScam: 'इस धोखाधड़ी की रिपोर्ट करें',
+    reporting: 'रिपोर्ट की जा रही है...',
+    reportSuccess: 'रिपोर्ट दर्ज की गई। दूसरों की सुरक्षा में मदद के लिए धन्यवाद।',
+    alreadyReported: 'पहले ही रिपोर्ट किया गया',
+    communityReports: 'सामुदायिक रिपोर्ट',
+    liveBadge: 'लाइव',
+    sessionBadge: 'इस सत्र'
   },
   bn: {
     home: 'হোম',
@@ -97,6 +111,13 @@ export const UI_STRINGS = {
     rule1: 'টাকা পেতে কখনো UPI PIN লাগে না।',
     rule2: 'ব্যাংক বা অফিস কখনো ব্যক্তিগত UPI ID-তে ফি চায় না।',
     rule3: 'টাকা গেছে? সঙ্গে সঙ্গে ১৯৩০-এ ফোন করুন: প্রথম কয়েক ঘণ্টাই সবচেয়ে জরুরি।',
-    footerTag: 'আর্থিক প্রযুক্তি ও পেমেন্ট'
+    footerTag: 'আর্থিক প্রযুক্তি ও পেমেন্ট',
+    reportThisScam: 'এই প্রতারণার রিপোর্ট করুন',
+    reporting: 'রিপোর্ট করা হচ্ছে...',
+    reportSuccess: 'রিপোর্ট নথিভুক্ত হয়েছে। অন্যদের সুরক্ষিত রাখতে সাহায্য করার জন্য ধন্যবাদ।',
+    alreadyReported: 'ইতিমধ্যে রিপোর্ট করা হয়েছে',
+    communityReports: 'কমিউনিটি রিপোর্ট',
+    liveBadge: 'লাইভ',
+    sessionBadge: 'এই সেশন'
   }
 };
