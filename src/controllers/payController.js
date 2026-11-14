@@ -234,7 +234,8 @@ function handleParseQr(req, res) {
         verdict,
         isVerifiedMerchant: !!verified,
         merchantDetails: verified || null,
-        isMuleFlagged: isMule
+        isMuleFlagged: isMule,
+        cooldownSeconds: verdict === 'CAUTION' ? CAUTION_COOLDOWN_SECONDS : 0
       }
     });
   } catch (err) {

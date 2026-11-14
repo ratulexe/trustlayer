@@ -29,6 +29,22 @@ const DEMO_QRS = [
   { id: 'person', title: 'Personal QR sent on WhatsApp', sub: '"Pay ₹2,000 to release your parcel"', payload: 'upi://pay?pa=ravi.kumar@ybl&pn=Ravi%20Kumar&am=2000.00&cu=INR&tn=Parcel%20release' }
 ];
 
+export function dedupeReasons(list) {
+  if (!Array.isArray(list)) return [];
+  const cleaned = [];
+  const seen = [];
+  for (const item of list) {
+    if (!item || typeof item !== 'string') continue;
+    const norm = item.trim().toLowerCase().replace(/[^a-z0-9]/g, ' ');
+    const isDup = seen.some((s) => s === norm || (s.length > 15 && norm.length > 15 && (s.includes(norm) || norm.includes(s))));
+    if (!isDup) {
+      seen.push(norm);
+      cleaned.push(item.trim());
+    }
+  }
+  return cleaned;
+}
+
 export default function CheckScreen({ onCheckComplete, prefilledText = '' }) {
   const { language, t } = useLanguage();
   const auth = useAuth();
@@ -95,11 +111,11 @@ export default function CheckScreen({ onCheckComplete, prefilledText = '' }) {
 
   // Normal scam check: rules + Gemini + Grok; saved to history/stats with a checkId.
   // Signed-in users are identified by token, others by an anonymous device ID.
-  const runCheck = async (rawInput) => {
+  const runCheck = async (rawInput, minScore = 0) => {
     const res = await authFetch('/api/check', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ rawInput, language, deviceId: getDeviceId() })
+      body: JSON.stringify({ rawInput, language, deviceId: getDeviceId(), minScore })
     });
     const data = await res.json();
     if (!data.success) throw new Error(data.error || 'Failed to analyze payload.');
@@ -150,7 +166,7 @@ export default function CheckScreen({ onCheckComplete, prefilledText = '' }) {
       if (!/^upi:\/\/pay/i.test(qrString)) {
         setInputText(qrString);
         const data = await runCheck(qrString);
-        return { ...data, reasons: [t.qrNotUpi, ...(data.reasons || [])] };
+        return { ...data, isQrScan: true, reasons: dedupeReasons([t.qrNotUpi, ...(data.reasons || [])]) };
       }
 
       const res = await fetch('/api/qr/parse', {
@@ -167,26 +183,42 @@ export default function CheckScreen({ onCheckComplete, prefilledText = '' }) {
         parsed.amount ? `amount ₹${parsed.amount}` : '',
         parsed.note ? `note: ${parsed.note}` : ''
       ].filter(Boolean).join(', ');
-      const check = await runCheck(description);
+      const check = await runCheck(description, preflightRisk.score);
 
       // Final risk = the stricter of the QR pre-flight and the full scam check
       const score = Math.max(check.score, preflightRisk.score);
       const verdict = score >= 70 ? 'SCAM' : score >= 30 ? 'CAUTION' : 'SAFE';
+      const cooldownSeconds = verdict === 'CAUTION'
+        ? (check.cooldownSeconds > 0 ? check.cooldownSeconds : (preflightRisk.cooldownSeconds || 20))
+        : 0;
+
       const qrReason = preflightRisk.isMuleFlagged
         ? fillTemplate(t.qrReasonMule, { upi: parsed.upiId })
         : preflightRisk.isVerifiedMerchant
         ? fillTemplate(t.qrReasonVerified, { name: preflightRisk.merchantDetails?.name || parsed.payeeName, upi: parsed.upiId })
         : fillTemplate(t.qrReasonUnknown, { name: parsed.payeeName || '—', upi: parsed.upiId });
 
+      const allReasons = dedupeReasons([qrReason, ...(check.reasons || []).filter((r) => r !== qrReason)]);
+
       return {
         ...check,
         score,
         verdict,
+        cooldownSeconds,
+        isQrScan: true,
         extractedUpi: parsed.upiId,
-        reasons: [qrReason, ...(check.reasons || []).filter((r) => r !== qrReason)],
+        reasons: allReasons,
         vernacularExplanation: verdict === check.verdict ? check.vernacularExplanation : verdict === 'CAUTION' ? t.qrUnknownExplain : check.vernacularExplanation,
         // Lets Safe Pay pre-fill exactly what the QR asked for
-        qr: { upiId: parsed.upiId, payeeName: parsed.payeeName, amount: parsed.amount, note: parsed.note }
+        qr: {
+          upiId: parsed.upiId,
+          payeeName: parsed.payeeName,
+          amount: parsed.amount,
+          note: parsed.note,
+          isVerifiedMerchant: preflightRisk.isVerifiedMerchant,
+          isMuleFlagged: preflightRisk.isMuleFlagged,
+          merchantDetails: preflightRisk.merchantDetails
+        }
       };
     });
   };

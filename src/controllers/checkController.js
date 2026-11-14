@@ -21,7 +21,7 @@ function isCautionTier({ score, verdict }) {
 
 async function handleCheck(req, res) {
   try {
-    const { rawInput, language = 'en', deviceId = 'anon_device' } = req.body;
+    const { rawInput, language = 'en', deviceId = 'anon_device', minScore = 0 } = req.body;
 
     if (!rawInput || typeof rawInput !== 'string') {
       return res.status(400).json({
@@ -38,13 +38,17 @@ async function handleCheck(req, res) {
     const checkId = `chk_${crypto.randomBytes(4).toString('hex')}`;
     const timestamp = new Date().toISOString();
 
+    const effectiveMin = typeof minScore === 'number' ? minScore : 0;
+    const finalScore = Math.max(evaluation.score, effectiveMin);
+    const finalVerdict = finalScore >= 70 ? 'SCAM' : finalScore >= 30 ? 'CAUTION' : evaluation.verdict;
+
     const record = {
       id: checkId,
       owner,
       rawInput,
       deviceId,
-      score: evaluation.score,
-      verdict: evaluation.verdict,
+      score: finalScore,
+      verdict: finalVerdict,
       reasons: evaluation.reasons,
       vernacularExplanation: evaluation.vernacularExplanation,
       extractedUpi: evaluation.extractedUpi,
