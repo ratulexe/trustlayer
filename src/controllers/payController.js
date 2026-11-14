@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const scamDb = require('../data/scamDatabase.json');
 const { checkHistory, isCautionTier, CAUTION_COOLDOWN_SECONDS } = require('./checkController');
 const { db, isFirestoreConnected } = require('../config/firebase');
+const { recordBlockedPaymentStat } = require('./statsController');
 
 const paymentsHistory = [];
 const idempotencyStore = new Map();
@@ -84,6 +85,7 @@ function handlePay(req, res) {
 
     // 1. Hard Block if known mule or scam
     if (scamDb.knownMuleVpas.includes(cleanUpi)) {
+      recordBlockedPaymentStat(amount);
       return res.status(403).json({
         success: false,
         error: 'PAYMENT_BLOCKED',
@@ -103,6 +105,7 @@ function handlePay(req, res) {
         riskScore = pastCheck.score;
         riskVerdict = pastCheck.verdict;
         if (pastCheck.verdict === 'SCAM') {
+          recordBlockedPaymentStat(amount);
           return res.status(403).json({
             success: false,
             error: 'PAYMENT_BLOCKED',

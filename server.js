@@ -10,6 +10,7 @@ const { projectId: firebaseProjectId } = require('./src/config/firebase');
 const { handleCheck, handleGetHistory } = require('./src/controllers/checkController');
 const { handlePay, handleParseQr, handleGetPayments } = require('./src/controllers/payController');
 const { handleGetStats } = require('./src/controllers/statsController');
+const { handleReport } = require('./src/controllers/reportController');
 const finance = require('./src/controllers/financeController');
 const { evaluateRisk } = require('./src/riskEngine');
 const { ledger } = require('./src/ledger');
@@ -43,6 +44,9 @@ app.get('/api/history', handleGetHistory);
 
 // 4. GET /api/stats (Community scam metrics & trending threat vectors)
 app.get('/api/stats', handleGetStats);
+
+// 4c. POST /api/report (Community scam reporting)
+app.post('/api/report', handleReport);
 
 // 4a. Google sign-in config for the browser (Firebase web config is public by design;
 //     it lives in env vars so each deployment can point at its own project)
@@ -169,6 +173,10 @@ app.get('/api/ledger', (req, res) => {
   });
 });
 
+app.get('/api/ledger/verify', (req, res) => {
+  res.json(ledger.verifyLedger());
+});
+
 app.post('/api/transactions/evaluate', (req, res) => {
   const { payerVpa, payeeVpa, amount, paymentNote, idempotencyKey } = req.body;
   const riskResult = evaluateRisk({
@@ -200,4 +208,7 @@ app.use((req, res) => {
 
 app.listen(PORT, () => {
   console.log(`[TrustLayer] Rail API online at http://localhost:${PORT}`);
+  ledger.initLedger().catch(err => {
+    console.error('[TrustLayer] Ledger init error on start:', err.message);
+  });
 });

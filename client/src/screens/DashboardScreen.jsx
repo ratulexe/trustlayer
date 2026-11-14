@@ -1,18 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
-import { ShieldCheck, IndianRupee, Zap, AlertTriangle, History } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { getDeviceId, formatInr } from '../utils/deviceId';
+import { ShieldCheck, IndianRupee, Zap, AlertTriangle, History, Flag } from 'lucide-react';
 
 export default function DashboardScreen() {
   const { t } = useLanguage();
+  const auth = useAuth();
+  const authFetch = auth?.authFetch || fetch;
   const [stats, setStats] = useState(null);
   const [history, setHistory] = useState([]);
 
   useEffect(() => {
     async function fetchData() {
       try {
+        const deviceId = getDeviceId();
         const [statsRes, historyRes] = await Promise.all([
           fetch('/api/stats'),
-          fetch('/api/history')
+          authFetch(`/api/history?deviceId=${encodeURIComponent(deviceId)}&limit=20`)
         ]);
         const statsData = await statsRes.json();
         const historyData = await historyRes.json();
@@ -24,56 +29,84 @@ export default function DashboardScreen() {
       }
     }
     fetchData();
-  }, []);
+  }, [authFetch]);
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       
-      {/* Title */}
-      <div className="text-center space-y-1.5">
-        <h2 className="text-2xl font-bold text-slate-900 tracking-tight font-display">
-          {t.dashTitle}
-        </h2>
+      {/* Title & Live Status */}
+      <div className="text-center space-y-2">
+        <div className="flex items-center justify-center gap-2">
+          <h2 className="text-2xl font-bold text-slate-900 tracking-tight font-display">
+            {t.dashTitle}
+          </h2>
+          {stats?.source && (
+            <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold font-mono border ${
+              stats.source === 'live'
+                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                : 'bg-slate-100 text-slate-600 border-slate-200'
+            }`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${stats.source === 'live' ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`} />
+              {stats.source === 'live' ? (t.liveBadge || 'Live') : (t.sessionBadge || 'This session')}
+            </span>
+          )}
+        </div>
         <p className="text-sm text-slate-500">
           Real-time aggregated threat intelligence across Indian UPI networks
         </p>
       </div>
 
-      {/* Metrics Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      {/* Metrics Row — 4 responsive cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         
-        <div className="bg-surface rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-card flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0 border border-rose-100">
-            <ShieldCheck className="w-6 h-6 text-rose-600" />
+        {/* Scams Blocked */}
+        <div className="bg-surface rounded-2xl p-4 border border-slate-200 shadow-card flex items-center gap-3">
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0 border border-rose-100">
+            <ShieldCheck className="w-5 h-5 text-rose-600" />
           </div>
-          <div>
-            <span className="text-xs text-slate-500 font-semibold block">{t.scamsBlocked}</span>
-            <span className="text-2xl font-black font-mono text-slate-900">
-              {stats?.metrics?.scamsBlocked ? stats.metrics.scamsBlocked.toLocaleString('en-IN') : '1,420+'}
+          <div className="min-w-0">
+            <span className="text-[11px] text-slate-500 font-semibold block truncate">{t.scamsBlocked}</span>
+            <span className="text-xl sm:text-2xl font-black font-mono text-slate-900 truncate block">
+              {Number(stats?.metrics?.scamsBlocked ?? 0).toLocaleString('en-IN')}
             </span>
           </div>
         </div>
 
-        <div className="bg-surface rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-card flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100">
-            <IndianRupee className="w-6 h-6 text-emerald-600" />
+        {/* Funds Protected */}
+        <div className="bg-surface rounded-2xl p-4 border border-slate-200 shadow-card flex items-center gap-3">
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100">
+            <IndianRupee className="w-5 h-5 text-emerald-600" />
           </div>
-          <div>
-            <span className="text-xs text-slate-500 font-semibold block">{t.fundsProtected}</span>
-            <span className="text-2xl font-black font-mono text-emerald-600">
-              ₹48.2 L
+          <div className="min-w-0">
+            <span className="text-[11px] text-slate-500 font-semibold block truncate">{t.fundsProtected}</span>
+            <span className="text-xl sm:text-2xl font-black font-mono text-emerald-600 truncate block">
+              {formatInr(stats?.metrics?.amountProtectedInr ?? 0)}
             </span>
           </div>
         </div>
 
-        <div className="bg-surface rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-card flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center shrink-0 border border-brand-100">
-            <Zap className="w-6 h-6 text-brand-600" />
+        {/* Active Threats */}
+        <div className="bg-surface rounded-2xl p-4 border border-slate-200 shadow-card flex items-center gap-3">
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center shrink-0 border border-brand-100">
+            <Zap className="w-5 h-5 text-brand-600" />
           </div>
-          <div>
-            <span className="text-xs text-slate-500 font-semibold block">{t.activeThreats}</span>
-            <span className="text-2xl font-black font-mono text-brand-600">
-              {stats?.metrics?.activeScamPatterns || 42}
+          <div className="min-w-0">
+            <span className="text-[11px] text-slate-500 font-semibold block truncate">{t.activeThreats}</span>
+            <span className="text-xl sm:text-2xl font-black font-mono text-brand-600 truncate block">
+              {Number(stats?.metrics?.activeScamPatterns ?? 0).toLocaleString('en-IN')}
+            </span>
+          </div>
+        </div>
+
+        {/* Community Reports */}
+        <div className="bg-surface rounded-2xl p-4 border border-slate-200 shadow-card flex items-center gap-3">
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 border border-amber-100">
+            <Flag className="w-5 h-5 text-amber-600" />
+          </div>
+          <div className="min-w-0">
+            <span className="text-[11px] text-slate-500 font-semibold block truncate">{t.communityReports || 'Community Reports'}</span>
+            <span className="text-xl sm:text-2xl font-black font-mono text-amber-600 truncate block">
+              {Number(stats?.metrics?.communityReports ?? 0).toLocaleString('en-IN')}
             </span>
           </div>
         </div>
@@ -100,24 +133,31 @@ export default function DashboardScreen() {
           <div className="space-y-3">
             {(stats?.trendingScams || []).map((scam, i) => (
               <div key={i} className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-xs text-slate-800 font-display">{scam.title}</span>
-                  <span className="text-[11px] font-mono font-bold text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded">
-                    {scam.severity}
-                  </span>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-bold text-xs text-slate-800 font-display truncate">{scam.title}</span>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    {scam.count !== undefined && (
+                      <span className="text-[10px] font-mono font-bold text-slate-600 bg-slate-200/80 px-1.5 py-0.5 rounded">
+                        {scam.count} reported
+                      </span>
+                    )}
+                    <span className="text-[10px] font-mono font-bold text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded">
+                      {scam.severity}
+                    </span>
+                  </div>
                 </div>
                 <p className="text-xs text-slate-500 leading-relaxed">
                   {scam.description}
                 </p>
                 <div className="text-[11px] text-slate-400 font-mono pt-1">
-                  Regions: {scam.affectedRegions.join(', ')}
+                  Regions: {Array.isArray(scam.affectedRegions) ? scam.affectedRegions.join(', ') : 'All India'}
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* User Recent Checks */}
+        {/* User Recent Checks (Private to this owner) */}
         <div className="bg-surface rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-card space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div className="flex items-center gap-2">
@@ -127,26 +167,26 @@ export default function DashboardScreen() {
               </h3>
             </div>
             <span className="text-[11px] font-mono text-slate-400">
-              Local Session
+              Private
             </span>
           </div>
 
           <div className="space-y-2.5">
             {history.length === 0 ? (
               <div className="py-8 text-center text-xs text-slate-400">
-                No scans performed yet in this session.
+                No scans performed yet on this device.
               </div>
             ) : (
               history.slice(0, 5).map((item, i) => (
-                <div key={i} className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
-                  <div className="space-y-0.5 max-w-[70%]">
+                <div key={i} className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs gap-3">
+                  <div className="space-y-0.5 min-w-0 max-w-[70%]">
                     <p className="font-mono text-xs text-slate-800 truncate">{item.snippet}</p>
                     <span className="text-[11px] text-slate-400 font-mono">
                       {new Date(item.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>
-                  <span className={`px-2 py-0.5 rounded text-[11px] font-bold font-mono ${
-                    item.verdict === 'SCAM' ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'
+                  <span className={`px-2 py-0.5 rounded text-[11px] font-bold font-mono shrink-0 ${
+                    item.verdict === 'SCAM' ? 'bg-rose-100 text-rose-800' : item.verdict === 'CAUTION' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'
                   }`}>
                     {item.verdict} ({item.score})
                   </span>
