@@ -80,8 +80,12 @@ async function handleCheck(req, res) {
       reasons: record.reasons,
       vernacularExplanation: record.vernacularExplanation,
       extractedUpi: record.extractedUpi,
+      extractedUpis: evaluation.extractedUpis || (record.extractedUpi ? [record.extractedUpi] : []),
       engine: record.engine,
       aiEnhanced: record.aiEnhanced,
+      // Per-engine scores (Rules / Gemini / Grok) and whether the AI models agreed
+      aiOpinions: evaluation.aiOpinions || null,
+      agreement: evaluation.agreement || null,
       latencyMs: record.latencyMs,
       timestamp,
       cautionRequired: isCautionTier(record),

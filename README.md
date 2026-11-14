@@ -13,7 +13,7 @@ UPI payments are instant and cannot be reversed. First-time users, senior citize
 **TrustLayer checks a payment _before_ the user presses Pay:**
 
 1. **Scam check** — paste an SMS, WhatsApp message or UPI ID, or scan a UPI QR code.
-2. **Two engines** — a rule engine (under 2 ms, works offline) plus Google Gemini 2.5 Flash for context. The final score is the higher of the two, and the rule engine takes over if the AI is slow or unavailable.
+2. **Three engines** — a rule engine (under 2 ms, works offline) plus **two AI models, Google Gemini and xAI Grok, asked in parallel**. Their opinions are combined (see "How the AI ensemble decides"), the AI can never lower a rule-engine alarm, and the rule engine takes over if both AIs are slow or unavailable.
    - **Accuracy**: **100.0%** on automated test suite (55 benchmark test cases across English, हिन्दी, বাংলা).
    - **False Positives**: **0** (emails like `help@gmail.com`, normal peer transfers, and verified merchants are never blocked).
    - **False Negatives**: **0** (catches obfuscated tricks like `k.y.c`, `l0ttery`, `$cam`, Indic digits, and typos like `electricty`/`disconected`).
@@ -53,14 +53,27 @@ _Screenshots: add to `docs/screenshots/` and link here._
 flowchart LR
     PWA["React + Vite PWA<br>(Tailwind, mobile-first)"] --> Express["Express.js API"]
     Express --> RuleEngine["Rule engine<br>(mule list, scam patterns, under 1 ms)"]
-    Express --> Gemini["Google Gemini 2.5 Flash<br>(multilingual reasoning)"]
+    Express --> Ensemble["AI ensemble<br>(combines opinions)"]
+    Ensemble --> Gemini["Google Gemini<br>(multilingual reasoning)"]
+    Ensemble --> Grok["xAI Grok<br>(second opinion)"]
     Express --> Firestore[("Cloud Firestore<br>checks, payments")]
     Express --> UPILink["upi://pay deep link"]
 ```
 
 - **Frontend**: React 19, Vite, Tailwind CSS, Lucide icons, installable PWA (manifest + service worker)
 - **Backend**: Node.js 20+, Express 5
-- **AI**: Google Gemini 2.5 Flash, with the rule engine as automatic fallback
+- **AI**: Google Gemini + xAI Grok in parallel (plain REST, no SDKs), with the rule engine as automatic fallback
+
+### How the AI ensemble decides
+
+1. **Rule engine first.** If it is already sure (score 85+, or the payee is only verified merchants) no AI is called — instant and free.
+2. **Uncertain messages go to Gemini and Grok at the same time**, with the same safety prompt (the message is treated as untrusted data, truncated to 2,000 characters) and one shared time limit (`GEMINI_TIMEOUT_MS`, default 3 s).
+3. **Combine:** AI score = average of the models that answered; final score = the higher of rules and AI.
+   - One model ≥ 85 and the other ≥ 50 → **SCAM**.
+   - Models more than 40 points apart → at least **CAUTION**, shown as "AI models disagree — verify before paying".
+   - One model fails or is out of quota → the other one's answer is used. Both fail → rule engine.
+4. **Saves quota:** repeated messages reuse the answer for 1 hour; a provider that returns "quota exceeded" is paused for 60 s; each provider can list backup models (`GEMINI_MODEL`, `GROK_MODEL`).
+5. The result screen shows each engine's score (Rules · Gemini · Grok) and whether the AIs agree.
 - **Database**: Cloud Firestore via `firebase-admin` (in-memory fallback when no credentials)
 - **Payments**: Standard NPCI `upi://pay` intent links
 

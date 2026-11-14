@@ -193,6 +193,46 @@ export default function ResultScreen({ result, onProceedToPay, onReset }) {
           </div>
         )}
 
+        {/* Rules / Gemini / Grok scores and whether the AI models agree */}
+        {Array.isArray(result.aiOpinions) && result.aiOpinions.length > 1 && (
+          <div className="space-y-2">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 font-display">{t.aiCheckLabel}</h4>
+              {result.agreement && (
+                <span
+                  className={`text-xs font-bold px-2.5 py-1 rounded-full border ${
+                    result.agreement === 'agree'
+                      ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                      : result.agreement === 'disagree'
+                      ? 'bg-amber-50 border-amber-200 text-amber-800'
+                      : 'bg-slate-50 border-slate-200 text-slate-600'
+                  }`}
+                >
+                  {result.agreement === 'agree' ? t.aiAgree : result.agreement === 'disagree' ? t.aiDisagree : result.agreement === 'partial' ? t.aiPartial : t.aiSingle}
+                </span>
+              )}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {result.aiOpinions.map((o) => (
+                <span
+                  key={o.provider}
+                  title={o.model || undefined}
+                  className={`inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-xl border font-semibold ${
+                    o.score >= 70
+                      ? 'bg-rose-50 border-rose-200 text-rose-700'
+                      : o.score >= 30
+                      ? 'bg-amber-50 border-amber-200 text-amber-800'
+                      : 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                  }`}
+                >
+                  {o.label}
+                  <strong className="font-mono">{o.score}</strong>
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Telemetry info */}
         <div className="flex items-center justify-between text-xs font-mono text-slate-400 border-t border-slate-100 pt-3">
           <span>Engine: <strong className="text-slate-600">{engine || 'Heuristic Shield'}</strong></span>
