@@ -48,7 +48,8 @@ export const QR_STRINGS = {
     qrUnlockReadyButton: "Proceed to Safe Pay",
     qrExplainableSignals: "Explainable Risk Signals & Evidence",
     qrAiConsensus: "AI Models Consensus",
-    qrScanAnother: "Scan Another QR / Message"
+    qrScanAnother: "Scan Another QR / Message",
+    cautionHeldMessage: "This message asks to pay an unverified recipient. Confirm the safety checklist and wait for the cool-down timer to unlock payment."
   },
   hi: {
     qrScanBtn: 'UPI QR कोड स्कैन करें',
@@ -98,7 +99,8 @@ export const QR_STRINGS = {
     qrUnlockReadyButton: "सुरक्षित भुगतान के लिए आगे बढ़ें",
     qrExplainableSignals: "जोखिम संकेत और प्रमाण",
     qrAiConsensus: "AI मॉडल आम सहमति",
-    qrScanAnother: "दूसरा QR / संदेश जांचें"
+    qrScanAnother: "दूसरा QR / संदेश जांचें",
+    cautionHeldMessage: "यह संदेश एक अपुष्ट प्राप्तकर्ता को भुगतान करने का अनुरोध करता है। सुरक्षा सूची की पुष्टि करें और प्रतीक्षा समय पूरा होने दें।"
   },
   bn: {
     qrScanBtn: 'UPI QR কোড স্ক্যান করুন',
@@ -148,6 +150,7 @@ export const QR_STRINGS = {
     qrUnlockReadyButton: "নিরাপদ পেমেন্টের জন্য এগিয়ে যান",
     qrExplainableSignals: "ঝুঁকি সংকেত ও প্রমাণসমূহ",
     qrAiConsensus: "AI মডেলগুলোর মতৈক্য",
-    qrScanAnother: "আরেকটি QR / মেসেজ স্ক্যান করুন"
+    qrScanAnother: "আরেকটি QR / মেসেজ স্ক্যান করুন",
+    cautionHeldMessage: "এই মেসেজে এক অপ্রমাণিত প্রাপককে টাকা পাঠাতে বলা হয়েছে। নিরাপত্তা চেকলিস্ট নিশ্চিত করুন এবং অপেক্ষার সময় শেষ হতে দিন।"
   }
 };

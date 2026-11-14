@@ -28,7 +28,7 @@ const DEMO_QRS = [
   { id: 'person', title: 'Personal QR sent on WhatsApp', sub: '"Pay ₹2,000 to release your parcel"', payload: 'upi://pay?pa=ravi.kumar@ybl&pn=Ravi%20Kumar&am=2000.00&cu=INR&tn=Parcel%20release' }
 ];
 
-export function dedupeReasons(list) {
+function dedupeReasons(list) {
   if (!Array.isArray(list)) return [];
   const cleaned = [];
   const seen = [];

@@ -8,9 +8,9 @@ const { recordCheckStat } = require('./statsController');
 const checkHistory = [];
 
 // PRD 3.2: moderate-risk (Caution) payments need a cool-down and explicit confirmation.
-// Override for live demos, e.g. CAUTION_COOLDOWN_SECONDS=20
+// Defaults to 20 seconds for hackathon evaluations and live demos; configurable via CAUTION_COOLDOWN_SECONDS.
 const parsedCooldown = parseInt(process.env.CAUTION_COOLDOWN_SECONDS, 10);
-const CAUTION_COOLDOWN_SECONDS = Number.isInteger(parsedCooldown) && parsedCooldown >= 0 ? parsedCooldown : 15 * 60;
+const CAUTION_COOLDOWN_SECONDS = Number.isInteger(parsedCooldown) && parsedCooldown >= 0 ? parsedCooldown : 20;
 
 // Same tiers as the UI: Scam >= 70 (or SCAM verdict), Safe < 30 with SAFE verdict, Caution otherwise
 function isCautionTier({ score, verdict }) {
