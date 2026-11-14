@@ -1,56 +1,78 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const { evaluateRisk, KNOWN_MULE_VPAS, VERIFIED_MERCHANTS } = require('./src/riskEngine');
-const { generateSimulatedMerchantHistory, calculateTrustScore } = require('./src/creditEngine');
+const { handleCheck, handleGetHistory } = require('./src/controllers/checkController');
+const { handlePay } = require('./src/controllers/payController');
+const { handleGetStats } = require('./src/controllers/statsController');
+const { evaluateRisk } = require('./src/riskEngine');
 const { ledger } = require('./src/ledger');
+const { generateSimulatedMerchantHistory, calculateTrustScore } = require('./src/creditEngine');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
+
+// Serve static assets from client/dist if built, otherwise public/
+app.use(express.static(path.join(__dirname, 'client/dist')));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Pre-load a sample informal merchant profile
+// --- CORE ARCHITECTURE SPECIFICATION API ENDPOINTS ---
+
+// 1. POST /api/check (Analyze message/UPI via Dual-Engine Threat Shield)
+app.post('/api/check', handleCheck);
+
+// 2. POST /api/pay (Verify payee & generate standard upi://pay deep-link)
+app.post('/api/pay', handlePay);
+
+// 3. GET /api/history (User's scan history)
+app.get('/api/history', handleGetHistory);
+
+// 4. GET /api/stats (Community scam metrics & trending threat vectors)
+app.get('/api/stats', handleGetStats);
+
+// 5. GET /api/scenarios (Presets for 10:30 AM evaluation round)
+app.get('/api/scenarios', (req, res) => {
+  res.json([
+    {
+      id: 'electricity-cut',
+      title: 'Electricity Disconnection Scam',
+      badge: 'Critical Scam (92/100)',
+      input: 'Dear consumer, your electricity power will be disconnected tonight at 9.30 PM from electricity office. Please immediately call officer at 9876543210 or pay pending bill to powerbill@okaxis',
+      targetUpi: 'powerbill@okaxis',
+      expectedVerdict: 'SCAM'
+    },
+    {
+      id: 'lottery-prize',
+      title: 'WhatsApp 25-Lakh Lottery Scam',
+      badge: 'Critical Scam (95/100)',
+      input: 'Congratulations! You won ₹25,00,000 in Special Scheme. To release your fund immediately transfer processing tax of ₹12,500 to lottery_reward99@okhdfc',
+      targetUpi: 'lottery_reward99@okhdfc',
+      expectedVerdict: 'SCAM'
+    },
+    {
+      id: 'safe-grocer',
+      title: 'Safe Local Grocer Payment',
+      badge: 'Verified Safe (8/100)',
+      input: 'Payment for weekly household groceries at Sharma Store. Pay ₹350 to grocer@okaxis',
+      targetUpi: 'grocer@okaxis',
+      expectedVerdict: 'SAFE'
+    }
+  ]);
+});
+
+// Financial Inclusion & Cryptographic Audit Ledger APIs (from Track Blueprint)
 const sampleMerchantData = generateSimulatedMerchantHistory('ramu-tea-stall');
-let activeLoans = [];
 
-// 1. Evaluate and Execute Transaction
-app.post('/api/transactions/evaluate', (req, res) => {
-  const { payerVpa, payeeVpa, amount, paymentNote, payerDevice, idempotencyKey } = req.body;
-
-  if (!payerVpa || !payeeVpa || !amount) {
-    return res.status(400).json({ error: 'payerVpa, payeeVpa, and amount are required' });
-  }
-
-  // Risk Engine evaluation
-  const riskResult = evaluateRisk({
-    payerVpa,
-    payeeVpa,
-    amount,
-    payerDevice: payerDevice || 'Android-Pixel7-UPI-Client',
-    paymentNote: paymentNote || ''
-  });
-
-  // Cryptographic Ledger entry
-  const { entry, isDuplicate } = ledger.appendTransaction({
-    idempotencyKey,
-    payerVpa,
-    payeeVpa,
-    amount,
-    riskResult
-  });
-
+app.get('/api/merchants/ramu-tea-stall/credit-profile', (req, res) => {
+  const scoreData = calculateTrustScore(sampleMerchantData);
   res.json({
-    success: true,
-    isDuplicate,
-    transaction: entry,
-    riskEvaluation: riskResult
+    merchant: sampleMerchantData,
+    creditAssessment: scoreData
   });
 });
 
-// 2. Fetch Immutable Audit Ledger
 app.get('/api/ledger', (req, res) => {
   res.json({
     chainLength: ledger.entries.length,
@@ -59,105 +81,39 @@ app.get('/api/ledger', (req, res) => {
   });
 });
 
-// 3. Financial Inclusion: Merchant Cashflow Credit Assessment
-app.get('/api/merchants/:id/credit-profile', (req, res) => {
-  const scoreData = calculateTrustScore(sampleMerchantData);
-  res.json({
-    merchant: {
-      id: sampleMerchantData.merchantId,
-      name: sampleMerchantData.name,
-      vpa: sampleMerchantData.vpa,
-      category: sampleMerchantData.category,
-      location: sampleMerchantData.location,
-      establishedDays: sampleMerchantData.establishedDays,
-      total30DayVolume: sampleMerchantData.totalVolume,
-      total30DayTxns: sampleMerchantData.totalTransactions
-    },
-    creditAssessment: scoreData,
-    activeLoans
+app.post('/api/transactions/evaluate', (req, res) => {
+  const { payerVpa, payeeVpa, amount, paymentNote, idempotencyKey } = req.body;
+  const riskResult = evaluateRisk({
+    payerVpa: payerVpa || 'user@upi',
+    payeeVpa: payeeVpa || 'merchant@upi',
+    amount: amount || 100,
+    paymentNote: paymentNote || ''
   });
-});
 
-// 4. Instant Micro-Loan Drawdown (Financial Inclusion workflow)
-app.post('/api/credit/drawdown', (req, res) => {
-  const { amount, tenureDays = 30 } = req.body;
-  const scoreData = calculateTrustScore(sampleMerchantData);
-
-  if (amount > scoreData.preApprovedLimit) {
-    return res.status(400).json({
-      error: `Requested amount ₹${amount} exceeds pre-approved limit ₹${scoreData.preApprovedLimit}`
-    });
-  }
-
-  const loanId = `LOAN_${Date.now()}`;
-  const loanRecord = {
-    loanId,
-    disbursedAt: new Date().toISOString(),
-    amount: parseFloat(amount),
-    interestRateApr: scoreData.interestRateApr,
-    tenureDays,
-    dailyDeduction: Math.round((amount * (1 + (scoreData.interestRateApr/100) * (tenureDays/365))) / tenureDays),
-    status: 'ACTIVE_DISBURSED',
-    disbursementMethod: 'INSTANT_UPI_CREDIT_TO_VPA'
-  };
-
-  activeLoans.push(loanRecord);
+  const { entry } = ledger.appendTransaction({
+    idempotencyKey,
+    payerVpa: payerVpa || 'user@upi',
+    payeeVpa: payeeVpa || 'merchant@upi',
+    amount: amount || 100,
+    riskResult
+  });
 
   res.json({
     success: true,
-    message: `₹${amount} disbursed instantly to ${sampleMerchantData.vpa} via UPI Rail!`,
-    loan: loanRecord
+    transaction: entry,
+    riskEvaluation: riskResult
   });
 });
 
-// 5. Preset Scenarios for Live Evaluation Demo
-app.get('/api/scenarios', (req, res) => {
-  res.json([
-    {
-      id: 'safe-grocery',
-      title: '1. Safe Grocery Payment (Fast-Path)',
-      description: 'Payer sends ₹350 to a verified neighbourhood grocer with 780 days clean history.',
-      payload: {
-        payerVpa: 'priya.sharma@okaxis',
-        payeeVpa: 'grocer@okaxis',
-        amount: 350,
-        paymentNote: 'Weekly vegetable bill'
-      },
-      expectedOutcome: 'APPROVE',
-      expectedBadge: 'Low Risk (<10)',
-      focusArea: 'UPI Integration & Seamless UX'
-    },
-    {
-      id: 'mule-scam',
-      title: '2. Inter-Bank Mule Scam Interception',
-      description: 'Payer transfers ₹18,500 to a newly created handle flagged in mule network databases.',
-      payload: {
-        payerVpa: 'amit.verma@sbi',
-        payeeVpa: 'lottery_reward99@okhdfc',
-        amount: 18500,
-        paymentNote: 'Claim lottery prize OTP'
-      },
-      expectedOutcome: 'BLOCK',
-      expectedBadge: 'Critical Risk (>90)',
-      focusArea: 'Fraud Mitigation'
-    },
-    {
-      id: 'escrow-unverified',
-      title: '3. Unverified Marketplace Transfer',
-      description: 'Payer sends ₹3,500 to an unknown individual for second-hand electronics.',
-      payload: {
-        payerVpa: 'rahul.k@icici',
-        payeeVpa: 'seller.gadgets.unknown@paytm',
-        amount: 3500,
-        paymentNote: 'Used smartphone advance deposit'
-      },
-      expectedOutcome: 'SMART_ESCROW',
-      expectedBadge: 'Moderate Risk (Escrow Hold)',
-      focusArea: 'Transactional Reliability & Buyer Protection'
-    }
-  ]);
+// Fallback route to React client index.html for SPA routing
+app.use((req, res) => {
+  const clientDist = path.join(__dirname, 'client/dist/index.html');
+  const publicIndex = path.join(__dirname, 'public/index.html');
+  res.sendFile(clientDist, (err) => {
+    if (err) res.sendFile(publicIndex);
+  });
 });
 
 app.listen(PORT, () => {
-  console.log(`[TrustLayer] Rail service listening on http://localhost:${PORT}`);
+  console.log(`[TrustLayer] Rail API online at http://localhost:${PORT}`);
 });
