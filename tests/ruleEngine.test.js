@@ -501,3 +501,51 @@ describe('TrustLayer Rule Engine & Threat Shield Test Suite', () => {
     assert.strictEqual(correctPredictions, totalTests, 'All test cases must pass');
   });
 });
+
+// ----------------------------------------------------------------------------
+// OTP / PIN sharing fraud — scams must be caught, genuine bank OTP SMS must not
+// ----------------------------------------------------------------------------
+describe('OTP / PIN sharing fraud pattern (negation-aware)', () => {
+  const scams = [
+    ['en', 'I am from your bank. Share the OTP you just received to stop your account being blocked.'],
+    ['en', 'Sir galti se OTP aapke number pe chala gaya, please OTP bata do'],
+    ['hi', 'Main SBI se bol raha hoon, aapka card band ho jayega, OTP batao jaldi'],
+    ['hi', 'Aapko OTP batana hai warna account block'],
+    ['hi', 'आपके फोन पर आया OTP बताएं ताकि KYC पूरा हो सके'],
+    ['bn', 'আপনার ফোনে আসা ওটিপি বলুন, না হলে অ্যাকাউন্ট বন্ধ হবে'],
+    ['en', 'To receive your refund please tell me your UPI PIN'],
+    ['en', 'Please read out the 6 digit code you just received on SMS'],
+    ['en', 'Kindly share your CVV and card number for verification'],
+    ['en', 'pls s h a r e the O.T.P you got']
+  ];
+  const genuine = [
+    ['en', '123456 is your OTP for login. Do not share it with anyone. -SBI'],
+    ['en', 'Your OTP is 482913. Never share your OTP with anyone, including bank staff.'],
+    ['en', 'OTP for txn of Rs 450 at Amazon is 771203. Do not share your OTP with anyone. - HDFC Bank'],
+    ['hi', 'Aapka OTP 552190 hai. Kisi ke saath OTP share na karein.'],
+    ['hi', 'आपका OTP 552190 है। इसे किसी को न बताएं।'],
+    ['bn', 'আপনার OTP 552190। এটি কাউকে বলবেন না।'],
+    ['hi', 'Bank kabhi OTP nahi maangta, OTP batana nahi hai kisi ko'],
+    ['en', 'Dont share your OTP or UPI PIN with anyone. Stay safe']
+  ];
+
+  for (const [lang, input] of scams) {
+    test(`flags OTP/PIN request as SCAM: "${input.slice(0, 50)}"`, () => {
+      const r = runRuleEngine({ rawInput: input, language: lang });
+      assert.strictEqual(r.verdict, 'SCAM', `score ${r.score}`);
+    });
+  }
+
+  for (const [lang, input] of genuine) {
+    test(`does not flag genuine OTP SMS: "${input.slice(0, 50)}"`, () => {
+      const r = runRuleEngine({ rawInput: input, language: lang });
+      assert.notStrictEqual(r.verdict, 'SCAM', `score ${r.score}`);
+    });
+  }
+
+  test('explains the OTP scam in the user language', () => {
+    const r = runRuleEngine({ rawInput: 'OTP batao jaldi', language: 'hi' });
+    assert.match(r.vernacularExplanation, /OTP/);
+    assert.match(r.vernacularExplanation, /[ऀ-ॿ]/); // Devanagari
+  });
+});

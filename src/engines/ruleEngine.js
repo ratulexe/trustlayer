@@ -232,6 +232,27 @@ function detectSuspiciousLinks(text = '', extractedUpis = []) {
   return false;
 }
 
+// Negation right before a trigger ("do not share your otp", "never share the otp")
+const NEGATION_BEFORE = /(?:\bnot|\bnever|\bdon'?t|\bdont|\bdo not|\bnahi|\bnahin|\bmat|\bna|नहीं|न|মত)\s*$/u;
+const NEGATION_BEFORE_NOSPACE = /(?:not|never|don'?t|dont)$/u;
+
+// Hindi / Hinglish / Bengali often negate after the verb ("otp batana nahi hai", "otp bolben na")
+const NEGATION_AFTER = /^\S*\s+(?:mat|nahi|nahin|na|नहीं|मत|না)(?:\s|$|[.,!])/u;
+
+/** true if `needle` occurs in `haystack` at least once without a negation just before (or after) it */
+function hasUnnegated(haystack, needle, negationRegex) {
+  if (!needle) return false;
+  let from = 0;
+  for (;;) {
+    const idx = haystack.indexOf(needle, from);
+    if (idx === -1) return false;
+    const before = haystack.slice(Math.max(0, idx - 14), idx);
+    const after = haystack.slice(idx + needle.length, idx + needle.length + 16);
+    if (!negationRegex.test(before) && !NEGATION_AFTER.test(after)) return true;
+    from = idx + 1;
+  }
+}
+
 function runRuleEngine({ rawInput = '', language = 'en' }) {
   const startTime = performance.now();
   const rawString = String(rawInput || '');
@@ -284,11 +305,18 @@ function runRuleEngine({ rawInput = '', language = 'en' }) {
       const lowerTrigger = trigger.toLowerCase();
       const triggerNoSpaces = lowerTrigger.replace(/\s+/g, '');
 
-      // Direct substring match on normalized text or space-stripped text
-      if (
-        normalizedText.includes(lowerTrigger) ||
-        normalizedNoSpaces.includes(triggerNoSpaces)
-      ) {
+      // Direct substring match on normalized text or space-stripped text.
+      // "negatable" patterns ignore a trigger that follows "do not / never / don't",
+      // so genuine bank SMS like "Do not share your OTP" are not flagged.
+      // When the spaced text contains the trigger it decides (it can see negation after the
+      // verb, e.g. "otp batana nahi hai"); the space-stripped text is only a fallback for
+      // obfuscated spacing.
+      const directMatch = pattern.negatable
+        ? normalizedText.includes(lowerTrigger)
+          ? hasUnnegated(normalizedText, lowerTrigger, NEGATION_BEFORE)
+          : hasUnnegated(normalizedNoSpaces, triggerNoSpaces, NEGATION_BEFORE_NOSPACE)
+        : normalizedText.includes(lowerTrigger) || normalizedNoSpaces.includes(triggerNoSpaces);
+      if (directMatch) {
         matched = true;
         break;
       }
