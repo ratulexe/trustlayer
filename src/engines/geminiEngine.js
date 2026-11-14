@@ -2,7 +2,50 @@
 const { performance } = require('perf_hooks');
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 const { runRuleEngine } = require('./ruleEngine');
+const scamDb = require('../data/scamDatabase.json');
+
+// ---- Quota savers -------------------------------------------------------------
+// The Gemini free tier is tiny (e.g. 5 requests/min, 20/day), so only ask the AI when
+// it can change the answer, reuse answers for repeated messages, and back off on 429.
+const VERIFIED_VPAS = new Set((scamDb.verifiedMerchants || []).map((m) => String(m.vpa).toLowerCase()));
+const CONFIDENT_SCAM_SCORE = 85; // rule engine already certain → AI can't raise it meaningfully
+const AI_CACHE_TTL_MS = 60 * 60 * 1000;
+const AI_CACHE_MAX = 300;
+const QUOTA_PAUSE_MS = 60 * 1000;
+const aiCache = new Map(); // key → { aiParsed, at }
+let aiPausedUntil = 0;
+
+function cacheKey(text, language) {
+  const normalized = String(text || '').toLowerCase().replace(/\s+/g, ' ').trim();
+  return crypto.createHash('sha256').update(`${language}|${normalized}`).digest('hex');
+}
+
+function isConfidentRuleResult(ruleResult) {
+  if (ruleResult.score >= CONFIDENT_SCAM_SCORE) return true;
+  const upis = ruleResult.extractedUpis || (ruleResult.extractedUpi ? [ruleResult.extractedUpi] : []);
+  // Paying only verified merchants with no scam signals → already safe
+  return ruleResult.score <= 10 && upis.length > 0 && upis.every((u) => VERIFIED_VPAS.has(String(u).toLowerCase()));
+}
+
+function combineWithAi(ruleResult, aiParsed, latencyMs, extra = {}) {
+  // The AI can never lower the rule engine's score
+  const finalScore = Math.max(ruleResult.score, Math.round(aiParsed.score));
+  return {
+    score: finalScore,
+    verdict: finalScore >= 70 ? 'SCAM' : finalScore >= 30 ? 'CAUTION' : 'SAFE',
+    reasons: [...new Set([...ruleResult.reasons, ...aiParsed.reasons])],
+    vernacularExplanation: aiParsed.vernacularExplanation || ruleResult.vernacularExplanation,
+    extractedUpi: ruleResult.extractedUpi,
+    extractedUpis: ruleResult.extractedUpis,
+    heuristicLatencyMs: ruleResult.latencyMs,
+    latencyMs,
+    engine: 'GEMINI_HYBRID_AI',
+    aiEnhanced: true,
+    ...extra
+  };
+}
 
 function getGeminiApiKey() {
   if (
@@ -59,6 +102,23 @@ async function evaluateWithGemini({ rawInput, language = 'en' }) {
     };
   }
 
+  // 1. Rule engine is already certain → don't spend quota
+  if (isConfidentRuleResult(ruleResult)) {
+    return { ...ruleResult, engine: 'HEURISTIC_RULE_ENGINE', aiEnhanced: false, aiSkipped: 'confident' };
+  }
+
+  // 2. Same message checked recently → reuse the AI's answer
+  const key = cacheKey(rawInput, language);
+  const cached = aiCache.get(key);
+  if (cached && Date.now() - cached.at < AI_CACHE_TTL_MS) {
+    return combineWithAi(ruleResult, cached.aiParsed, ruleResult.latencyMs, { aiCached: true });
+  }
+
+  // 3. Quota just ran out → skip the AI briefly instead of waiting on calls that will fail
+  if (Date.now() < aiPausedUntil) {
+    return { ...ruleResult, engine: 'HEURISTIC_FALLBACK', aiEnhanced: false, fallbackReason: 'AI_QUOTA_PAUSED' };
+  }
+
   // Truncate rawInput to 2,000 characters before sending to AI
   const sanitizedInput = String(rawInput || '').slice(0, 2000);
 
@@ -97,17 +157,23 @@ Respond ONLY with valid JSON in this exact structure:
   "vernacularExplanation": "Clear, non-technical 1-sentence warning directly addressing the user in ${language}"
 }`;
 
-    // Model is configurable because Google retires older models for new API keys
-    // (gemini-2.5-flash now returns 404 "no longer available to new users").
-    const model = (process.env.GEMINI_MODEL || 'gemini-3.8-flash').replace(/^models\//, '').trim();
+    // GEMINI_MODEL may list several models, comma-separated. Each model has its own free
+    // quota (~20 requests/day), so when one is out of quota (429) or retired for this key
+    // (404) the next one is tried. Google retires models for new keys, hence configurable.
+    const models = (process.env.GEMINI_MODEL || 'gemini-3.8-flash,gemini-2.5-flash-lite')
+      .split(',')
+      .map((m) => m.replace(/^models\//, '').trim())
+      .filter(Boolean);
     const baseConfig = { responseMimeType: 'application/json', temperature: 0.1 };
     // Keep "thinking" short: a scam verdict doesn't need long reasoning, and it is the main
     // source of latency. 2.5 models take thinkingBudget; newer models take thinkingLevel.
-    const thinkingConfig = model.startsWith('gemini-2.5')
-      ? { thinkingBudget: 0 }
-      : { thinkingLevel: process.env.GEMINI_THINKING_LEVEL || 'low' };
+    const thinkingFor = (model) =>
+      model.startsWith('gemini-2.5')
+        ? { thinkingBudget: 0 }
+        : { thinkingLevel: process.env.GEMINI_THINKING_LEVEL || 'low' };
 
-    const callGemini = async (withThinking) => {
+    const callModel = async (model, withThinking) => {
+      const thinkingConfig = thinkingFor(model);
       const res = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${apiKey}`,
         {
@@ -129,21 +195,36 @@ Respond ONLY with valid JSON in this exact structure:
     };
 
     const elapsed = () => performance.now() - aiStart;
-    let data;
-    try {
-      data = await callGemini(true);
-    } catch (err) {
-      if (err.status === 400 && /thinking/i.test(err.message)) {
-        // This model doesn't accept the thinking setting — retry once without it
-        data = await callGemini(false);
-      } else if ((err.status === 503 || err.status === 429) && elapsed() < timeoutMs / 2) {
-        // Temporary overload — one quick retry while there's still time left
-        await new Promise((r) => setTimeout(r, 250));
-        data = await callGemini(true);
-      } else {
+
+    // One model: retry without thinking if that setting is rejected, and once on a brief 503
+    const callWithRetries = async (model) => {
+      try {
+        return await callModel(model, true);
+      } catch (err) {
+        if (err.status === 400 && /thinking/i.test(err.message)) return callModel(model, false);
+        if (err.status === 503 && elapsed() < timeoutMs / 2) {
+          await new Promise((r) => setTimeout(r, 250));
+          return callModel(model, true);
+        }
         throw err;
       }
+    };
+
+    // Walk the model list: move on when a model is out of quota (429), retired (404) or overloaded (503)
+    let data;
+    let lastErr;
+    for (const model of models) {
+      try {
+        data = await callWithRetries(model);
+        break;
+      } catch (err) {
+        lastErr = err;
+        const tryNext = [404, 429, 503].includes(err.status) && elapsed() < timeoutMs * 0.8;
+        if (!tryNext) throw err;
+        console.warn(`[Gemini] ${model} unavailable (HTTP ${err.status}), trying next model`);
+      }
     }
+    if (!data) throw lastErr || new Error('No Gemini model available');
     // Use the answer part (skip any "thought" parts) and strip ```json fences if present
     const parts = data.candidates?.[0]?.content?.parts || [];
     const textOutput = (parts.filter((p) => !p.thought).map((p) => p.text || '').join('') || '')
@@ -176,30 +257,17 @@ Respond ONLY with valid JSON in this exact structure:
       throw new Error('Invalid AI response JSON schema');
     }
 
-    // Compute finalScore strictly from Math.max(ruleResult.score, aiParsed.score)
-    // The AI can never lower the rule engine's score
-    const finalScore = Math.max(ruleResult.score, Math.round(aiParsed.score));
-    const finalVerdict =
-      finalScore >= 70 ? 'SCAM' : finalScore >= 30 ? 'CAUTION' : 'SAFE';
+    // Remember this answer so repeated messages don't spend quota
+    if (aiCache.size >= AI_CACHE_MAX) aiCache.delete(aiCache.keys().next().value);
+    aiCache.set(key, { aiParsed, at: Date.now() });
 
     const totalLatencyMs = Number(
       (ruleResult.latencyMs + (performance.now() - aiStart)).toFixed(2)
     );
-
-    return {
-      score: finalScore,
-      verdict: finalVerdict,
-      reasons: [...new Set([...ruleResult.reasons, ...aiParsed.reasons])],
-      vernacularExplanation:
-        aiParsed.vernacularExplanation || ruleResult.vernacularExplanation,
-      extractedUpi: ruleResult.extractedUpi,
-      extractedUpis: ruleResult.extractedUpis,
-      heuristicLatencyMs: ruleResult.latencyMs,
-      latencyMs: totalLatencyMs,
-      engine: 'GEMINI_HYBRID_AI',
-      aiEnhanced: true
-    };
+    return combineWithAi(ruleResult, aiParsed, totalLatencyMs);
   } catch (err) {
+    // Out of quota → pause AI calls for a minute (checks keep working on the rule engine)
+    if (err.status === 429) aiPausedUntil = Date.now() + QUOTA_PAUSE_MS;
     // Deterministic fallback to rule engine. Log why (never the key or the user's message).
     const reason = err.name === 'AbortError' ? 'timeout' : String(err.message || err).replace(/key=[^&\s]+/g, 'key=***').slice(0, 300);
     console.warn(`[Gemini] Fallback to rule engine: ${reason}`);
