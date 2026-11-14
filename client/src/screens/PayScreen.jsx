@@ -4,12 +4,12 @@ import { getDeviceId } from '../utils/deviceId';
 import { useAuth } from '../contexts/AuthContext';
 import { ShieldCheck, AlertTriangle, ExternalLink, ArrowLeft, CheckCircle2, ArrowRight, Wallet } from 'lucide-react';
 
-export default function PayScreen({ prefilledVpa = '', payContext = null, onBack }) {
+export default function PayScreen({ prefilledVpa = '', prefill = null, payContext = null, onBack }) {
   const { t } = useLanguage();
   const [upiId, setUpiId] = useState(prefilledVpa || 'grocer@okaxis');
-  const [payeeName, setPayeeName] = useState('Verified Merchant');
-  const [amount, setAmount] = useState('350');
-  const [note, setNote] = useState('TrustLayer Verified Pay');
+  const [payeeName, setPayeeName] = useState(prefill?.payeeName || 'Verified Merchant');
+  const [amount, setAmount] = useState(prefill?.amount ? String(prefill.amount) : '350');
+  const [note, setNote] = useState(prefill?.note || 'TrustLayer Verified Pay');
   const [paymentResult, setPaymentResult] = useState(null);
   const [errorMsg, setErrorMsg] = useState('');
   const [isLoading, setIsLoading] = useState(false);

@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
-import { getDeviceId } from '../utils/deviceId';
+import { getDeviceId, fillTemplate } from '../utils/deviceId';
 import ScamChip from '../components/ScamChip';
-import { Clipboard, ArrowRight, Loader2, Zap, Gift, Store, X, QrCode } from 'lucide-react';
+import QrScanner from '../components/QrScanner';
+import { Clipboard, ArrowRight, Loader2, Zap, Gift, Store, X, QrCode, ScanLine } from 'lucide-react';
 
 export default function CheckScreen({ onCheckComplete }) {
   const { language, t } = useLanguage();
@@ -13,6 +14,7 @@ export default function CheckScreen({ onCheckComplete }) {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [showQrSim, setShowQrSim] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
 
   const handlePaste = async () => {
     try {
@@ -56,41 +58,80 @@ export default function CheckScreen({ onCheckComplete }) {
     }
   };
 
+  // Runs the normal scam check (rule engine + Gemini, saved to history/stats, gets a checkId)
+  const runCheck = async (rawInput) => {
+    const res = await authFetch('/api/check', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rawInput, language, deviceId: getDeviceId() })
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error || 'Failed to analyze text.');
+    return data;
+  };
+
+  // A scanned (or demo) QR: UPI QRs are parsed, risk-checked and checked like a message;
+  // any other QR (e.g. a link) is checked as a message.
   const handleScanQr = async (qrString) => {
     setIsLoading(true);
     setErrorMsg('');
     setShowQrSim(false);
+    setShowScanner(false);
 
     try {
+      if (!/^upi:\/\/pay/i.test(qrString)) {
+        setInputText(qrString);
+        const data = await runCheck(qrString);
+        onCheckComplete({ ...data, reasons: [t.qrNotUpi, ...(data.reasons || [])] });
+        return;
+      }
+
       const res = await fetch('/api/qr/parse', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ qrString })
       });
-
-      const data = await res.json();
-      if (data.success) {
-        // Feed into regular check result flow
-        const isScam = data.preflightRisk.verdict === 'SCAM';
-        onCheckComplete({
-          success: true,
-          score: data.preflightRisk.score,
-          verdict: data.preflightRisk.verdict,
-          extractedUpi: data.parsed.upiId,
-          reasons: isScam 
-            ? [`QR Code leads to Mule VPA: ${data.parsed.upiId}`, 'Intercepted prior to transaction confirmation.']
-            : [`QR Verified: ${data.parsed.payeeName} (${data.parsed.upiId})`, 'Clean verified operational history.'],
-          vernacularExplanation: isScam
-            ? 'सावधान! यह QR कोड एक संदिग्ध धोखाधड़ी खाते से जुड़ा हुआ है।'
-            : 'सुरक्षित QR कोड: व्यापारी की पहचान सत्यापित है।',
-          engine: 'QR_PREFLIGHT_PARSER',
-          latencyMs: 14
-        });
-      } else {
-        setErrorMsg(data.message || 'QR code parsing failed');
+      const parsedData = await res.json();
+      if (!parsedData.success) {
+        setErrorMsg(t.qrInvalid);
+        return;
       }
+
+      const { parsed, preflightRisk } = parsedData;
+      // Describe the QR as a message so the scam engines also read the payee name and note
+      const description = [
+        `UPI QR payment to ${parsed.payeeName || 'payee'} (${parsed.upiId})`,
+        parsed.amount ? `amount ₹${parsed.amount}` : '',
+        parsed.note ? `note: ${parsed.note}` : ''
+      ].filter(Boolean).join(', ');
+      const check = await runCheck(description);
+
+      // Final risk = the stricter of the QR pre-flight and the full scam check
+      const score = Math.max(check.score, preflightRisk.score);
+      const verdict = score >= 70 ? 'SCAM' : score >= 30 ? 'CAUTION' : 'SAFE';
+      const qrReason = preflightRisk.isMuleFlagged
+        ? fillTemplate(t.qrReasonMule, { upi: parsed.upiId })
+        : preflightRisk.isVerifiedMerchant
+        ? fillTemplate(t.qrReasonVerified, { name: preflightRisk.merchantDetails?.name || parsed.payeeName, upi: parsed.upiId })
+        : fillTemplate(t.qrReasonUnknown, { name: parsed.payeeName || '—', upi: parsed.upiId });
+
+      onCheckComplete({
+        ...check,
+        score,
+        verdict,
+        extractedUpi: parsed.upiId,
+        reasons: [qrReason, ...(check.reasons || []).filter((r) => r !== qrReason)],
+        vernacularExplanation:
+          verdict === check.verdict
+            ? check.vernacularExplanation
+            : verdict === 'CAUTION'
+            ? t.qrUnknownExplain
+            : check.vernacularExplanation,
+        // Lets Safe Pay pre-fill exactly what the QR asked for
+        qr: { upiId: parsed.upiId, payeeName: parsed.payeeName, amount: parsed.amount, note: parsed.note }
+      });
     } catch (err) {
-      setErrorMsg('Failed to process QR code: ' + err.message);
+      setErrorMsg(t.qrFailed + (err?.message ? ` (${err.message})` : ''));
     } finally {
       setIsLoading(false);
     }
@@ -117,10 +158,29 @@ export default function CheckScreen({ onCheckComplete }) {
         </p>
       </div>
 
+      {/* Real camera QR scan */}
+      <button
+        type="button"
+        onClick={() => setShowScanner(true)}
+        disabled={isLoading}
+        className="w-full rounded-2xl p-4 sm:p-5 bg-gradient-to-br from-brand-500 to-violet-500 text-white shadow-float hover:brightness-105 disabled:opacity-60 transition flex items-center gap-4 text-left"
+      >
+        <span className="w-12 h-12 shrink-0 rounded-xl bg-white/15 border border-white/25 flex items-center justify-center">
+          <ScanLine className="w-6 h-6" />
+        </span>
+        <span className="flex-1 min-w-0">
+          <span className="block text-base font-bold font-display">{t.qrScanBtn}</span>
+          <span className="block text-sm text-indigo-50/95">{t.qrScanSub}</span>
+        </span>
+        <ArrowRight className="w-5 h-5 shrink-0" />
+      </button>
+
+      {showScanner && <QrScanner onResult={handleScanQr} onClose={() => setShowScanner(false)} />}
+
       {/* Main Check Card */}
       <div className="bg-surface rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-card">
         <form onSubmit={handleSubmit} className="space-y-4">
-          
+
           <div className="relative">
             <textarea
               rows={5}
@@ -160,7 +220,7 @@ export default function CheckScreen({ onCheckComplete }) {
                 className="h-10 px-3.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:border-brand-200 font-semibold flex items-center gap-1.5 transition"
               >
                 <QrCode className="w-4 h-4 text-brand-600" />
-                <span>Simulate UPI QR</span>
+                <span>{t.qrDemoBtn}</span>
               </button>
             </div>
 
@@ -211,6 +271,22 @@ export default function CheckScreen({ onCheckComplete }) {
                   </span>
                   <span className="text-[11px] font-mono text-slate-400 mt-1 block">
                     Payload: lottery_reward99@okhdfc
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleScanQr('upi://pay?pa=ravi.kumar@ybl&pn=Ravi%20Kumar&am=2000.00&cu=INR&tn=Parcel%20release')}
+                  className="sm:col-span-2 p-3 rounded-xl bg-surface border border-slate-200 hover:border-brand-300 text-left transition shadow-xs group"
+                >
+                  <span className="font-bold text-slate-800 group-hover:text-brand-600 block font-display">
+                    Personal QR sent on WhatsApp
+                  </span>
+                  <span className="text-xs text-slate-500 block mt-0.5">
+                    "Pay ₹2,000 to release your parcel" from an unknown person
+                  </span>
+                  <span className="text-[11px] font-mono text-slate-400 mt-1 block">
+                    Payload: ravi.kumar@ybl
                   </span>
                 </button>
               </div>

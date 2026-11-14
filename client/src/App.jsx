@@ -55,6 +55,7 @@ function MainApp() {
     setPayContext({
       checkId: lastCheckResult?.checkId || null,
       checkedUpi: upi || null,
+      qr: lastCheckResult?.qr || null,
       cautionAcknowledged
     });
     go('pay');
@@ -97,6 +98,7 @@ function MainApp() {
           <PayScreen
             key={payContext?.checkId || 'direct'}
             prefilledVpa={targetVpa}
+            prefill={payContext?.qr || null}
             payContext={payContext}
             onBack={() => go('check')}
           />

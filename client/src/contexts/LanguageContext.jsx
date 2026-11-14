@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState } from 'react';
 import { MONEY_STRINGS } from './moneyStrings';
 import { UI_STRINGS } from './uiStrings';
+import { QR_STRINGS } from './qrStrings';
 
 const LanguageContext = createContext();
 
@@ -206,6 +207,7 @@ export const LanguageProvider = ({ children }) => {
   const [language, setLanguage] = useState('en');
   const t = {
     ...(UI_STRINGS[language] || UI_STRINGS.en),
+    ...(QR_STRINGS[language] || QR_STRINGS.en),
     ...(MONEY_STRINGS[language] || MONEY_STRINGS.en),
     ...(DICTIONARY[language] || DICTIONARY.en)
   };
