@@ -1,9 +1,16 @@
+// Load .env if present (Node 20.12+ built-in; real environment variables win)
+try {
+  process.loadEnvFile();
+} catch (_) {}
+
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const { projectId: firebaseProjectId } = require('./src/config/firebase');
 const { handleCheck, handleGetHistory } = require('./src/controllers/checkController');
 const { handlePay, handleParseQr, handleGetPayments } = require('./src/controllers/payController');
 const { handleGetStats } = require('./src/controllers/statsController');
+const finance = require('./src/controllers/financeController');
 const { evaluateRisk } = require('./src/riskEngine');
 const { ledger } = require('./src/ledger');
 const { generateSimulatedMerchantHistory, calculateTrustScore } = require('./src/creditEngine');
@@ -36,6 +43,37 @@ app.get('/api/history', handleGetHistory);
 
 // 4. GET /api/stats (Community scam metrics & trending threat vectors)
 app.get('/api/stats', handleGetStats);
+
+// 4a. Google sign-in config for the browser (Firebase web config is public by design;
+//     it lives in env vars so each deployment can point at its own project)
+app.get('/api/auth/config', (req, res) => {
+  const apiKey = process.env.FIREBASE_WEB_API_KEY;
+  const appId = process.env.FIREBASE_WEB_APP_ID;
+  if (!apiKey || !appId || !firebaseProjectId) {
+    return res.json({ success: true, enabled: false });
+  }
+  res.json({
+    success: true,
+    enabled: true,
+    config: {
+      apiKey,
+      appId,
+      projectId: firebaseProjectId,
+      authDomain: process.env.FIREBASE_AUTH_DOMAIN || `${firebaseProjectId}.firebaseapp.com`
+    }
+  });
+});
+
+// 4b. Personal finance: cash + UPI money diary and Financial Health Score
+app.get('/api/finance/categories', finance.handleGetCategories);
+app.get('/api/finance/transactions', finance.handleListTransactions);
+app.post('/api/finance/transactions', finance.handleAddTransaction);
+app.delete('/api/finance/transactions/:id', finance.handleDeleteTransaction);
+app.put('/api/finance/budget', finance.handleSetBudget);
+app.get('/api/finance/summary', finance.handleGetSummary);
+app.get('/api/finance/health-score', finance.handleGetHealthScore);
+app.post('/api/finance/demo-seed', finance.handleDemoSeed);
+app.post('/api/finance/claim', finance.handleClaimDeviceDiary);
 
 // 5. GET /api/scenarios (Presets for 10:30 AM evaluation round)
 app.get('/api/scenarios', (req, res) => {

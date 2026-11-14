@@ -14,7 +14,7 @@ export default function ScamChip({ icon: Icon, label, subtext, onClick }) {
         <span className="font-bold text-slate-800 block group-hover:text-brand-600 transition font-display">
           {label}
         </span>
-        <span className="text-[11px] text-slate-500 line-clamp-1">
+        <span className="text-xs text-slate-500 line-clamp-1">
           {subtext}
         </span>
       </div>

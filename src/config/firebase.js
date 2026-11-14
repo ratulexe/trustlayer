@@ -44,7 +44,33 @@ try {
   isFirestoreConnected = false;
 }
 
+// Project ID for the browser sign-in config (from the key file or env)
+// (the key file wins, matching how Firestore itself is initialised above)
+let projectId = null;
+try {
+  const keyPath = path.resolve(__dirname, '../../serviceAccountKey.json');
+  if (fs.existsSync(keyPath)) projectId = require(keyPath).project_id || null;
+} catch (_) {}
+if (!projectId) projectId = process.env.FIREBASE_PROJECT_ID || null;
+
+/**
+ * Verifies a Firebase Auth ID token from the browser (Google sign-in).
+ * Returns { uid, name, email, picture } or null when missing/invalid/not configured.
+ */
+async function verifyIdToken(idToken) {
+  if (!idToken || !getApps().length) return null;
+  try {
+    const { getAuth } = require('firebase-admin/auth');
+    const decoded = await getAuth().verifyIdToken(idToken);
+    return { uid: decoded.uid, name: decoded.name || null, email: decoded.email || null, picture: decoded.picture || null };
+  } catch (_) {
+    return null;
+  }
+}
+
 module.exports = {
   db,
-  isFirestoreConnected
+  isFirestoreConnected,
+  projectId,
+  verifyIdToken
 };

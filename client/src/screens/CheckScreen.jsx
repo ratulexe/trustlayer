@@ -108,18 +108,18 @@ export default function CheckScreen({ onCheckComplete }) {
         <h2 className="text-2xl font-bold text-slate-900 tracking-tight font-display">
           {t.checkTitle}
         </h2>
-        <p className="text-xs text-slate-500 max-w-md mx-auto">
+        <p className="text-sm text-slate-500 max-w-md mx-auto">
           {t.checkSubtitle}
         </p>
       </div>
 
       {/* Main Check Card */}
-      <div className="bg-surface rounded-2xl p-6 border border-slate-200 shadow-card">
+      <div className="bg-surface rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-card">
         <form onSubmit={handleSubmit} className="space-y-4">
           
           <div className="relative">
             <textarea
-              rows={4}
+              rows={5}
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               placeholder={t.placeholder}
@@ -130,7 +130,7 @@ export default function CheckScreen({ onCheckComplete }) {
               <button
                 type="button"
                 onClick={() => setInputText('')}
-                className="absolute top-2.5 right-2.5 px-2 py-1 rounded-lg text-[11px] bg-slate-200 text-slate-600 hover:bg-slate-300 transition flex items-center gap-1"
+                className="absolute top-2.5 right-2.5 px-2 py-1 rounded-lg text-xs bg-slate-200 text-slate-600 hover:bg-slate-300 transition flex items-center gap-1"
               >
                 <X className="w-3 h-3" />
                 <span>Clear</span>
@@ -138,12 +138,12 @@ export default function CheckScreen({ onCheckComplete }) {
             )}
           </div>
 
-          <div className="flex items-center justify-between text-xs">
-            <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
+            <div className="flex flex-wrap items-center gap-2">
               <button
                 type="button"
                 onClick={handlePaste}
-                className="text-brand-600 hover:text-brand-700 font-semibold flex items-center gap-1.5 transition"
+                className="h-10 px-3.5 rounded-xl bg-brand-50 border border-brand-100 text-brand-600 hover:bg-brand-100 font-semibold flex items-center gap-1.5 transition"
               >
                 <Clipboard className="w-4 h-4" />
                 <span>{t.pasteBtn}</span>
@@ -152,14 +152,15 @@ export default function CheckScreen({ onCheckComplete }) {
               <button
                 type="button"
                 onClick={() => setShowQrSim(!showQrSim)}
-                className="text-slate-600 hover:text-slate-900 font-semibold flex items-center gap-1.5 transition"
+                aria-expanded={showQrSim}
+                className="h-10 px-3.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:border-brand-200 font-semibold flex items-center gap-1.5 transition"
               >
                 <QrCode className="w-4 h-4 text-brand-600" />
                 <span>Simulate UPI QR</span>
               </button>
             </div>
 
-            <span className="text-[11px] text-slate-400 font-mono">
+            <span className="hidden sm:inline text-xs text-slate-400 font-mono">
               Dual-Engine: Heuristics + Gemini
             </span>
           </div>
@@ -171,7 +172,7 @@ export default function CheckScreen({ onCheckComplete }) {
                 <span className="font-bold text-slate-800 block font-display">
                   Simulate Camera QR Scan (Point phone at real-world QR):
                 </span>
-                <p className="text-[11px] text-slate-500 mt-0.5">
+                <p className="text-xs text-slate-500 mt-0.5">
                   The user never knows in advance if a QR is genuine. TrustLayer inspects the raw payload before payment:
                 </p>
               </div>
@@ -185,10 +186,10 @@ export default function CheckScreen({ onCheckComplete }) {
                   <span className="font-bold text-slate-800 group-hover:text-brand-600 block font-display">
                     Local Shop Counter Standee
                   </span>
-                  <span className="text-[11px] text-slate-500 block mt-0.5">
+                  <span className="text-xs text-slate-500 block mt-0.5">
                     Physical QR displayed at Tea Stall (₹45)
                   </span>
-                  <span className="text-[10px] font-mono text-slate-400 mt-1 block">
+                  <span className="text-[11px] font-mono text-slate-400 mt-1 block">
                     Payload: ramu.tea@upi
                   </span>
                 </button>
@@ -201,10 +202,10 @@ export default function CheckScreen({ onCheckComplete }) {
                   <span className="font-bold text-slate-800 group-hover:text-brand-600 block font-display">
                     WhatsApp Flyer QR Code
                   </span>
-                  <span className="text-[11px] text-slate-500 block mt-0.5">
+                  <span className="text-xs text-slate-500 block mt-0.5">
                     "Scan to Claim ₹25 Lakh Prize" (₹15,000 fee)
                   </span>
-                  <span className="text-[10px] font-mono text-slate-400 mt-1 block">
+                  <span className="text-[11px] font-mono text-slate-400 mt-1 block">
                     Payload: lottery_reward99@okhdfc
                   </span>
                 </button>
@@ -240,7 +241,7 @@ export default function CheckScreen({ onCheckComplete }) {
       </div>
 
       {/* 10:30 AM Evaluation Preset Scenarios */}
-      <div className="bg-surface rounded-2xl p-6 border border-slate-200 shadow-subtle space-y-3">
+      <div className="bg-surface rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-subtle space-y-3">
         <span className="text-xs uppercase tracking-wider font-bold text-slate-500 font-display block">
           {t.presetLabel}
         </span>

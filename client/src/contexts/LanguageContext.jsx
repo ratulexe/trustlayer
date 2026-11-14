@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState } from 'react';
+import { MONEY_STRINGS } from './moneyStrings';
+import { UI_STRINGS } from './uiStrings';
 
 const LanguageContext = createContext();
 
@@ -202,7 +204,11 @@ export const DICTIONARY = {
 
 export const LanguageProvider = ({ children }) => {
   const [language, setLanguage] = useState('en');
-  const t = DICTIONARY[language] || DICTIONARY.en;
+  const t = {
+    ...(UI_STRINGS[language] || UI_STRINGS.en),
+    ...(MONEY_STRINGS[language] || MONEY_STRINGS.en),
+    ...(DICTIONARY[language] || DICTIONARY.en)
+  };
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage, t }}>

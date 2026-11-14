@@ -34,7 +34,7 @@ export default function DashboardScreen() {
         <h2 className="text-2xl font-bold text-slate-900 tracking-tight font-display">
           {t.dashTitle}
         </h2>
-        <p className="text-xs text-slate-500">
+        <p className="text-sm text-slate-500">
           Real-time aggregated threat intelligence across Indian UPI networks
         </p>
       </div>
@@ -42,7 +42,7 @@ export default function DashboardScreen() {
       {/* Metrics Row */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         
-        <div className="bg-surface rounded-2xl p-5 border border-slate-200 shadow-card flex items-center gap-4">
+        <div className="bg-surface rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-card flex items-center gap-4">
           <div className="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0 border border-rose-100">
             <ShieldCheck className="w-6 h-6 text-rose-600" />
           </div>
@@ -54,7 +54,7 @@ export default function DashboardScreen() {
           </div>
         </div>
 
-        <div className="bg-surface rounded-2xl p-5 border border-slate-200 shadow-card flex items-center gap-4">
+        <div className="bg-surface rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-card flex items-center gap-4">
           <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100">
             <IndianRupee className="w-6 h-6 text-emerald-600" />
           </div>
@@ -66,7 +66,7 @@ export default function DashboardScreen() {
           </div>
         </div>
 
-        <div className="bg-surface rounded-2xl p-5 border border-slate-200 shadow-card flex items-center gap-4">
+        <div className="bg-surface rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-card flex items-center gap-4">
           <div className="w-12 h-12 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center shrink-0 border border-brand-100">
             <Zap className="w-6 h-6 text-brand-600" />
           </div>
@@ -84,7 +84,7 @@ export default function DashboardScreen() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         
         {/* Trending Scams */}
-        <div className="bg-surface rounded-2xl p-6 border border-slate-200 shadow-card space-y-4">
+        <div className="bg-surface rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-card space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div className="flex items-center gap-2">
               <AlertTriangle className="w-4 h-4 text-amber-500" />
@@ -92,7 +92,7 @@ export default function DashboardScreen() {
                 {t.trendingHeader}
               </h3>
             </div>
-            <span className="text-[10px] font-mono bg-rose-50 text-rose-700 px-2 py-0.5 rounded-full border border-rose-200 font-bold">
+            <span className="text-[11px] font-mono bg-rose-50 text-rose-700 px-2 py-0.5 rounded-full border border-rose-200 font-bold">
               HIGH ALERT
             </span>
           </div>
@@ -102,14 +102,14 @@ export default function DashboardScreen() {
               <div key={i} className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-xs text-slate-800 font-display">{scam.title}</span>
-                  <span className="text-[10px] font-mono font-bold text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded">
+                  <span className="text-[11px] font-mono font-bold text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded">
                     {scam.severity}
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-500 leading-relaxed">
+                <p className="text-xs text-slate-500 leading-relaxed">
                   {scam.description}
                 </p>
-                <div className="text-[10px] text-slate-400 font-mono pt-1">
+                <div className="text-[11px] text-slate-400 font-mono pt-1">
                   Regions: {scam.affectedRegions.join(', ')}
                 </div>
               </div>
@@ -118,7 +118,7 @@ export default function DashboardScreen() {
         </div>
 
         {/* User Recent Checks */}
-        <div className="bg-surface rounded-2xl p-6 border border-slate-200 shadow-card space-y-4">
+        <div className="bg-surface rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-card space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div className="flex items-center gap-2">
               <History className="w-4 h-4 text-slate-500" />
@@ -126,7 +126,7 @@ export default function DashboardScreen() {
                 {t.recentHeader}
               </h3>
             </div>
-            <span className="text-[10px] font-mono text-slate-400">
+            <span className="text-[11px] font-mono text-slate-400">
               Local Session
             </span>
           </div>
@@ -140,12 +140,12 @@ export default function DashboardScreen() {
               history.slice(0, 5).map((item, i) => (
                 <div key={i} className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
                   <div className="space-y-0.5 max-w-[70%]">
-                    <p className="font-mono text-[11px] text-slate-800 truncate">{item.snippet}</p>
-                    <span className="text-[10px] text-slate-400 font-mono">
+                    <p className="font-mono text-xs text-slate-800 truncate">{item.snippet}</p>
+                    <span className="text-[11px] text-slate-400 font-mono">
                       {new Date(item.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>
-                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold font-mono ${
+                  <span className={`px-2 py-0.5 rounded text-[11px] font-bold font-mono ${
                     item.verdict === 'SCAM' ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'
                   }`}>
                     {item.verdict} ({item.score})

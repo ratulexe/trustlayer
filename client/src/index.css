@@ -1,15 +1,24 @@
 @import "tailwindcss";
 
+/* Design tokens — see DESIGN.md (bright, minimal, high-trust) */
 @theme {
-  --font-sans: 'Kanchenjunga', system-ui, -apple-system, sans-serif;
-  --font-display: 'Kanchenjunga', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
-  
+  /* Latin brand font first, then native Devanagari / Bengali fonts for Hindi & Bengali */
+  --font-sans: 'Kanchenjunga', 'Noto Sans Devanagari', 'Noto Sans Bengali', system-ui, -apple-system, sans-serif;
+  --font-display: 'Kanchenjunga', 'Noto Sans Devanagari', 'Noto Sans Bengali', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* Readable on small phones and for older users: xs = 13px, sm = 15px */
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: 1.25rem;
+  --text-sm: 0.9375rem;
+  --text-sm--line-height: 1.45rem;
+
   --color-canvas: #F8FAFC;
   --color-surface: #FFFFFF;
-  
+
   --color-brand-50: #EEF2FF;
   --color-brand-100: #E0E7FF;
+  --color-brand-200: #C7D2FE;
   --color-brand-500: #4F46E5;
   --color-brand-600: #4338CA;
   --color-brand-700: #3730A3;
@@ -31,11 +40,65 @@
   --color-scam-500: #EF4444;
   --color-scam-600: #DC2626;
   --color-scam-700: #B91C1C;
+
+  /* Shadows from DESIGN.md (were referenced by components but never defined) */
+  --shadow-subtle: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.04);
+  --shadow-card: 0 4px 20px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+  --shadow-float: 0 12px 32px -4px rgba(79, 70, 229, 0.28);
 }
 
-body {
-  margin: 0;
-  background-color: #F8FAFC;
-  color: #0F172A;
-  font-family: 'Kanchenjunga', system-ui, -apple-system, sans-serif;
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    color: #0F172A;
+    font-family: var(--font-sans);
+    background-color: #F8FAFC;
+    /* Soft brand glow at the top keeps the canvas bright but not flat */
+    background-image:
+      radial-gradient(60rem 28rem at 50% -8rem, rgba(99, 102, 241, 0.10), transparent 70%),
+      radial-gradient(40rem 20rem at 100% 0, rgba(16, 185, 129, 0.06), transparent 70%);
+    background-repeat: no-repeat;
+    min-height: 100vh;
+  }
+
+  button:not(:disabled),
+  [role='button']:not([aria-disabled='true']),
+  select,
+  label:has(input[type='checkbox']) {
+    cursor: pointer;
+  }
+
+  :focus-visible {
+    outline: 3px solid rgba(79, 70, 229, 0.45);
+    outline-offset: 2px;
+  }
+
+  /* Comfortable tap targets on phones */
+  input,
+  select,
+  textarea {
+    font-size: max(16px, 1em); /* stops iOS zooming into fields */
+  }
+}
+
+@layer utilities {
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

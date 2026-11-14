@@ -19,6 +19,11 @@ services:
         value: "20"
       - key: GEMINI_API_KEY
         sync: false
+      # Google sign-in (Firebase web app config)
+      - key: FIREBASE_WEB_API_KEY
+        sync: false
+      - key: FIREBASE_WEB_APP_ID
+        sync: false
       # Firestore: either upload serviceAccountKey.json as a Secret File,
       # or fill in these three values
       - key: FIREBASE_PROJECT_ID

@@ -2,7 +2,7 @@
 
 > **Track**: Financial Technology & Payments
 > **Tagline**: The vernacular scam guard and safe payment companion for first-time UPI users.
-> **Live demo**: _link added after the Render deploy_ · Runs locally at http://localhost:3000
+> **Live demo**: https://trustlayer-r880.onrender.com (free tier: first load after idle can take ~30–60 s)
 
 ---
 
@@ -20,9 +20,11 @@ UPI payments are instant and cannot be reversed. First-time users, senior citize
    - **Caution** → a safety checklist, a cool-down timer and a second confirmation, enforced by the server.
    - **Scam** → payment blocked, with one tap to call the 1930 cyber-crime helpline.
 5. **Threat feed** — trending scam types and the user's own check history.
-6. **Financial inclusion** — a 300–900 trust score for a street vendor built from UPI sales, with an instant small loan.
-7. **Tamper-proof ledger** — every evaluated transaction is SHA-256 hash-chained, with payer IDs masked.
-8. **Installable app** — add it to a phone's home screen like a native app.
+6. **My Money (personal finance)** — a money diary for **cash and UPI**: log spending, income and ATM withdrawals; see cash in hand, cash vs UPI split, spending by category and a monthly budget. UPI payments made through Safe Pay can be logged with one tap.
+7. **Financial Health Score** — a 300–900 score built only from the user's own cash + UPI diary (no credit history needed), with a transparent factor breakdown, improvement tips and an estimated small-loan limit.
+8. **Financial inclusion** — a 300–900 trust score for a street vendor built from UPI sales, with an instant small loan.
+9. **Tamper-proof ledger** — every evaluated transaction is SHA-256 hash-chained, with payer IDs masked.
+10. **Installable app** — add it to a phone's home screen like a native app.
 
 ---
 
@@ -32,7 +34,8 @@ UPI payments are instant and cannot be reversed. First-time users, senior citize
 | :--- | :--- |
 | **Scam Check** | Paste box, language switch, demo QR scans |
 | **Result** | Risk gauge, reasons, vernacular explanation, and the Safe / Caution / Scam action |
-| **Safe Pay** | Payee, amount, verified UPI link, PIN safety rule |
+| **Safe Pay** | Payee, amount, verified UPI link, PIN safety rule, one-tap "add to My Money" |
+| **My Money** | Cash + UPI diary, cash in hand, budget, category breakdown, Financial Health Score |
 | **Threat Feed** | Community stats, trending scams, recent checks |
 | **Financial Inclusion** | Merchant trust score, loan offer, audit ledger |
 
@@ -75,6 +78,8 @@ npm start         # http://localhost:3000
 - **Gemini**: copy `.env.example` to `.env` and set `GEMINI_API_KEY`.
 - **Firestore**: Firebase console → Project settings → Service accounts → *Generate new private key*. Save it as `serviceAccountKey.json` in the project root. It is gitignored — **never commit it**.
 
+**Google sign-in (optional):** in the Firebase console enable **Authentication → Sign-in method → Google**, add a **Web app** under Project settings, and put its `apiKey` and `appId` in `.env` as `FIREBASE_WEB_API_KEY` and `FIREBASE_WEB_APP_ID`. Add your live domain under **Authentication → Settings → Authorized domains**. Without these the app works normally and simply hides the Sign in button.
+
 **Demo setting:** the Caution cool-down is 15 minutes by default. For a live demo, shorten it:
 
 ```bash
@@ -109,9 +114,24 @@ The free plan sleeps after about 15 minutes idle and takes 30–60 seconds to wa
 | :--- | :--- |
 | **Fraud Mitigation** | Two-engine scam scoring, mule-account blocking, Caution checklist + cool-down, 1930 helpline |
 | **UPI Integration & Payment Rails** | `upi://pay` links, UPI QR parsing, duplicate-payment protection, hash-chained ledger |
-| **Credit & Risk Scoring Models** | 0–100 scam score, payment risk score, 300–900 merchant trust score with loan limits |
-| **Financial Inclusion Tools** | Hindi & Bengali throughout, built for first-time users, seniors and street vendors |
-| **Personal Finance Management** | Personal check history; every payment is checked before it leaves the account |
+| **Credit & Risk Scoring Models** | 0–100 scam score, payment risk score, 300–900 merchant trust score, and a 300–900 personal Financial Health Score from cash + UPI records (6 weighted, explainable factors → loan limit and safe EMI) |
+| **Financial Inclusion Tools** | Hindi & Bengali throughout; a credit signal for cash-earning people with no credit history; built for first-time users, seniors and street vendors |
+| **Personal Finance Management** | My Money diary tracking **cash and UPI** together: income, spending, ATM withdrawals, cash in hand, budget alerts, category breakdown |
+
+### How the Financial Health Score works
+
+Computed from the last 90 days of the user's own diary (needs at least 10 entries over 14 days). Each factor is scored 0–100, then `score = 300 + 6 × weighted average`.
+
+| Factor | Weight | 0 → 100 |
+| :--- | :--- | :--- |
+| Savings rate | 25% | saves −10% → saves 20%+ of income |
+| Regular income | 20% | share of weeks with any income |
+| Steady spending | 15% | weekly day-to-day spend variation (rent, bills, family transfers excluded) |
+| Sticks to budget | 15% | average monthly spend 130% → 90% of budget |
+| Needs before wants | 10% | discretionary share 70% → 30% |
+| Regular record keeping | 15% | days with an entry, up to 50% of days |
+
+Tiers: 750+ Excellent, 650+ Good, 550+ Fair, below Building. The estimated loan limit is 3× / 2× / 1× / 0× average monthly savings by tier (capped at ₹50,000), and the safe EMI is 40% of monthly savings. This is an illustrative estimate, not a lending decision.
 
 ---
 
@@ -125,7 +145,8 @@ Paste these in order:
 | 2 | Same result → switch to **বাংলা** / **हिन्दी** | Warning in the user's language |
 | 3 | `Bhai please send 2000 to release my parcel, pay to ravi.kumar@ybl` | **Caution** (50): checklist → cool-down → confirm → pay |
 | 4 | `Payment for weekly household groceries at Sharma Store. Pay ₹350 to grocer@okaxis` | **Safe**, verified UPI link |
-| 5 | **Financial Inclusion** tab → request ₹5,000 | Trust score, loan approved, ledger entry |
+| 5 | **My Money** tab → add a ₹180 cash grocery expense, then **Load 60-day sample diary** | Cash vs UPI split, budget alert, Financial Health Score 739 (Good), tips, loan estimate |
+| 6 | **Financial Inclusion** tab → request ₹5,000 | Merchant trust score, loan approved, ledger entry |
 
 Talking point: _"Banks protect you after the money is gone. TrustLayer protects you before you press Pay."_
 

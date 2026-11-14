@@ -39,20 +39,20 @@ function CautionGate({ result, onProceed }) {
   return (
     <div className="space-y-3">
       {/* Safety checklist */}
-      <fieldset className="p-4 rounded-xl bg-amber-50 border border-amber-200 space-y-2.5">
-        <legend className="float-left w-full mb-1 text-xs font-bold text-amber-900 font-display">{t.cautionChecklistTitle}</legend>
+      <div role="group" aria-labelledby="caution-checklist-title" className="p-4 rounded-xl bg-amber-50 border border-amber-200 space-y-3">
+        <p id="caution-checklist-title" className="text-sm font-bold text-amber-900 font-display">{t.cautionChecklistTitle}</p>
         {CHECKLIST_KEYS.map((key, i) => (
-          <label key={key} className="flex items-start gap-2.5 text-xs text-amber-950 leading-relaxed cursor-pointer">
+          <label key={key} className="flex items-start gap-3 text-sm text-amber-950 leading-relaxed cursor-pointer">
             <input
               type="checkbox"
               checked={checked[i]}
               onChange={() => toggle(i)}
-              className="mt-0.5 w-4 h-4 shrink-0 accent-amber-600 cursor-pointer"
+              className="mt-1 w-5 h-5 shrink-0 accent-amber-600 cursor-pointer"
             />
-            <span>{t[key]}</span>
+            <span className="min-w-0">{t[key]}</span>
           </label>
         ))}
-      </fieldset>
+      </div>
 
       {/* Cool-down timer */}
       <div
@@ -126,7 +126,7 @@ export default function ResultScreen({ result, onProceedToPay, onReset }) {
     <div className="max-w-2xl mx-auto space-y-6">
 
       {/* Risk Gauge Visual Card */}
-      <div className="bg-surface rounded-2xl p-6 border border-slate-200 shadow-card space-y-6">
+      <div className="bg-surface rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-card space-y-6">
 
         <RiskGauge score={score} verdict={verdict} />
 
@@ -165,7 +165,7 @@ export default function ResultScreen({ result, onProceedToPay, onReset }) {
         )}
 
         {/* Telemetry info */}
-        <div className="flex items-center justify-between text-[11px] font-mono text-slate-400 border-t border-slate-100 pt-3">
+        <div className="flex items-center justify-between text-xs font-mono text-slate-400 border-t border-slate-100 pt-3">
           <span>Engine: <strong className="text-slate-600">{engine || 'Heuristic Shield'}</strong></span>
           <span>Latency: <strong className="text-brand-600">{latencyMs || 18}ms</strong></span>
         </div>

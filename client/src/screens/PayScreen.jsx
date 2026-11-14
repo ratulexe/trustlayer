@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
-import { ShieldCheck, AlertTriangle, ExternalLink, ArrowLeft, CheckCircle2, ArrowRight } from 'lucide-react';
+import { getDeviceId } from '../utils/deviceId';
+import { useAuth } from '../contexts/AuthContext';
+import { ShieldCheck, AlertTriangle, ExternalLink, ArrowLeft, CheckCircle2, ArrowRight, Wallet } from 'lucide-react';
 
 export default function PayScreen({ prefilledVpa = '', payContext = null, onBack }) {
   const { t } = useLanguage();
@@ -11,6 +13,31 @@ export default function PayScreen({ prefilledVpa = '', payContext = null, onBack
   const [paymentResult, setPaymentResult] = useState(null);
   const [errorMsg, setErrorMsg] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const { authFetch } = useAuth();
+  const [logState, setLogState] = useState('idle'); // idle | saving | done | error
+
+  // The UPI app confirms the payment, not us — so the user taps once to log it as a UPI expense
+  const handleLogPayment = async () => {
+    setLogState('saving');
+    try {
+      const res = await authFetch('/api/finance/transactions', {
+        method: 'POST',
+        body: JSON.stringify({
+          deviceId: getDeviceId(),
+          type: 'expense',
+          mode: 'upi',
+          amount: paymentResult.amount,
+          category: 'other',
+          note: `${payeeName} (${paymentResult.upiId})`.slice(0, 120),
+          source: 'safe_pay',
+          date: new Date().toLocaleDateString('en-CA')
+        })
+      });
+      setLogState(res.ok ? 'done' : 'error');
+    } catch {
+      setLogState('error');
+    }
+  };
 
   const handleGeneratePay = async (e) => {
     e.preventDefault();
@@ -58,12 +85,12 @@ export default function PayScreen({ prefilledVpa = '', payContext = null, onBack
         <h2 className="text-2xl font-bold text-slate-900 tracking-tight font-display">
           {t.payTitle}
         </h2>
-        <p className="text-xs text-slate-500">
+        <p className="text-sm text-slate-500">
           {t.paySubtitle}
         </p>
       </div>
 
-      <div className="bg-surface rounded-2xl p-6 border border-slate-200 shadow-card space-y-5">
+      <div className="bg-surface rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-card space-y-5">
         
         {/* Golden Rule Alert */}
         <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs space-y-1">
@@ -153,11 +180,11 @@ export default function PayScreen({ prefilledVpa = '', payContext = null, onBack
                     <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                     <span>Verified Pay Ready</span>
                   </span>
-                  <span className="text-[10px] font-mono bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">
+                  <span className="text-[11px] font-mono bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">
                     {paymentResult.paymentId}
                   </span>
                 </div>
-                <div className="text-[11px] font-mono text-slate-600 break-all bg-white p-2.5 rounded-lg border border-emerald-100">
+                <div className="text-xs font-mono text-slate-600 break-all bg-white p-2.5 rounded-lg border border-emerald-100">
                   {paymentResult.upiDeepLink}
                 </div>
               </div>
@@ -177,6 +204,16 @@ export default function PayScreen({ prefilledVpa = '', payContext = null, onBack
                 <span>{t.openUpiBtn}</span>
                 <ExternalLink className="w-4 h-4" />
               </a>
+
+              <button
+                type="button"
+                onClick={handleLogPayment}
+                disabled={logState === 'saving' || logState === 'done'}
+                className="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 disabled:opacity-80 border border-slate-300 text-slate-800 font-bold text-xs transition flex items-center justify-center gap-2 font-display"
+              >
+                <Wallet className="w-4 h-4" />
+                <span>{logState === 'done' ? t.loggedPayment : logState === 'error' ? t.errorGeneric : t.logPayment}</span>
+              </button>
             </div>
           )}
         </form>
